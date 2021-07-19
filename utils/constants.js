@@ -8,6 +8,7 @@ const GHOST = 'Ghost',
       CLUE = 'clue';
 
 const ROLES = [GHOST, HUNTER, HUNTER, KILLER];
+const LOBBIES = {};
 
 const EVIDENCE_CARD_INFO = ['Knife', 'Revolver', 'Pills', 'Falling Debris', 'Animal Bite', 'Power Tool', 'Machine', 'Motor Vehicle', 'Plastic Bag', 'Brick', 'Axe', 'Crowbar', 'Drowned', 'Hunting Rifle', 'Heart Attack'];
 
@@ -93,6 +94,7 @@ const CAUSES_DECK = GHOST_CARDS.filter(card => card.type === CAUSE);
 const LOCS_DECK = GHOST_CARDS.filter(card => card.type === LOCATION);
 const CLUES_DECK = GHOST_CARDS.filter(card => card.type === CLUE);
 
+exports.LOBBIES = LOBBIES;
 exports.ROLES = ROLES;
 exports.GHOST = GHOST;
 exports.HUNTER = HUNTER;

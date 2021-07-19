@@ -1,6 +1,7 @@
 // Data
 
 const { ROLES, HUNTER, KILLER, GHOST, EVIDENCE_DECK, LOCS_DECK, CLUES_DECK, CAUSES_DECK } = require('./utils/constants');
+const { announce } = require('./utils/chat-utils');
 const { shuffle, shuffleAndBatch } = require('./utils/utils');
 const sample = require('lodash.sample');
 
@@ -124,7 +125,7 @@ function makeGame(settings) {
   this.game = game;
   this.gameOn = true;
 
-  console.log(game);
+  // console.log(game);
 };
 
 const makeUser = ({ id, myLobby, lobbyCreator = false }) => {
@@ -184,31 +185,14 @@ const sara = {
 
 lobbies[silas.myLobby] = makeLobby(silas);
 lobbies[sara.myLobby].users.push(sara);
-// lobbies[king.myLobby].makeGame();
-// console.log(lobbies[king.myLobby].game.currentStage)
+// lobbies[silas.myLobby].makeGame();
+// console.log(lobbies[silas.myLobby].game.currentStage);
 
+// const x = announce.accusation({accuser: 'Nina', accusee: 'Hel', evidence: ['gun','towel']});
+// console.log(x);
 
 exports.lobbies = lobbies;
 exports.makeLobby = makeLobby;
 exports.makeUser = makeUser;
 exports.getLobbyById = getLobbyById;
 exports.getUserById = getUserById;
-
-// const roleMixins = (role) => {
-//   if (role === HUNTER) {
-//     return {
-//       canAccuse: true
-//     };
-//   };
-//   if (role === KILLER) {
-//     return {
-//       canAccuse: true,
-//       keyEvidence: [],
-//     };
-//   };
-//   if (role === GHOST) {
-//     return {
-
-//     };
-//   };
-// };
