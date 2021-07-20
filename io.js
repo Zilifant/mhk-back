@@ -1,10 +1,11 @@
 const { getLobbyById } = require('./data');
+const { announce } = require('./utils/chat-utils');
 const intersection = require('lodash.intersection');
 
 module.exports = (io) => {
 
   io.on('connection', (socket) => {
-    console.log(`Socket: ${socket.id} connected`);
+    // console.log(`Socket: ${socket.id} connected`);
 
     const getUserBySID = (SID) => {
       return lobby.users.find(user => user.socketId === SID);
@@ -12,7 +13,7 @@ module.exports = (io) => {
 
     let lobby;
     socket.on('connectToLobby', ({ userId, lobbyId }) => {
-      console.log(`Connecting: ${userId} to: ${lobbyId} on: ${socket.id}`);
+      // console.log(`Connecting: ${userId} to: ${lobbyId} on: ${socket.id}`);
 
       lobby = getLobbyById(lobbyId);
       const user = lobby.users.find(u => u.id === userId);
@@ -35,13 +36,19 @@ module.exports = (io) => {
         usersOnline: lobby.users.filter(u => u.isOnline === true),
         user: user
       };
-      io.in(lobbyId).emit('userConnected', resData);
+      io.in(lobbyId).emit(
+        'userConnected',
+        {
+          resData,
+          msg: announce.join(user.id)
+        }
+      );
     });
 
     // disconnect
 
     socket.on('disconnect', async () => {
-      console.log(`Socket: ${socket.id} disconnected`);
+      // console.log(`Socket: ${socket.id} disconnected`);
 
       let user;
       try {
@@ -65,16 +72,24 @@ module.exports = (io) => {
         newLeader.isLeader = true;
         lobby.leader = newLeader.id;
         newLeaderId = newLeader.id;
-        console.log(`${newLeaderId} is the new leader of ${lobby.id}`);
+        // console.log(`${newLeaderId} is the new leader of ${lobby.id}`);
       };
 
-      io.to(lobby.id).emit('userDisco', {
+      let resData = {
         usersOnline: lobby.users.filter(u => u.isOnline === true),
         discoUserId: user.id,
         newLeaderId
-      });
+      };
 
-      console.log(`Removed: ${user.id} on: ${socket.id} from: ${lobby.id}`);
+      io.to(lobby.id).emit(
+        'userDisco',
+        {
+          resData,
+          msg: announce.leave(user.id)
+        }
+      );
+
+      // console.log(`Removed: ${user.id} on: ${socket.id} from: ${lobby.id}`);
     });
 
     // readyUnready
@@ -89,50 +104,81 @@ module.exports = (io) => {
         ready: user.isReady,
         canStart: lobby.canStart()
       };
-      console.log(`${userId} is ${user.isReady ? 'ready' : 'not ready'}`);
-      io.in(lobby.id).emit('readyUnready', resData);
+      // console.log(`${userId} is ${user.isReady ? 'ready' : 'not ready'}`);
+      io.in(lobby.id).emit(
+        'readyUnready',
+        {
+          resData,
+          msg: announce.ready(userId, user.isReady)
+        }
+      );
     });
 
     // startGame
 
     socket.on('startGame', (data) => {
-      console.log('Game started');
+      // console.log('Game started');
 
       lobby.makeGame(data.settings);
-      io.in(lobby.id).emit('startGame', { game: lobby.game })
+      io.in(lobby.id).emit(
+        'startGame',
+        {
+          game: lobby.game,
+          msg: announce.gameStart()
+        }
+      );
     });
 
     // clearGame
 
     socket.on('clearGame', () => {
-      console.log('Game cleared by leader');
+      // console.log('Game cleared by leader');
 
       lobby.game = null;
-      io.in(lobby.id).emit('gameEnd', { cause: 'emergencyStop' });
+      lobby.gameOn = false;
+      io.in(lobby.id).emit(
+        'gameEnd',
+        { cause: 'emergencyStop' }
+      );
     });
 
     // keyEvidenceChosen (by killer)
 
     socket.on('keyEvidenceChosen', (keyEv) => {
-      console.log(`Key evidence chosen: ${keyEv[0]}, ${keyEv[1]}`);
+      // console.log(`Key evidence chosen: ${keyEv[0]}, ${keyEv[1]}`);
 
       lobby.game.keyEvidence = keyEv;
       lobby.game.advanceStage();
-      io.in(lobby.id).emit('advanceStage', {game: lobby.game});
-      io.to(lobby.game.ghost.socketId).emit('keyEvidenceChosen', {game: lobby.game});
-    }); // {advancingTo: lobby.game.currentStage}
+      io.in(lobby.id).emit(
+        'advanceStage', // {advancingTo: lobby.game.currentStage}
+        {
+          game: lobby.game,
+          msg: announce.advanceTo(2)
+        }
+      );
+      io.to(lobby.game.ghost.socketId).emit(
+        'keyEvidenceChosen',
+        { game: lobby.game }
+      );
+    });
 
     // clueChosen (by Ghost)
 
     socket.on('clueChosen', (data) => {
       const clue = data[0];
 
-      console.log(`Clue chosen: ${clue}`);
+      // console.log(`Clue chosen: ${clue}`);
 
       lobby.game.confirmedClues.push(clue);
       const cardToLock = lobby.game.ghostCards.find(card => card.opts.some(opt => opt.id === clue));
       cardToLock.isLocked = true;
-      io.in(lobby.id).emit('clueChosen', {game: lobby.game});
+      io.in(lobby.id).emit(
+        'clueChosen',
+        {
+          game: lobby.game,
+          msg: announce.clueChosen(clue)
+        }
+      );
     });
 
     // accusation
@@ -140,31 +186,56 @@ module.exports = (io) => {
     socket.on('accusation', ({accuserSID, accusedId, accusalEv}) => {
       const accuser = getUserBySID(accuserSID);
 
-      console.log(`${accuser.id} accuses: ${accusedId} (${accusalEv[0]}, ${accusalEv[1]})`);
+      // console.log(`${accuser.id} accuses: ${accusedId} (${accusalEv[0]}, ${accusalEv[1]})`);
 
       const correct = intersection(accusalEv, lobby.game.keyEvidence).length === 2;
       if (correct) {
-        io.in(lobby.id).emit('gameEnd', {
-          cause: 'accusation',
-          accuserId: accuser.id,
-          killerId: accusedId,
-          keyEv: accusalEv
-        });
-        console.log(`${accuser.id} is correct; ${accusedId} loses; game over!`);
+        io.in(lobby.id).emit(
+          'gameEnd',
+          {
+            cause: 'accusation',
+            accuserId: accuser.id,
+            killerId: accusedId,
+            keyEv: accusalEv
+          }
+        );
+        io.in(lobby.id).emit(
+          'rightAccusation',
+          {
+            msg: announce.accusationRight(accuser.id, accusedId)
+          }
+        );
+        lobby.game = null;
+        lobby.gameOn = false;
+        // console.log(`${accuser.id} is correct; ${accusedId} loses; game over!`);
         return;
       };
 
-      console.log(`${accuser.id} is incorrect; game continues...`);
+      // console.log(`${accuser.id} is incorrect; game continues...`);
 
       accuser.accusalSpent = true;
-      io.in(lobby.id).emit('wrongAccusation', {game: lobby.game});
+      io.in(lobby.id).emit(
+        'wrongAccusation',
+        {
+          game: lobby.game,
+          msg: announce.accusation({
+            accuser: accuser.id,
+            accusee: accusedId,
+            evidence: accusalEv
+          })
+        }
+      );
     });
 
     // newMessage
 
     socket.on('newMessage', (data) => {
-      lobby.chat.push(data);
-      io.in(lobby.id).emit('newMessage', data);
+      const msg = announce.userMessage(data.sender, data.text)
+      lobby.chat.push(msg);
+      io.in(lobby.id).emit(
+        'newMessage',
+        msg
+      );
     });
 
   });

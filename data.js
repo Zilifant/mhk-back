@@ -89,7 +89,9 @@ function makeGame(settings) {
     });
   } else {
     const shuffledRoles = shuffle(ROLES);
-    player.role = shuffledRoles[game.players.indexOf(player)];
+    game.players.forEach(player => {
+      player.role = shuffledRoles[game.players.indexOf(player)];
+    });
   };
 
   game.ghost = game.players.find(player => player.role === GHOST);
