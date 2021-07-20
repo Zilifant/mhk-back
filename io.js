@@ -142,6 +142,19 @@ module.exports = (io) => {
       );
     });
 
+    // advanceStage
+
+    socket.on('advanceStage', () => {
+      lobby.game.advanceStage();
+      io.in(lobby.id).emit(
+        'advanceStage',
+        {
+          game: lobby.game,
+          msg: announce.advanceTo(lobby.game.currentStage)
+        }
+      )
+    });
+
     // keyEvidenceChosen (by killer)
 
     socket.on('keyEvidenceChosen', (keyEv) => {
@@ -150,10 +163,10 @@ module.exports = (io) => {
       lobby.game.keyEvidence = keyEv;
       lobby.game.advanceStage();
       io.in(lobby.id).emit(
-        'advanceStage', // {advancingTo: lobby.game.currentStage}
+        'advanceStage',
         {
           game: lobby.game,
-          msg: announce.advanceTo(2)
+          msg: announce.advanceTo(lobby.game.currentStage)
         }
       );
       io.to(lobby.game.ghost.socketId).emit(

@@ -1,9 +1,28 @@
 // Data
 
-const { ROLES, HUNTER, KILLER, GHOST, EVIDENCE_DECK, LOCS_DECK, CLUES_DECK, CAUSES_DECK } = require('./utils/constants');
-const { announce } = require('./utils/chat-utils');
+const { ROLES, GAME_STAGES, HUNTER, KILLER, GHOST, EVIDENCE_DECK, GHOST_CARD_INFO } = require('./utils/constants');
+// const { announce } = require('./utils/chat-utils');
 const { shuffle, shuffleAndBatch } = require('./utils/utils');
 const sample = require('lodash.sample');
+
+  const makeGhostCard = (item) => {
+    item.opts = item.opts.map(opt => {
+      return {
+        id: opt,
+        isSelected: false
+      };
+    });
+    return {
+      ...item,
+      isDisplayed: false,
+      isLocked: false
+    };
+  };
+
+  const GHOST_CARDS = GHOST_CARD_INFO.map(item => makeGhostCard(item));
+  const CAUSES_DECK = GHOST_CARDS.filter(card => card.type === 'cause');
+  const LOCS_DECK = GHOST_CARDS.filter(card => card.type === 'location');
+  const CLUES_DECK = GHOST_CARDS.filter(card => card.type === 'clue');
 
 const lobbies = {};
 
@@ -44,38 +63,10 @@ function makeGame(settings) {
     players: this.usersReady(),
     keyEvidence: [],
     confirmedClues: [],
-    roundNum: 1,
-    currentStage: 'setup',
-    stages: [
-      {
-        number: 1,
-        name: 'killerChoosing',
-        isCurrent: true
-      },
-      {
-        number: 2,
-        name: 'firstRound',
-        isCurrent: false
-      },
-      {
-        number: 2,
-        name: 'secondRound',
-        isCurrent: false
-      },
-      {
-        number: 2,
-        name: 'thirdRound',
-        isCurrent: false
-      },
-      {
-        number: 3,
-        name: 'finale',
-        isCurrent: false
-      }
-    ],
-    currentStage: 1,
+    currentStage: GAME_STAGES[0],
     advanceStage() {
-      this.currentStage = this.currentStage + 1;
+      const stageNum = GAME_STAGES.indexOf(this.currentStage);
+      this.currentStage = GAME_STAGES[stageNum+1];
     }
   };
 
@@ -127,7 +118,7 @@ function makeGame(settings) {
   this.game = game;
   this.gameOn = true;
 
-  // console.log(game);
+  console.log(game.ghostCards);
 };
 
 const makeUser = ({ id, myLobby, lobbyCreator = false }) => {

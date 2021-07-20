@@ -27,7 +27,7 @@ function defaultObj(text) {
 
 function keywordObj(keyword) {
   return { text: keyword, style: KEYWORD_CLS };
-}
+};
 
 const announce = (() => {
 
@@ -95,9 +95,7 @@ const announce = (() => {
     keywordObj(' loses!')
   ];
 
-  const advanceTo = (stage) => {
-    if (stage === 2) return [msgTime(), defaultObj('Starting Round One.')];
-  };
+  const advanceTo = (stage) => [msgTime(), defaultObj(`Starting ${stage}`)];
 
   const gameStart = () => [
     msgTime(),
