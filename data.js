@@ -2,27 +2,8 @@
 
 const { ROLES, GAME_STAGES, HUNTER, KILLER, GHOST, EVIDENCE_DECK, GHOST_CARD_INFO } = require('./utils/constants');
 // const { announce } = require('./utils/chat-utils');
-const { shuffle, shuffleAndBatch } = require('./utils/utils');
+const { shuffle, shuffleAndBatch, makeGhostCard, makeGhostDecks } = require('./utils/utils');
 const sample = require('lodash.sample');
-
-  const makeGhostCard = (item) => {
-    item.opts = item.opts.map(opt => {
-      return {
-        id: opt,
-        isSelected: false
-      };
-    });
-    return {
-      ...item,
-      isDisplayed: false,
-      isLocked: false
-    };
-  };
-
-  const GHOST_CARDS = GHOST_CARD_INFO.map(item => makeGhostCard(item));
-  const CAUSES_DECK = GHOST_CARDS.filter(card => card.type === 'cause');
-  const LOCS_DECK = GHOST_CARDS.filter(card => card.type === 'location');
-  const CLUES_DECK = GHOST_CARDS.filter(card => card.type === 'clue');
 
 const lobbies = {};
 
@@ -58,7 +39,13 @@ const makeLobby = (creator) => {
 
 function makeGame(settings) {
 
+  const GHOST_CARDS = GHOST_CARD_INFO.map(item => makeGhostCard(item));
+  const CAUSES_DECK = GHOST_CARDS.filter(card => card.type === 'cause');
+  const LOCS_DECK = GHOST_CARDS.filter(card => card.type === 'location');
+  const CLUES_DECK = GHOST_CARDS.filter(card => card.type === 'clue');
+
   const game = {
+    // ghostDecks: makeGhostDecks(GHOST_CARD_INFO),
     settings: settings,
     players: this.usersReady(),
     keyEvidence: [],
@@ -99,14 +86,17 @@ function makeGame(settings) {
   });
 
   game.causeCard = sample(CAUSES_DECK);
+  // game.causeCard = sample(game.ghostDecks.causes);
   game.causeCard.isDisplayed = true;
   game.cause = null;
 
   game.locationCard = sample(LOCS_DECK);
+  // game.locationCard = sample(game.ghostDecks.locs);
   game.locationCard.isDisplayed = true;
   game.location = null;
 
   game.cluesDeck = shuffle(CLUES_DECK).filter((clue, index) => index < 6);
+  // game.cluesDeck = shuffle(game.ghostDecks.clues).filter((clue, index) => index < 6);
 
   game.cluesDeck.forEach((clue, index) => {
     if (index < 4) clue.isDisplayed = true;
@@ -117,8 +107,6 @@ function makeGame(settings) {
 
   this.game = game;
   this.gameOn = true;
-
-  console.log(game.ghostCards);
 };
 
 const makeUser = ({ id, myLobby, lobbyCreator = false }) => {
@@ -182,6 +170,7 @@ lobbies[sara.myLobby].users.push(sara);
 // console.log(lobbies[silas.myLobby].game.currentStage);
 
 // const x = announce.accusation({accuser: 'Nina', accusee: 'Hel', evidence: ['gun','towel']});
+// const x = announce.userMessage('Harold-9382', 'Hey, how are you??')
 // console.log(x);
 
 exports.lobbies = lobbies;

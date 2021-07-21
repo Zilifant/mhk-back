@@ -138,7 +138,10 @@ module.exports = (io) => {
       lobby.gameOn = false;
       io.in(lobby.id).emit(
         'gameEnd',
-        { cause: 'emergencyStop' }
+        {
+          cause: 'emergencyStop',
+          msg: announce.gameEnd('emergencyStop')
+        }
       );
     });
 

@@ -10,6 +10,7 @@ const LOBBIES = {},
 
 const ROLES = [GHOST, HUNTER, HUNTER, KILLER];
 const GAME_STAGES = ['Setup','Round 1','Round 2','Round 3'];
+const USER_COLORS = ['red','blue','green','yellow','orange','purple','pink','cyan','emerald','violet','rose','amber'];
 
 const EVIDENCE_CARD_INFO = ['Knife', 'Revolver', 'Pills', 'Falling Debris', 'Animal Bite', 'Power Tool', 'Machine', 'Motor Vehicle', 'Plastic Bag', 'Brick', 'Axe', 'Crowbar', 'Drowned', 'Hunting Rifle', 'Heart Attack'];
 
@@ -106,3 +107,4 @@ exports.EVIDENCE_DECK = EVIDENCE_DECK;
 // exports.LOCS_DECK = LOCS_DECK;
 // exports.CLUES_DECK = CLUES_DECK;
 exports.GHOST_CARD_INFO = GHOST_CARD_INFO;
+exports.USER_COLORS = USER_COLORS;

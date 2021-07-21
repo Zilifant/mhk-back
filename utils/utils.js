@@ -71,7 +71,81 @@ const shuffleAndBatch = (array, batchSize) => {
   return batches;
 };
 
+function parseSMDString(str, opts) {
+  const defStyle = opts.default || 'default';
+  const st = opts.splitTextOn || '^';
+  const sc = opts.splitClsOn || '_';
+
+  const createStyleObj = (string, style = defStyle) => {
+    return { string, style }
+  };
+
+  const checkAbbr = (cls) => opts.abbr.find(e => e.abb === cls);
+
+  const arr = str.split(st).filter(e => !!e);
+
+  const result = arr.map(str => {
+
+    if (str.charAt(0) !== sc) return createStyleObj(str);
+
+    const a = str.split(sc).filter(e => !!e);
+
+    let abbr;
+    if (!!opts) abbr = checkAbbr(a[0]);
+    if (!!abbr) return createStyleObj(a[1], abbr.classname);
+
+    return createStyleObj(a[1], a[0]);
+  });
+  return result;
+};
+
+const SMDopts = {
+  wrapper: 'announcement-wrapper',
+  splitTextOn: '^',
+  splitClsOn: '_',
+  default: 'announcement',
+  abbr: [
+    {abb: 'm', classname: 'announcement--usermessage'},
+    {abb: 't', classname: 'announcement--timestamp'},
+    {abb: 'u', classname: 'announcement--username'},
+    {abb: 'k', classname: 'announcement--keyword'}
+  ]
+};
+
+const parseSMD = (string) => {
+  return parseSMDString(string, SMDopts);
+};
+
+const makeGhostCard = (item) => {
+  const optObjects = item.opts.map(opt => {
+    return {
+      id: opt,
+      isSelected: false
+    };
+  });
+  return {
+    type: item.type,
+    id: item.id,
+    opts: optObjects,
+    isDisplayed: false,
+    isLocked: false
+  };
+};
+
+const makeGhostDecks = (ghostCardInfo) => {
+  const gCards = ghostCardInfo.map(item => makeGhostCard(item));
+  const gDecks = {
+    causes: gCards.filter(card => card.type === 'cause'),
+    locs: gCards.filter(card => card.type === 'location'),
+    clues: gCards.filter(card => card.type === 'clue')
+  };
+  return gDecks;
+};
+
 exports.shuffle = shuffle;
 exports.shuffleAndBatch = shuffleAndBatch;
 exports.uniqUserID = uniqUserID;
 exports.uniqLobbyID = uniqLobbyID;
+exports.parseSMD = parseSMD;
+exports.makeGhostCard = makeGhostCard;
+exports.makeGhostDecks = makeGhostDecks;

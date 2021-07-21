@@ -1,122 +1,91 @@
 
-const JOIN = ' has joined.',
-      LEAVE = ' has left.',
-      READY = ' is ready.',
-      UNREADY = ' is not ready',
-      ANNOUNCE_CLS = 'announcement',
-      DEFAULT_CLS = ANNOUNCE_CLS,
-      TIMESTAMP_CLS = `${ANNOUNCE_CLS}--timestamp`,
-      USERNAME_CLS = `${ANNOUNCE_CLS}--username`,
-      KEYWORD_CLS = `${ANNOUNCE_CLS}--keyword`;
+const { parseSMD } = require('./utils');
 
-// function styledTextElement(text, style) {
-//   return { text: text, style: style };
-// };
+// const JOIN = ' has joined.',
+//       LEAVE = ' has left.',
+//       READY = ' is ready.',
+//       UNREADY = ' is not ready',
+//       ANNOUNCE_CLS = 'announcement',
+//       DEFAULT_CLS = ANNOUNCE_CLS,
+//       TIMESTAMP_CLS = `${ANNOUNCE_CLS}--timestamp`,
+//       USERNAME_CLS = `${ANNOUNCE_CLS}--username`,
+//       KEYWORD_CLS = `${ANNOUNCE_CLS}--keyword`;
 
-function msgTime() {
-  return { text: `${new Date().toLocaleTimeString().slice(0,-6)} `, style: TIMESTAMP_CLS };
-};
-
-function userNameObj(username) {
-  return { text: username.slice(0,-5), style: USERNAME_CLS };
-};
-
-function defaultObj(text) {
-  return { text: text, style: DEFAULT_CLS };
-};
-
-function keywordObj(keyword) {
-  return { text: keyword, style: KEYWORD_CLS };
-};
+const timestamp = () => new Date().toLocaleTimeString().slice(0,-6);
+const username = (userId) => userId.slice(0,-5);
 
 const announce = (() => {
 
-  const userMessage = (user, text) => [
-    msgTime(),
-    userNameObj(user),
-    defaultObj(`: ${text}`)
-  ];
-
-  const join = (user) => [
-    msgTime(),
-    userNameObj(user),
-    defaultObj(JOIN)
-  ];
-
-  const leave = (user) => [
-    msgTime(),
-    userNameObj(user),
-    defaultObj(LEAVE)
-  ];
-
-  const ready = (user, ready) => {
-    if (ready) return [
-      msgTime(),
-      userNameObj(user),
-      defaultObj(READY)
-    ];
-    return [
-      msgTime(),
-      userNameObj(user),
-      defaultObj(UNREADY)
-    ];
+  const userMessage = (user, text) => {
+    const str = `_t_${timestamp()} ^_u_${username(user)}^_m_: ${text}`;
+    return parseSMD(str);
   };
 
-  const newLeader = (user) => [
-    msgTime(),
-    userNameObj(user),
-    defaultObj(' is the new'),
-    keywordObj(' leader.')
-  ];
+  const join = (user) => {
+    const str = `_t_${timestamp()} ^_u_${username(user)}^ joined.`;
+    return parseSMD(str);
+  };
 
-  const accusation = ({ accuser, accusee, evidence: [ev1, ev2] }) => [
-    msgTime(),
-    userNameObj(accuser),
-    defaultObj(' accuses '),
-    userNameObj(accusee),
-    defaultObj('! The evidence: '),
-    keywordObj(ev1),
-    defaultObj(' and '),
-    keywordObj(ev2),
-    defaultObj('.')
-  ];
+  const leave = (user) => {
+    const str = `_t_${timestamp()} ^_u_${username(user)}^ left.`;
+    return parseSMD(str);
+  };
 
-  const accusationWrong = (accuser) => [
-    msgTime(),
-    userNameObj(accuser),
-    defaultObj(' is wrong!')
-  ];
+  const ready = (user, ready) => {
+    const str = `_t_${timestamp()} ^_u_${username(user)}^ is ${ready ? 'ready' : 'not ready'}.`;
+    return parseSMD(str);
+  };
 
-  const accusationRight = (accuser, accusee) => [
-    msgTime(),
-    userNameObj(accuser),
-    defaultObj(' is correct. '),
-    userNameObj(accusee),
-    keywordObj(' loses!')
-  ];
+  const newLeader = (user) => {
+    const str = `_t_${timestamp()} ^_u_${username(user)}^ is the new leader.`;
+    return parseSMD(str);
+  };
 
-  const advanceTo = (stage) => [msgTime(), defaultObj(`Starting ${stage}`)];
+  const accusation = ({ accuser, accusee, evidence: [ev1, ev2] }) => {
+    const str = `_t_${timestamp()} ^_u_${username(accuser)}^ accuses ^_u_${username(accusee)}^! with evidence: ^_k_${ev1}^ and ^_k_${ev2}^.`;
+    return parseSMD(str);
+  };
 
-  const gameStart = () => [
-    msgTime(),
-    defaultObj('Game started. Waiting for the'),
-    keywordObj(' Killer'),
-    defaultObj(' to select key evidence.')
-  ];
+  const accusationWrong = (accuser) => {
+    const str = `_t_${timestamp()} ^_u_${username(accuser)}^ is wrong.`;
+    return parseSMD(str);
+  };
 
-  const clueChosen = (clue) => [
-    msgTime(),
-    defaultObj('The Ghost has chosen a clue: '),
-    keywordObj(clue),
-    defaultObj('.')
-  ];
+  const accusationRight = (accuser, accusee) => {
+    const str = `_t_${timestamp()} ^_u_${username(accuser)}^ is correct! ^_u_${username(accusee)}^ is the Killer.`;
+    return parseSMD(str);
+  };
+
+  const advanceTo = (stage) => {
+    const str = `_t_${timestamp()} ^Starting ^_k_${stage}^.`;
+    return parseSMD(str);
+  }
+
+  const gameStart = () => {
+    const str = `_t_${timestamp()} ^Game started. Waiting for the Killer to select key evidence.`;
+    return parseSMD(str);
+  };
+
+  const gameEnd = (reason) => {
+    if (reason === 'emergencyStop') {
+      const str = `_t_${timestamp()} ^The lobby leader ended the game.`;
+      return parseSMD(str);
+    };
+    const str = `_t_${timestamp()} ^The game ended for an unknown reason.`;
+    return parseSMD(str);
+  };
+
+  const clueChosen = (clue) => {
+    const str = `_t_${timestamp()} ^The Ghost has chosen a clue: ^_k_${clue}^.`;
+    return parseSMD(str);
+  };
 
   return {
     userMessage,
     join, leave, ready,
     newLeader,
     advanceTo,
-    gameStart,
+    gameStart, gameEnd,
     clueChosen,
     accusation, accusationRight, accusationWrong
   };
