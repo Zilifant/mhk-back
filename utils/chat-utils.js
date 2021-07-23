@@ -80,9 +80,15 @@ const announce = (() => {
     return parseSMD(str);
   };
 
+  const ghostAssigned = (userId) => {
+    const str = `_t_${timestamp()} ^_u_${username(userId)}^ is assigned to Ghost.`;
+    return parseSMD(str);
+  }
+
   return {
     userMessage,
     join, leave, ready,
+    ghostAssigned,
     newLeader,
     advanceTo,
     gameStart, gameEnd,

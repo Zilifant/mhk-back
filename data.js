@@ -1,9 +1,13 @@
 // Data
 
-const { ROLES, GAME_STAGES, HUNTER, KILLER, GHOST, EVIDENCE_DECK, GHOST_CARD_INFO } = require('./utils/constants');
 // const { announce } = require('./utils/chat-utils');
-const { shuffle, shuffleAndBatch, makeGhostCard, makeGhostDecks } = require('./utils/utils');
 const sample = require('lodash.sample');
+const {
+  ROLES, GAME_STAGES,
+  HUNTER, KILLER, GHOST,
+  EVIDENCE_DECK, GHOST_CARD_INFO
+} = require('./utils/constants');
+const { shuffle, shuffleAndBatch, makeGhostCard } = require('./utils/utils');
 
 const lobbies = {};
 
@@ -13,22 +17,12 @@ const makeLobby = (creator) => {
     creatorId: creator.id,
     leader: creator.id,
     users: [creator],
-    numOnline() {
-      return this.users.filter(u => u.isOnline === true).length;
-    },
-    numReady() {
-      return this.users.filter(u => u.isReady === true).length;
-    },
-    usersOnline() {
-      return this.users.filter(u => u.isOnline === true);
-    },
-    usersReady() {
-      return this.users.filter(u => u.isReady === true);
-    },
-    canStart() {
-      return (this.numReady() >= 3) &&
-      (this.numReady() === this.numOnline());
-    },
+    assignedToGhost: null,
+    numOnline() { return this.users.filter(u => u.isOnline === true).length; },
+    numReady() { return this.users.filter(u => u.isReady === true).length; },
+    usersOnline() { return this.users.filter(u => u.isOnline === true); },
+    usersReady() { return this.users.filter(u => u.isReady === true); },
+    canStart() { return (this.numReady() >= 3) && (this.numReady() === this.numOnline()); },
     makeGame,
     gameOn: false,
     game: null,
@@ -45,7 +39,6 @@ function makeGame(settings) {
   const CLUES_DECK = GHOST_CARDS.filter(card => card.type === 'clue');
 
   const game = {
-    // ghostDecks: makeGhostDecks(GHOST_CARD_INFO),
     settings: settings,
     players: this.usersReady(),
     keyEvidence: [],
@@ -118,6 +111,7 @@ const makeUser = ({ id, myLobby, lobbyCreator = false }) => {
     isOnline: false,
     isLeader: lobbyCreator,
     isReady: false,
+    isAssignedToGhost: false,
     color: null,
     role: null,
     socketId: null,

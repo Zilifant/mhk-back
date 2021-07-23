@@ -114,6 +114,27 @@ module.exports = (io) => {
       );
     });
 
+    // ghostAssigned
+
+    socket.on('ghostAssigned', userId => {
+      const user = lobby.users.find(u => u.id === userId);
+      user.isAssignedToGhost = true;
+      lobby.assignedToGhost = userId;
+
+      let resData = {
+        usersOnline: lobby.users.filter(u => u.isOnline === true),
+        assignedToGhost: userId
+      };
+
+      io.in(lobby.id).emit(
+        'ghostAssigned',
+        {
+          resData,
+          msg: announce.ghostAssigned(userId)
+        }
+      );
+    });
+
     // startGame
 
     socket.on('startGame', (data) => {

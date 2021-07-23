@@ -76,26 +76,6 @@ const GHOST_CARD_INFO = [
   }
 ];
 
-// const makeGhostCard = (item) => {
-//   item.opts = item.opts.map(opt => {
-//     return {
-//       id: opt,
-//       isSelected: false
-//     };
-//   });
-//   return {
-//     ...item,
-//     isDisplayed: false,
-//     isLocked: false
-//   };
-// };
-
-// const GHOST_CARDS = GHOST_CARD_INFO.map(item => makeGhostCard(item));
-
-// const CAUSES_DECK = GHOST_CARDS.filter(card => card.type === CAUSE);
-// const LOCS_DECK = GHOST_CARDS.filter(card => card.type === LOCATION);
-// const CLUES_DECK = GHOST_CARDS.filter(card => card.type === CLUE);
-
 exports.LOBBIES = LOBBIES;
 exports.GAME_STAGES = GAME_STAGES;
 exports.ROLES = ROLES;
@@ -103,8 +83,5 @@ exports.GHOST = GHOST;
 exports.HUNTER = HUNTER;
 exports.KILLER = KILLER;
 exports.EVIDENCE_DECK = EVIDENCE_DECK;
-// exports.CAUSES_DECK = CAUSES_DECK;
-// exports.LOCS_DECK = LOCS_DECK;
-// exports.CLUES_DECK = CLUES_DECK;
 exports.GHOST_CARD_INFO = GHOST_CARD_INFO;
 exports.USER_COLORS = USER_COLORS;
