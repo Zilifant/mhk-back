@@ -42,7 +42,7 @@ const announce = (() => {
   };
 
   const accusation = ({ accuser, accusee, evidence: [ev1, ev2] }) => {
-    const str = `_t_${timestamp()} ^_u_${username(accuser)}^ accuses ^_u_${username(accusee)}^! with evidence: ^_k_${ev1}^ and ^_k_${ev2}^.`;
+    const str = `_t_${timestamp()} ^_u_${username(accuser)}^ accuses ^_u_${username(accusee)}^ with evidence: ^_k_${ev1}^ and ^_k_${ev2}^.`;
     return parseSMD(str);
   };
 
@@ -81,7 +81,9 @@ const announce = (() => {
   };
 
   const ghostAssigned = (userId) => {
-    const str = `_t_${timestamp()} ^_u_${username(userId)}^ is assigned to Ghost.`;
+    let str;
+    userId ? str = `_t_${timestamp()} ^_u_${username(userId)}^ is assigned to Ghost.`
+           : str = `_t_${timestamp()} ^Ghost unassigned.`;
     return parseSMD(str);
   }
 

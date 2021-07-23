@@ -13,7 +13,6 @@ const checkForSess = async (req, res, next) => {
 
   let user;
   if (req.session.userIdCookie) {
-    console.log(req.session);
     try {
       user = await getUserById({
         lobbyId: req.session.userLobbyCookie,

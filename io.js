@@ -48,7 +48,7 @@ module.exports = (io) => {
     // disconnect
 
     socket.on('disconnect', async () => {
-      // console.log(`Socket: ${socket.id} disconnected`);
+      console.log(`Socket: ${socket.id} disconnected`);
 
       let user;
       try {
@@ -89,7 +89,7 @@ module.exports = (io) => {
         }
       );
 
-      // console.log(`Removed: ${user.id} on: ${socket.id} from: ${lobby.id}`);
+      console.log(`Removed: ${user.id} on: ${socket.id} from: ${lobby.id}`);
     });
 
     // readyUnready
@@ -116,14 +116,29 @@ module.exports = (io) => {
 
     // ghostAssigned
 
-    socket.on('ghostAssigned', userId => {
-      const user = lobby.users.find(u => u.id === userId);
-      user.isAssignedToGhost = true;
+    function assignGhost(userId) {
+      const formerGhost = lobby.users.find(u => u.isAssignedToGhost === true);
+      if (formerGhost) formerGhost.isAssignedToGhost = false;
+
+      const newGhost = lobby.users.find(u => u.id === userId);
+      newGhost.isAssignedToGhost = true;
       lobby.assignedToGhost = userId;
+    };
+
+    function unAssignGhost() {
+      lobby.assignedToGhost = null;
+      const formerGhost = lobby.users.find(u => u.isAssignedToGhost === true);
+      if (formerGhost) formerGhost.isAssignedToGhost = false;
+    };
+
+    socket.on('ghostAssigned', (data) => {
+      console.log(data)
+      const userId = data[0];
+      userId ? assignGhost(userId) : unAssignGhost();
 
       let resData = {
         usersOnline: lobby.users.filter(u => u.isOnline === true),
-        assignedToGhost: userId
+        assignedToGhost: lobby.assignedToGhost
       };
 
       io.in(lobby.id).emit(
