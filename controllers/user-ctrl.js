@@ -1,7 +1,8 @@
 
 const HttpError = require('../models/HttpError');
-const { uniqUserID } = require('../utils/utils');
-const { getLobbyById, getUserById, makeUser } = require('../data');
+const { uniqUserID } = require('../utils/uniqUserID');
+const { makeUser } = require('../data');
+const { getLobbyById, getUserById } = require('../utils/utils');
 
 const checkForSess = async (req, res, next) => {
   console.log('getSession');
@@ -40,7 +41,7 @@ const addUserToLobby = async (req, res, next) => {
   };
 
   if (!lobby) {
-    const error = new HttpError('No lobby with that name!', 404);
+    const error = new HttpError('No lobby with that name.', 404);
     return next(error);
   };
 

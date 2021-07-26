@@ -1,6 +1,6 @@
-const { getLobbyById } = require('./data');
-const { announce } = require('./utils/chat-utils');
 const intersection = require('lodash.intersection');
+const { getLobbyById } = require('../utils/utils');
+const { announce } = require('../utils/chat-utils');
 
 module.exports = (io) => {
 

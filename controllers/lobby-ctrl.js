@@ -1,7 +1,10 @@
 
 const HttpError = require('../models/HttpError');
-const { uniqUserID, uniqLobbyID } = require('../utils/utils');
-const { getLobbyById, lobbies, makeLobby, makeUser } = require('../data');
+const { uniqUserID } = require('../utils/uniqUserID');
+const { uniqLobbyID } = require('../utils/uniqLobbyID');
+const { makeLobby, makeUser } = require('../data');
+const { getLobbyById } = require('../utils/utils');
+const { LOBBIES } = require('../utils/constants');
 
 const getLobby = async (req, res, next) => {
   console.log('getLobby');
@@ -32,7 +35,7 @@ const createLobby = async (req, res) => {
 
   const newLobby = makeLobby(newUser);
 
-  lobbies[newLobby.id] = newLobby;
+  LOBBIES[newLobby.id] = newLobby;
 
   req.session.userIdCookie = userId;
   req.session.userLobbyCookie = lobbyId;

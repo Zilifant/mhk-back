@@ -1,5 +1,48 @@
 
-const { parseSMD } = require('./utils');
+function parseSMDString(str, opts) {
+  const defStyle = opts.default || 'default';
+  const st = opts.splitTextOn || '^';
+  const sc = opts.splitClsOn || '_';
+
+  const createStyleObj = (string, style = defStyle) => {
+    return { string, style }
+  };
+
+  const checkAbbr = (cls) => opts.abbr.find(e => e.abb === cls);
+
+  const arr = str.split(st).filter(e => !!e);
+
+  const result = arr.map(str => {
+
+    if (str.charAt(0) !== sc) return createStyleObj(str);
+
+    const a = str.split(sc).filter(e => !!e);
+
+    let abbr;
+    if (!!opts) abbr = checkAbbr(a[0]);
+    if (!!abbr) return createStyleObj(a[1], abbr.classname);
+
+    return createStyleObj(a[1], a[0]);
+  });
+  return result;
+};
+
+const SMDopts = {
+  wrapper: 'announcement-wrapper',
+  splitTextOn: '^',
+  splitClsOn: '_',
+  default: 'announcement',
+  abbr: [
+    {abb: 'm', classname: 'announcement--usermessage'},
+    {abb: 't', classname: 'announcement--timestamp'},
+    {abb: 'u', classname: 'announcement--username'},
+    {abb: 'k', classname: 'announcement--keyword'}
+  ]
+};
+
+const parseSMD = (string) => {
+  return parseSMDString(string, SMDopts);
+};
 
 // const JOIN = ' has joined.',
 //       LEAVE = ' has left.',
@@ -100,3 +143,4 @@ const announce = (() => {
 })();
 
 exports.announce = announce;
+exports.parseSMD = parseSMD;

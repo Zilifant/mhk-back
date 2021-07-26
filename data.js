@@ -1,15 +1,29 @@
-// Data
 
-// const { announce } = require('./utils/chat-utils');
 const sample = require('lodash.sample');
 const {
-  ROLES, GAME_STAGES,
+  GAME_STAGES, ROLES,
   HUNTER, KILLER, GHOST,
   EVIDENCE_DECK, GHOST_CARD_INFO
 } = require('./utils/constants');
-const { shuffle, shuffleAndBatch, makeGhostCard } = require('./utils/utils');
+const {
+  shuffle, shuffleAndBatch, makeGhostCard
+} = require('./utils/utils');
 
-const lobbies = {};
+const makeUser = ({ id, myLobby, lobbyCreator = false }) => {
+  const userName = id.slice(0,-5);
+  return {
+    id,
+    userName: userName,
+    myLobby,
+    isOnline: false,
+    isLeader: lobbyCreator,
+    isReady: false,
+    isAssignedToGhost: false,
+    color: null,
+    role: null,
+    socketId: null,
+  };
+};
 
 const makeLobby = (creator) => {
   return {
@@ -60,7 +74,10 @@ function makeGame(settings) {
     });
   } else {
     const shuffledRoles = shuffle(ROLES);
+    // if (this.assignedToGhost) {
+    // } 
     game.players.forEach(player => {
+      // if (player.isAssignedToGhost) player.role = GHOST;
       player.role = shuffledRoles[game.players.indexOf(player)];
     });
   };
@@ -102,73 +119,40 @@ function makeGame(settings) {
   this.gameOn = true;
 };
 
-const makeUser = ({ id, myLobby, lobbyCreator = false }) => {
-  const userName = id.slice(0,-5);
-  return {
-    id,
-    userName: userName,
-    myLobby,
-    isOnline: false,
-    isLeader: lobbyCreator,
-    isReady: false,
-    isAssignedToGhost: false,
-    color: null,
-    role: null,
-    socketId: null,
-  };
-};
+exports.makeUser = makeUser;
+exports.makeLobby = makeLobby;
 
-const getLobbyById = id => {
-  if (!lobbies[id]) {
-    console.log(`Lobby: ${id} no longer exists`);
-    return;
-  };
-  return lobbies[id];
-};
+// const silas = {
+//   id: 'Silas-0000',
+//   userName: 'Silas',
+//   myLobby: 'z',
+//   isOnline: true,
+//   isLeader: true,
+//   isReady: true,
+//   color: null,
+//   role: null,
+//   socketId: null
+// };
 
-const getUserById = ({lobbyId, userId}) => {
-  if (!lobbies[lobbyId]) {
-    console.log(`Lobby: ${lobbyId} no longer exists`);
-    return;
-  };
-  return lobbies[lobbyId].users.find(user => user.id === userId);
-};
+// const sara = {
+//   id: 'Sara-0000',
+//   userName: 'Sara',
+//   myLobby: 'z',
+//   isOnline: true,
+//   isLeader: false,
+//   isReady: true,
+//   color: null,
+//   role: null,
+//   socketId: null
+// };
 
-const silas = {
-  id: 'Silas-0000',
-  userName: 'Silas',
-  myLobby: 'z',
-  isOnline: true,
-  isLeader: true,
-  isReady: true,
-  color: null,
-  role: null,
-  socketId: null
-};
 
-const sara = {
-  id: 'Sara-0000',
-  userName: 'Sara',
-  myLobby: 'z',
-  isOnline: true,
-  isLeader: false,
-  isReady: true,
-  color: null,
-  role: null,
-  socketId: null
-};
+// LOBBIES[silas.myLobby] = makeLobby(silas);
+// LOBBIES[sara.myLobby].users.push(sara);
+// LOBBIES[silas.myLobby].makeGame();
+// console.log(LOBBIES[silas.myLobby].game.currentStage);
 
-lobbies[silas.myLobby] = makeLobby(silas);
-lobbies[sara.myLobby].users.push(sara);
-// lobbies[silas.myLobby].makeGame();
-// console.log(lobbies[silas.myLobby].game.currentStage);
-
+// const { announce } = require('./utils/chat-utils');
 // const x = announce.accusation({accuser: 'Nina', accusee: 'Hel', evidence: ['gun','towel']});
 // const x = announce.userMessage('Harold-9382', 'Hey, how are you??')
 // console.log(x);
-
-exports.lobbies = lobbies;
-exports.makeLobby = makeLobby;
-exports.makeUser = makeUser;
-exports.getLobbyById = getLobbyById;
-exports.getUserById = getUserById;

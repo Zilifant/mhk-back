@@ -10,10 +10,7 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 
 const lobbyRoutes = require('./routes/lobby-rts');
 const userRoutes = require('./routes/user-rts');
-const chatRoutes = require('./routes/chat-rts');
 const adminRoutes = require('./routes/admin-rts');
-// const sessRoutes = require('./routes/sess-rts');
-// const messageRoutes = require('./routes/message-rts');
 
 const port = 5000;
 
@@ -36,7 +33,7 @@ const io = socketio(server, {
   origins: [process.env.CLIENT_URL_HTTP, process.env.CLIENT_URL_HTTPS]
 });
 
-require('./io.js')(io);
+require('./io/io')(io);
 
 app.use(cors(corsOpts));
 app.use(express.json());
@@ -67,10 +64,7 @@ app.use(session({
 
 app.use('/api/user', userRoutes);
 app.use('/api/lobby', lobbyRoutes);
-app.use('/api/lobby/chat', chatRoutes);
 app.use('/api/admin', adminRoutes);
-// app.use('/api/sess', sessRoutes);
-// app.use('/api/lobby/chat/messages', messageRoutes);
 
 // this will execute if any middleware before it throws an error
 app.use((error, req, res, next) => {
