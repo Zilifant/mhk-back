@@ -7,21 +7,27 @@ module.exports = (io) => {
   io.on('connection', (socket) => {
     // console.log(`Socket: ${socket.id} connected`);
 
-    const getUserBySID = (SID) => {
-      return lobby.users.find(user => user.socketId === SID);
+    function getUserBySID(SID) {
+      return lobby.users.find(u => u.socketId === SID);
+    };
+
+    function huntersRmId() {
+      return `${lobby.id}-hunters`
+    };
+
+    function ghostKillerRmId() {
+      return `${lobby.id}-ghostkiller`
     };
 
     let lobby;
+
     socket.on('connectToLobby', ({ userId, lobbyId }) => {
       // console.log(`Connecting: ${userId} to: ${lobbyId} on: ${socket.id}`);
 
       lobby = getLobbyById(lobbyId);
       const user = lobby.users.find(u => u.id === userId);
 
-      if (!user) {
-        console.log(`${userId} not in ${lobbyId}'s user list`);
-        return;
-      };
+      if (!user) return console.log(`${userId} not in ${lobbyId}'s user list`)
 
       socket.join(lobbyId);
       user.isOnline = true;
@@ -32,7 +38,7 @@ module.exports = (io) => {
         user.isLeader = true;
       };
 
-      let resData = {
+      const resData = {
         usersOnline: lobby.users.filter(u => u.isOnline === true),
         user: user
       };
@@ -47,21 +53,22 @@ module.exports = (io) => {
 
     // disconnect
 
-    socket.on('disconnect', async () => {
+    socket.on('disconnect', () => {
       console.log(`Socket: ${socket.id} disconnected`);
 
       let user;
+
       try {
-        user = await getUserBySID(socket.id);
+        user = getUserBySID(socket.id);
       } catch (err) {
-        console.log(`Cannot find user on Socket: ${socket.id}`);
-        return;
+        return console.log(`Cannot find user on Socket: ${socket.id}`);
       };
 
       user.isOnline = false;
       user.isReady = false;
 
       const needNewLeader = user.isLeader && (lobby.numOnline() >= 1);
+
       let newLeaderId;
 
       if (!needNewLeader) {
@@ -75,7 +82,7 @@ module.exports = (io) => {
         // console.log(`${newLeaderId} is the new leader of ${lobby.id}`);
       };
 
-      let resData = {
+      const resData = {
         usersOnline: lobby.users.filter(u => u.isOnline === true),
         discoUserId: user.id,
         newLeaderId
@@ -88,8 +95,7 @@ module.exports = (io) => {
           msg: announce.leave(user.id)
         }
       );
-
-      console.log(`Removed: ${user.id} on: ${socket.id} from: ${lobby.id}`);
+      // console.log(`Removed: ${user.id} on: ${socket.id} from: ${lobby.id}`);
     });
 
     // readyUnready
@@ -98,7 +104,7 @@ module.exports = (io) => {
       const user = lobby.users.find(u => u.id === userId);
       user.isReady ? user.isReady = false : user.isReady = true;
 
-      let resData = {
+      const resData = {
         usersOnline: lobby.users.filter(u => u.isOnline === true),
         userId: userId,
         ready: user.isReady,
@@ -116,27 +122,28 @@ module.exports = (io) => {
 
     // ghostAssigned
 
-    function assignGhost(userId) {
+    function unAssignGhost() {
       const formerGhost = lobby.users.find(u => u.isAssignedToGhost === true);
       if (formerGhost) formerGhost.isAssignedToGhost = false;
+    };
 
+    function assignNewGhost(userId) {
+      unAssignGhost();
       const newGhost = lobby.users.find(u => u.id === userId);
       newGhost.isAssignedToGhost = true;
       lobby.assignedToGhost = userId;
     };
 
-    function unAssignGhost() {
+    function assignNoGhost() {
+      unAssignGhost();
       lobby.assignedToGhost = null;
-      const formerGhost = lobby.users.find(u => u.isAssignedToGhost === true);
-      if (formerGhost) formerGhost.isAssignedToGhost = false;
     };
 
     socket.on('ghostAssigned', (data) => {
-      console.log(data)
       const userId = data[0];
-      userId ? assignGhost(userId) : unAssignGhost();
+      userId ? assignNewGhost(userId) : assignNoGhost();
 
-      let resData = {
+      const resData = {
         usersOnline: lobby.users.filter(u => u.isOnline === true),
         assignedToGhost: lobby.assignedToGhost
       };
@@ -150,19 +157,61 @@ module.exports = (io) => {
       );
     });
 
+    // newMessage
+
+    socket.on('newMessage', (data) => {
+      const msg = announce.userMessage(data.sender, data.text)
+      lobby.chat.push(msg);
+      io.in(lobby.id).emit(
+        'newMessage',
+        msg
+      );
+    });
+
     // startGame
 
-    socket.on('startGame', (data) => {
-      // console.log('Game started');
+    function emitToHunters(user) {
+      io.to(user.socketId).emit(
+        'startGame',
+        {
+          game: lobby.game.viewAsHunter(),
+          msg: announce.gameStart(),
+        }
+      );
+    };
 
-      lobby.makeGame(data.settings);
-      io.in(lobby.id).emit(
+    function emitToGhostKiller(user) {
+      io.to(user.socketId).emit(
         'startGame',
         {
           game: lobby.game,
           msg: announce.gameStart()
         }
       );
+    };
+
+    socket.on('startGame', (data) => {
+      // console.log('Game started');
+
+      lobby.makeGame(data.settings);
+
+      lobby.game.players.forEach(player => {
+        lobby.game.hunters.includes(player) ? emitToHunters(player) : emitToGhostKiller(player);
+      });
+
+      // console.log(socket.id)
+      // const user = getUserBySID(socket.id);
+      // console.log(user);
+      // if (lobby.game.hunters.includes(user)) socket.join(huntersRmId());
+      // if (lobby.game.killer === user || lobby.game.ghost === user) socket.join(ghostKillerRmId());
+
+      // io.in(lobby.id).emit(
+      //   'startGame',
+      //   {
+      //     game: lobby.game,
+      //     msg: announce.gameStart()
+      //   }
+      // );
     });
 
     // clearGame
@@ -276,17 +325,6 @@ module.exports = (io) => {
             evidence: accusalEv
           })
         }
-      );
-    });
-
-    // newMessage
-
-    socket.on('newMessage', (data) => {
-      const msg = announce.userMessage(data.sender, data.text)
-      lobby.chat.push(msg);
-      io.in(lobby.id).emit(
-        'newMessage',
-        msg
       );
     });
 

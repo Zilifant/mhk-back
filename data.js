@@ -1,27 +1,25 @@
 
 const sample = require('lodash.sample');
 const {
-  GAME_STAGES, ROLES,
-  HUNTER, KILLER, GHOST,
+  GAME_STAGES, ROLES, HUNTER, KILLER, GHOST,
   EVIDENCE_DECK, GHOST_CARD_INFO
 } = require('./utils/constants');
-const {
-  shuffle, shuffleAndBatch, makeGhostCard
-} = require('./utils/utils');
+const { omit, shuffle, shuffleAndBatch, makeGhostCard } = require('./utils/utils');
 
 const makeUser = ({ id, myLobby, lobbyCreator = false }) => {
   const userName = id.slice(0,-5);
   return {
     id,
+    socketId: null,
     userName: userName,
     myLobby,
     isOnline: false,
-    isLeader: lobbyCreator,
     isReady: false,
+    isLeader: lobbyCreator,
     isAssignedToGhost: false,
     color: null,
-    role: null,
-    socketId: null,
+    accusalSpent: null,
+    hand: null,
   };
 };
 
@@ -55,55 +53,71 @@ function makeGame(settings) {
   const game = {
     settings: settings,
     players: this.usersReady(),
-    keyEvidence: [],
     confirmedClues: [],
+    ghost: null,
+    nonGhosts: [],
+    causeCard: null,
+    cause: null,
+    locationCard: null,
+    location: null,
+    cluesDeck: [],
+    // ghostCards: [],
     currentStage: GAME_STAGES[0],
     advanceStage() {
       const stageNum = GAME_STAGES.indexOf(this.currentStage);
       this.currentStage = GAME_STAGES[stageNum+1];
-    }
+    },
+    viewAsHunter() {
+      const g = omit(this, [this.keyEvidence, this.hunters, this.killer])
+      g.viewingAs = HUNTER;
+      return g;
+    },
+    keyEvidence: [],
+    hunters: [],
+    killer: null
   };
 
   if (this.id === 'z') {
     game.players.forEach(player => {
-      if (player.id === 'Ali-0000') player.role = KILLER;
-      if (player.id === 'Ainsley-0000') player.role = GHOST;
-      if (player.id === 'Amber-0000') player.role = HUNTER;
-      if (player.id === 'Silas-0000') player.role = HUNTER;
-      if (player.id === 'Sara-0000') player.role = HUNTER;
+      if (player.id === 'Kali-0000') return game.killer = player;
+      if (player.id === 'Gerrard-0000') return game.ghost = player;
+      return game.hunters.push(player);
+    });
+    game.nonGhosts = game.hunters.concat(game.killer);
+  } else if (this.assignedToGhost) {
+    game.ghost = game.players.find(player => player.id === this.assignedToGhost);
+    game.nonGhosts = game.players.filter(player => player.id !== this.assignedToGhost);
+
+    const shuffledRoles = shuffle(ROLES);
+    game.nonGhosts.forEach((nG, index) => {
+      if (shuffledRoles[index] === KILLER) return game.killer = nG;
+      return game.hunters.push(nG);
     });
   } else {
-    const shuffledRoles = shuffle(ROLES);
-    // if (this.assignedToGhost) {
-    // } 
-    game.players.forEach(player => {
-      // if (player.isAssignedToGhost) player.role = GHOST;
-      player.role = shuffledRoles[game.players.indexOf(player)];
-    });
-  };
-
-  game.ghost = game.players.find(player => player.role === GHOST);
-  game.killer = game.players.find(player => player.role === KILLER);
-  game.hunters = game.players.filter(player => player.role === HUNTER);
-  game.nonGhosts = game.hunters.concat(game.killer)
+    const allRoles = ROLES.concat(GHOST);
+    const shuffledRoles = shuffle(allRoles)
+    game.players.forEach((player, index) => {
+      if (shuffledRoles[index] === KILLER) return game.killer = player;
+      if (shuffledRoles[index] === GHOST) return game.ghost = player;
+      return game.hunters.push(player);
+    })
+    game.nonGhosts = game.hunters.concat(game.killer);
+  }
 
   const hands = shuffleAndBatch(EVIDENCE_DECK, 3);
 
   game.nonGhosts.forEach(nG => {
     nG.hand = hands[game.nonGhosts.indexOf(nG)];
     nG.accusalSpent = false;
-    // if (nG.role === KILLER) nG.keyEvidence = [];
   });
 
   game.causeCard = sample(CAUSES_DECK);
   // game.causeCard = sample(game.ghostDecks.causes);
   game.causeCard.isDisplayed = true;
-  game.cause = null;
 
   game.locationCard = sample(LOCS_DECK);
   // game.locationCard = sample(game.ghostDecks.locs);
   game.locationCard.isDisplayed = true;
-  game.location = null;
 
   game.cluesDeck = shuffle(CLUES_DECK).filter((clue, index) => index < 6);
   // game.cluesDeck = shuffle(game.ghostDecks.clues).filter((clue, index) => index < 6);
@@ -112,8 +126,8 @@ function makeGame(settings) {
     if (index < 4) clue.isDisplayed = true;
   });
 
-  game.ghostCards = game.cluesDeck
-  game.ghostCards.unshift(game.causeCard, game.locationCard)
+  // game.ghostCards = game.cluesDeck
+  game.cluesDeck.unshift(game.causeCard, game.locationCard)
 
   this.game = game;
   this.gameOn = true;

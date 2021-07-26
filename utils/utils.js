@@ -1,6 +1,14 @@
 
 const { LOBBIES } = require('./constants');
 
+const omit = (obj, keys) => {
+  const newObj = Object.assign({}, obj);
+  keys.forEach(key => {
+    if (newObj[key]) delete newObj[key];
+  })
+  return newObj;
+};
+
 const shuffle = (array) => {
   let m = array.length, t, i;
   while (m) {
@@ -74,6 +82,23 @@ const getUserById = ({lobbyId, userId}) => {
   return LOBBIES[lobbyId].users.find(user => user.id === userId);
 };
 
+// function assignRoles({ ghost, players }) {
+
+// };
+
+// function rolesDevMode(players) {
+
+// };
+
+// function rolesRandomGhost(players) {
+
+// };
+
+// function rolesAssignedGhost(ghost, players) {
+
+// };
+
+exports.omit = omit;
 exports.shuffle = shuffle;
 exports.shuffleAndBatch = shuffleAndBatch;
 exports.makeGhostCard = makeGhostCard;
