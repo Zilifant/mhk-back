@@ -51,7 +51,7 @@ const shuffleAndBatch = (array, batchSize) => {
 };
 
 const makeGhostCard = (item) => {
-  const optObjects = item.opts.map(opt => {
+  const optionObjects = item.opts.map(opt => {
     return {
       id: opt,
       isSelected: false
@@ -60,7 +60,7 @@ const makeGhostCard = (item) => {
   return {
     type: item.type,
     id: item.id,
-    opts: optObjects,
+    opts: optionObjects,
     isDisplayed: false,
     isLocked: false
   };
@@ -81,22 +81,6 @@ const getUserById = ({lobbyId, userId}) => {
   };
   return LOBBIES[lobbyId].users.find(user => user.id === userId);
 };
-
-// function assignRoles({ ghost, players }) {
-
-// };
-
-// function rolesDevMode(players) {
-
-// };
-
-// function rolesRandomGhost(players) {
-
-// };
-
-// function rolesAssignedGhost(ghost, players) {
-
-// };
 
 exports.omit = omit;
 exports.shuffle = shuffle;

@@ -17,10 +17,10 @@ router.post(
   lobbyControl.createLobby
 );
 
+// get lobby (needs to know userId to recieve user/role-specific lobby/game data)
 router.post(
   '/:lobbyUrlRoute',
   lobbyControl.getLobby
 );
-
 
 module.exports = router;

@@ -11,14 +11,6 @@ module.exports = (io) => {
       return lobby.users.find(u => u.socketId === SID);
     };
 
-    function huntersRmId() {
-      return `${lobby.id}-hunters`
-    };
-
-    function ghostKillerRmId() {
-      return `${lobby.id}-ghostkiller`
-    };
-
     let lobby;
 
     socket.on('connectToLobby', ({ userId, lobbyId }) => {
@@ -131,12 +123,12 @@ module.exports = (io) => {
       unAssignGhost();
       const newGhost = lobby.users.find(u => u.id === userId);
       newGhost.isAssignedToGhost = true;
-      lobby.assignedToGhost = userId;
+      lobby.gameSettings.assignedToGhost = userId;
     };
 
     function assignNoGhost() {
       unAssignGhost();
-      lobby.assignedToGhost = null;
+      lobby.gameSettings.assignedToGhost = null;
     };
 
     socket.on('ghostAssigned', (data) => {
@@ -145,7 +137,7 @@ module.exports = (io) => {
 
       const resData = {
         usersOnline: lobby.users.filter(u => u.isOnline === true),
-        assignedToGhost: lobby.assignedToGhost
+        assignedToGhost: lobby.gameSettings.assignedToGhost
       };
 
       io.in(lobby.id).emit(
@@ -156,6 +148,33 @@ module.exports = (io) => {
         }
       );
     });
+
+    // toggle
+
+    function emitGameSettingsChange() {
+      io.in(lobby.id).emit(
+        'gameSettingsUpdate',
+        {
+          gameSettings: lobby.gameSettings
+        }
+      );
+    };
+
+    function toggleItem(toggledItem) {
+      switch (toggledItem) {
+        case `witness`:
+          lobby.gameSettings.hasWitness = !lobby.gameSettings.hasWitness;
+          emitGameSettingsChange();
+          break;
+        case `accomplice`:
+          lobby.gameSettings.hasAccomplice = !lobby.gameSettings.hasAccomplice;
+          emitGameSettingsChange();
+          break;
+        default: return console.log(`toggleItem Error: 'toggledItem' = ${toggledItem}`);
+      };
+    };
+
+    socket.on('toggle', toggledItem => toggleItem(toggledItem));
 
     // newMessage
 
@@ -198,20 +217,6 @@ module.exports = (io) => {
       lobby.game.players.forEach(player => {
         lobby.game.hunters.includes(player) ? emitToHunters(player) : emitToGhostKiller(player);
       });
-
-      // console.log(socket.id)
-      // const user = getUserBySID(socket.id);
-      // console.log(user);
-      // if (lobby.game.hunters.includes(user)) socket.join(huntersRmId());
-      // if (lobby.game.killer === user || lobby.game.ghost === user) socket.join(ghostKillerRmId());
-
-      // io.in(lobby.id).emit(
-      //   'startGame',
-      //   {
-      //     game: lobby.game,
-      //     msg: announce.gameStart()
-      //   }
-      // );
     });
 
     // clearGame
@@ -271,7 +276,7 @@ module.exports = (io) => {
       // console.log(`Clue chosen: ${clue}`);
 
       lobby.game.confirmedClues.push(clue);
-      const cardToLock = lobby.game.ghostCards.find(card => card.opts.some(opt => opt.id === clue));
+      const cardToLock = lobby.game.cluesDeck.find(card => card.opts.some(opt => opt.id === clue));
       cardToLock.isLocked = true;
       io.in(lobby.id).emit(
         'clueChosen',
