@@ -61,14 +61,13 @@ function makeGame(settings) {
     locationCard: null,
     location: null,
     cluesDeck: [],
-    // ghostCards: [],
     currentStage: GAME_STAGES[0],
     advanceStage() {
       const stageNum = GAME_STAGES.indexOf(this.currentStage);
       this.currentStage = GAME_STAGES[stageNum+1];
     },
     viewAsHunter() {
-      const g = omit(this, [this.keyEvidence, this.hunters, this.killer])
+      const g = omit(this, ['keyEvidence', 'hunters', 'killer'])
       g.viewingAs = HUNTER;
       return g;
     },

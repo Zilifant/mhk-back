@@ -5,10 +5,10 @@ const lobbyControl = require('../controllers/lobby-ctrl');
 
 const router = express.Router();
 
-router.get(
-  '/:lobbyUrlRoute',
-  lobbyControl.getLobby
-);
+// router.get(
+//   '/:lobbyUrlRoute',
+//   lobbyControl.getLobby
+// );
 
 // create new lobby
 router.post(
@@ -16,5 +16,11 @@ router.post(
   [ check('userName').not().isEmpty() ],
   lobbyControl.createLobby
 );
+
+router.post(
+  '/:lobbyUrlRoute',
+  lobbyControl.getLobby
+);
+
 
 module.exports = router;

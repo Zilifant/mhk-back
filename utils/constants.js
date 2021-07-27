@@ -8,7 +8,7 @@ const LOBBIES = {},
       LOCATION = 'location',
       CLUE = 'clue';
 
-const ROLES = [HUNTER, HUNTER, KILLER];
+const ROLES = [HUNTER, KILLER];
 const GAME_STAGES = ['Setup','Round 1','Round 2','Round 3'];
 const USER_COLORS = ['red','blue','green','yellow','orange','purple','pink','cyan','emerald','violet','rose','amber'];
 

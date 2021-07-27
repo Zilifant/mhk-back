@@ -3,8 +3,18 @@ const HttpError = require('../models/HttpError');
 const { uniqUserID } = require('../utils/uniqUserID');
 const { uniqLobbyID } = require('../utils/uniqLobbyID');
 const { makeLobby, makeUser } = require('../data');
-const { getLobbyById } = require('../utils/utils');
+const { getLobbyById, omit } = require('../utils/utils');
 const { LOBBIES } = require('../utils/constants');
+
+function resWithGame(userId, lobby) {
+  const reqUser = lobby.users.find(u => u.id === userId);
+  if (lobby.game.hunters.includes(reqUser)) {
+    const lobbyWithGame = omit(lobby, [`game`]);
+    lobbyWithGame.game = lobby.game.viewAsHunter();
+    return lobbyWithGame;
+  };
+  return lobby;
+}
 
 const getLobby = async (req, res, next) => {
   console.log('getLobby');
@@ -18,7 +28,11 @@ const getLobby = async (req, res, next) => {
     return next(error);
   };
 
-  res.status(200).json({ lobby });
+  const resData = lobby.gameOn
+                  ? resWithGame(req.body.userId, lobby)
+                  : lobby
+
+  res.status(200).json({ lobby: resData });
 };
 
 const createLobby = async (req, res) => {
