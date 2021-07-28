@@ -1,11 +1,19 @@
 
 const { LOBBIES } = require('./constants');
 
+const nullify = (obj, keys) => {
+  const newObj = Object.assign({}, obj);
+  keys.forEach(key => {
+    newObj[key] = null;
+  });
+  return newObj;
+};
+
 const omit = (obj, keys) => {
   const newObj = Object.assign({}, obj);
   keys.forEach(key => {
-    if (newObj[key]) delete newObj[key];
-  })
+    delete newObj[key];
+  });
   return newObj;
 };
 
@@ -83,6 +91,7 @@ const getUserById = ({lobbyId, userId}) => {
 };
 
 exports.omit = omit;
+exports.nullify = nullify;
 exports.shuffle = shuffle;
 exports.shuffleAndBatch = shuffleAndBatch;
 exports.makeGhostCard = makeGhostCard;

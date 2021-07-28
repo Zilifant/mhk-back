@@ -189,33 +189,19 @@ module.exports = (io) => {
 
     // startGame
 
-    function emitToHunters(user) {
-      io.to(user.socketId).emit(
-        'startGame',
-        {
-          game: lobby.game.viewAsHunter(),
-          msg: announce.gameStart(),
-        }
-      );
-    };
-
-    function emitToGhostKiller(user) {
-      io.to(user.socketId).emit(
-        'startGame',
-        {
-          game: lobby.game,
-          msg: announce.gameStart()
-        }
-      );
-    };
-
     socket.on('startGame', (data) => {
       // console.log('Game started');
 
       lobby.makeGame(data.settings);
 
-      lobby.game.players.forEach(player => {
-        lobby.game.hunters.includes(player) ? emitToHunters(player) : emitToGhostKiller(player);
+      lobby.game.rolesRef.forEach(ref => {
+        io.to(ref.user.socketId).emit(
+          'startGame',
+          {
+            game: lobby.game.viewAs(ref.role),
+            msg: announce.gameStart()
+          }
+        );
       });
     });
 

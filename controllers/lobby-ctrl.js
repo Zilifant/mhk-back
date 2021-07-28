@@ -51,13 +51,17 @@ const createLobby = async (req, res) => {
 };
 
 function resWithGame(userId, lobby) {
-  const reqUser = lobby.users.find(u => u.id === userId);
-  if (lobby.game.hunters.includes(reqUser)) {
-    const lobbyWithGame = omit(lobby, [`game`]);
-    lobbyWithGame.game = lobby.game.viewAsHunter();
-    return lobbyWithGame;
-  };
-  return lobby;
+  const role = getRoleById(userId, lobby);
+
+  const lobbyWithGame = omit(lobby, ['game']);
+  lobbyWithGame.game = lobby.game.viewAs(role);
+  return lobbyWithGame;
+};
+
+function getRoleById(userId, lobby) {
+  const role = lobby.game.rolesRef.find(ref => ref.user.id === userId).role;
+  if (!!role) return role;
+  return console.log(`${userId} matches no roles in this game`);
 };
 
 exports.getLobby = getLobby;

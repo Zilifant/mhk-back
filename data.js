@@ -1,12 +1,12 @@
 
 const sample = require('lodash.sample');
 const {
-  GAME_STAGES, ROLES,
+  GAME_STAGES, OPT_ROLES, HIDE_FROM,
   HUNTER, KILLER, GHOST, ACCOMPLICE, WITNESS,
   EVIDENCE_DECK, GHOST_CARD_INFO
 } = require('./utils/constants');
 const {
-  omit, shuffle, shuffleAndBatch, makeGhostCard
+  nullify, shuffle, shuffleAndBatch, makeGhostCard
 } = require('./utils/utils');
 
 const makeUser = ({ id, myLobby, lobbyCreator = false }) => {
@@ -66,23 +66,22 @@ const makeLobby = (creator) => {
   };
 };
 
-function makeGame(settings) {
+function makeGame() {
 
   const game = {
-    settings: settings,
+    settings: this.gameSettings,
     players: this.usersReady(),
     confirmedClues: [],
     timerSettings: `placeholder`,
+    rolesRef: [],
+    blueTeam: [],
+    redTeam: [],
+    nonGhosts: [],
+    ghost: null,
+    hunters: [],
+    killer: null,
     accomplice: null,
     witness: null,
-    ghost: null,
-    nonGhosts: [],
-    killer: null,
-    hunters: [],
-    causeCard: null,
-    cause: null,
-    locationCard: null,
-    location: null,
     cluesDeck: [],
     keyEvidence: [],
     currentStage: GAME_STAGES[0],
@@ -90,22 +89,81 @@ function makeGame(settings) {
       const stageNum = GAME_STAGES.indexOf(this.currentStage);
       this.currentStage = GAME_STAGES[stageNum+1];
     },
-    viewAsHunter() {
-      const g = omit(this, ['keyEvidence', 'hunters', 'killer'])
-      g.viewingAs = HUNTER;
+    viewAs(role) {
+      const g = nullify(this, HIDE_FROM[role]);
+      g.viewingAs = role;
       return g;
     }
   };
 
-  this.gameSettings.assignedToGhost
-    ? rolesAssignedGhost(game, this.gameSettings.assignedToGhost)
-    : rolesRandomGhost(game);
-
+  initRoles(game);
   createHands(game);
-  createGhostCardsDisplay(game);
+  createGhostCardDisplay(game);
 
   this.game = game;
   this.gameOn = true;
+};
+
+function initRoles(game) {
+  selectGhost(game);
+  assignNGRoles(game, initNGRoles);
+  createRolesRef(game);
+  createTeamsRef(game);
+};
+
+function selectGhost(game) {
+  const ghostId = game.settings.assignedToGhost
+  !!ghostId ? assignGhost(game, ghostId) : randomGhost(game);
+}
+
+function assignGhost(game, ghostId) {
+  return game.ghost = game.players.find(player => player.id === ghostId);
+};
+
+function randomGhost(game) {
+  return game.ghost = sample(game.players);
+};
+
+function initNGRoles(game) {
+  game.nonGhosts = getNonGhosts(game);
+
+  const roles = [KILLER];
+  if (game.settings.hasWitness) roles.push(WITNESS);
+  if (game.settings.hasAccomplice) roles.push(ACCOMPLICE);
+  const numHunters = game.nonGhosts.length - roles.length;
+  for (let i = 0; i < numHunters ; i++) roles.push(HUNTER);
+  return roles;
+};
+
+function getNonGhosts(game) {
+  return game.players.filter(player => player.id !== game.ghost.id);
+};
+
+function assignNGRoles(game, initNGRoles) {
+  const shuffledRoles = shuffle(initNGRoles(game));
+  game.nonGhosts.forEach((nG, index) => {
+    if (shuffledRoles[index] === KILLER) return game.killer = nG;
+    if (shuffledRoles[index] === WITNESS) return game.witness = nG;
+    if (shuffledRoles[index] === ACCOMPLICE) return game.accomplice = nG;
+    return game.hunters.push(nG);
+  });
+};
+
+function createRolesRef(game) {
+  game.rolesRef = [
+    {role: GHOST, user: game.ghost},
+    {role: KILLER, user: game.killer},
+  ];
+  game.hunters.forEach(h => game.rolesRef.push({role: HUNTER, user: h}));
+  OPT_ROLES.forEach(role => {
+    console.log(game[role]);
+    if (!!game[role]) game.rolesRef.push({role: role, user: game[role]});
+  });
+};
+
+function createTeamsRef(game) {
+  game.blueTeam = [game.ghost, game.witness, game.hunters].flat().filter(x => !!x);
+  game.redTeam = [game.killer, game.accomplice].filter(x => !!x);
 };
 
 function createHands(game) {
@@ -116,17 +174,17 @@ function createHands(game) {
   });
 };
 
-function createGhostCardsDisplay(game) {
+function createGhostCardDisplay(game) {
   const GHOST_CARDS = GHOST_CARD_INFO.map(item => makeGhostCard(item));
   const CAUSES_DECK = GHOST_CARDS.filter(card => card.type === 'cause');
   const LOCS_DECK   = GHOST_CARDS.filter(card => card.type === 'location');
   const CLUES_DECK  = GHOST_CARDS.filter(card => card.type === 'clue');
 
-  game.causeCard = sample(CAUSES_DECK);
-  game.causeCard.isDisplayed = true;
+  const causeCard = sample(CAUSES_DECK);
+  causeCard.isDisplayed = true;
 
-  game.locationCard = sample(LOCS_DECK);
-  game.locationCard.isDisplayed = true;
+  const locationCard = sample(LOCS_DECK);
+  locationCard.isDisplayed = true;
 
   game.cluesDeck = shuffle(CLUES_DECK).filter((card, index) => index < 6);
 
@@ -134,29 +192,7 @@ function createGhostCardsDisplay(game) {
     if (index < 4) card.isDisplayed = true;
   });
 
-  game.cluesDeck.unshift(game.causeCard, game.locationCard)
-};
-
-function rolesAssignedGhost(game, ghostId) {
-  game.ghost = game.players.find(player => player.id === ghostId);
-  game.nonGhosts = game.players.filter(player => player.id !== ghostId);
-
-  const shuffledRoles = shuffle(ROLES);
-  game.nonGhosts.forEach((nG, index) => {
-    if (shuffledRoles[index] === KILLER) return game.killer = nG;
-    return game.hunters.push(nG);
-  });
-};
-
-function rolesRandomGhost(game) {
-  const allRoles = ROLES.concat(GHOST);
-  const shuffledRoles = shuffle(allRoles)
-  game.players.forEach((player, index) => {
-    if (shuffledRoles[index] === KILLER) return game.killer = player;
-    if (shuffledRoles[index] === GHOST) return game.ghost = player;
-    return game.hunters.push(player);
-  })
-  game.nonGhosts = game.hunters.concat(game.killer);
+  game.cluesDeck.unshift(causeCard, locationCard)
 };
 
 exports.makeUser = makeUser;
@@ -222,3 +258,25 @@ exports.makeLobby = makeLobby;
 // const x = announce.accusation({accuser: 'Nina', accusee: 'Hel', evidence: ['gun','towel']});
 // const x = announce.userMessage('Harold-9382', 'Hey, how are you??')
 // console.log(x);
+
+// function rolesAssignedGhost(game, ghostId) {
+//   game.ghost = game.players.find(player => player.id === ghostId);
+//   game.nonGhosts = game.players.filter(player => player.id !== ghostId);
+
+//   const shuffledRoles = shuffle(ROLES);
+//   game.nonGhosts.forEach((nG, index) => {
+//     if (shuffledRoles[index] === KILLER) return game.killer = nG;
+//     return game.hunters.push(nG);
+//   });
+// };
+
+// function rolesRandomGhost(game) {
+//   const allRoles = ROLES.concat(GHOST);
+//   const shuffledRoles = shuffle(allRoles)
+//   game.players.forEach((player, index) => {
+//     if (shuffledRoles[index] === KILLER) return game.killer = player;
+//     if (shuffledRoles[index] === GHOST) return game.ghost = player;
+//     return game.hunters.push(player);
+//   })
+//   game.nonGhosts = game.hunters.concat(game.killer);
+// };

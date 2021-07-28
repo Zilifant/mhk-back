@@ -1,20 +1,26 @@
 // constants
 
 const LOBBIES = {},
-      GHOST = 'Ghost',
-      HUNTER = 'Hunter',
-      KILLER = 'Killer',
-      ACCOMPLICE = 'Accomplice',
-      WITNESS = 'Witness'
+      GHOST = 'ghost',
+      HUNTER = 'hunter',
+      KILLER = 'killer',
+      ACCOMPLICE = 'accomplice',
+      WITNESS = 'witness'
       CAUSE = 'cause',
       LOCATION = 'location',
       CLUE = 'clue';
 
-const ROLES = [HUNTER, KILLER];
-const GAME_STAGES = ['Setup','Round 1','Round 2','Round 3'];
-const USER_COLORS = ['red','blue','green','yellow','orange','purple','pink','cyan','emerald','violet','rose','amber'];
+const OPT_ROLES = ['witness', 'accomplice'];
+const GAME_STAGES = [
+  'Setup','Round 1','Round 2','Round 3'
+];
+const USER_COLORS = [
+  'red','blue','green','yellow','orange','purple','pink','cyan','emerald','violet','rose','amber'
+];
 
-const EVIDENCE_CARD_INFO = ['Knife', 'Revolver', 'Pills', 'Falling Debris', 'Animal Bite', 'Power Tool', 'Machine', 'Motor Vehicle', 'Plastic Bag', 'Brick', 'Axe', 'Crowbar', 'Drowned', 'Hunting Rifle', 'Heart Attack'];
+const EVIDENCE_CARD_INFO = [
+  'Knife', 'Revolver', 'Pills', 'Falling Debris', 'Animal Bite', 'Power Tool', 'Machine', 'Motor Vehicle', 'Plastic Bag', 'Brick', 'Axe', 'Crowbar', 'Drowned', 'Hunting Rifle', 'Heart Attack'
+];
 
 const makeEvidenceCard = (info) => {
   return {
@@ -78,9 +84,25 @@ const GHOST_CARD_INFO = [
   }
 ];
 
+const HIDE_FROM = {
+  ghost: [],
+  killer: [
+    'blueTeam', 'redTeam', 'rolesRef', 'witness', 'hunters'
+  ],
+  accomplice: [
+    'blueTeam', 'redTeam', 'rolesRef', 'witness', 'hunters'
+  ],
+  witness: [
+    'blueTeam', 'rolesRef', 'keyEvidence', 'killer', 'accomplice'
+  ],
+  hunter: [
+    'blueTeam', 'redTeam', 'rolesRef', 'keyEvidence', 'hunters', 'killer', 'accomplice', 'witness'
+  ]
+};
+
 exports.LOBBIES = LOBBIES;
 exports.GAME_STAGES = GAME_STAGES;
-exports.ROLES = ROLES;
+exports.OPT_ROLES = OPT_ROLES;
 exports.GHOST = GHOST;
 exports.HUNTER = HUNTER;
 exports.KILLER = KILLER;
@@ -89,3 +111,4 @@ exports.WITNESS = WITNESS;
 exports.EVIDENCE_DECK = EVIDENCE_DECK;
 exports.GHOST_CARD_INFO = GHOST_CARD_INFO;
 exports.USER_COLORS = USER_COLORS;
+exports.HIDE_FROM = HIDE_FROM;
