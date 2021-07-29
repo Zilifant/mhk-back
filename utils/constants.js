@@ -12,8 +12,66 @@ const LOBBIES = {},
 
 const OPT_ROLES = ['witness', 'accomplice'];
 
+function newClueCard(game, i) {
+  game.cluesDeck[i].isDisplayed = true;
+  game.cluesDeck[i].isNew = true;
+  game.cluesDeck[i-1].isNew = false;
+};
+
+function removeClueCard(game, cardId) {
+  game.cluesDeck.find(card => card.id === cardId).isDisplayed = false;
+};
+
 const GAME_STAGES = [
-  'Setup','Round 1','Round 2','Round 3', 'Second Murder', 'Finale'
+  {
+    type: 'setup',
+    id: 'Setup',
+    display: 'Setup',
+  },
+  {
+    type: 'round',
+    id: 'Round 1',
+    roundNum: 1,
+    display: 'Round 1',
+  },
+  {
+    type: 'liminal',
+    id: 'round-2-start',
+    roundNum: 2,
+    display: 'Round 2',
+    onStart: (game) => newClueCard(game, 6),
+  },
+  {
+    type: 'round',
+    id: 'Round 2',
+    roundNum: 2,
+    display: 'Round 2',
+    onStart: (game, cardId) => removeClueCard(game, cardId),
+  },
+  {
+    type: 'liminal',
+    id: 'round-3-start',
+    roundNum: 3,
+    display: 'Round 3',
+    onStart: (game) => newClueCard(game, 7),
+  },
+  {
+    type: 'round',
+    id: 'Round 3',
+    roundNum: 3,
+    display: 'Round 3',
+    onStart: (game, cardId) => removeClueCard(game, cardId),
+  },
+  {
+    type: 'special',
+    id: 'Second Murder',
+    display: 'Second Murder'
+  },
+  {
+    type: 'postgame',
+    id: 'Finale',
+    display: 'Finale',
+  }
 ];
 
 const GAME_OUTCOMES = [
@@ -44,51 +102,61 @@ const EVIDENCE_DECK = EVIDENCE_CARD_INFO.map(info => makeEvidenceCard(info));
 const GHOST_CARD_INFO = [
   {
     type: CAUSE,
+  
     id: 'Cause of Death',
     opts: ['Suffocation', 'Severe Injury', 'Blood Loss', 'Illness/Disease', 'Poison', 'Accident']
   },
   {
     type: LOCATION,
+  
     id: 'Location',
     opts: ['Playground', 'Classroom', 'Dormitory', 'Cafeteria', 'Elevator', 'Toilet']
   },
   {
     type: LOCATION,
+  
     id: 'Location',
     opts: ['Pub', 'Restaurant', 'Bookstore', 'Hotel', 'Hospital', 'Building Site']
   },
   {
     type: CLUE,
+  
     id: 'Motive',
     opts: ['Hatred', 'Power', 'Money', 'Love', 'Envy', 'Justice']
   },
   {
     type: CLUE,
+  
     id: 'In Progress',
     opts: ['Entertainment', 'Relaxation', 'Assembly', 'Trading', 'Visit', 'Dining']
   },
   {
     type: CLUE,
+  
     id: 'Duration',
     opts: ['Instant', 'Brief', 'Gradual', 'Prolonged', 'A Few Days', 'Unclear']
   },
   {
     type: CLUE,
+  
     id: 'General Impression',
     opts: ['Common', 'Creative', 'Fishy', 'Cruel', 'Horrific', 'Suspensful']
   },
   {
     type: CLUE,
+  
     id: 'Relationship',
     opts: ['Relatives', 'Friends', 'Colleagues', 'Competitors', 'Lovers', 'Strangers']
   },
   {
     type: CLUE,
+  
     id: 'Victim\'s Expression',
     opts: ['Peaceful', 'Struggling', 'Frightened', 'In Pain', 'Blank', 'Angry']
   },
   {
     type: CLUE,
+  
     id: 'Hint on Corpse',
     opts: ['Head', 'Chest', 'Hand', 'Leg', 'Partial', 'All-over']
   }

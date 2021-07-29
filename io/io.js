@@ -12,6 +12,7 @@ module.exports = (io) => {
     };
 
     let lobby;
+    let game;
 
     socket.on('connectToLobby', ({ userId, lobbyId }) => {
       // console.log(`Connecting: ${userId} to: ${lobbyId} on: ${socket.id}`);
@@ -192,6 +193,7 @@ module.exports = (io) => {
 
     socket.on('startGame', (data) => {
       lobby.makeGame(data.settings);
+      game = lobby.game;
       emitByRole('startGame', announce.gameStart());
     });
 
@@ -210,9 +212,11 @@ module.exports = (io) => {
 
     // advanceStage
 
-    socket.on('advanceStage', () => {
+    socket.on('advanceStage', (data) => {
       lobby.game.advanceStage();
-      emitByRole('advanceStage', announce.advanceTo(lobby.game.currentStage));
+      const newStage = lobby.game.currentStage;
+      if (!!newStage.onStart) newStage.onStart(lobby.game, data);
+      emitByRole('advanceStage', announce.advanceTo(newStage.id));
     });
 
     // keyEvidenceChosen (by killer)
@@ -222,7 +226,7 @@ module.exports = (io) => {
 
       lobby.game.keyEvidence = keyEv;
       lobby.game.advanceStage();
-      emitByRole('advanceStage', announce.advanceTo(lobby.game.currentStage));
+      emitByRole('advanceStage', announce.advanceTo(lobby.game.currentStage.id));
     });
 
     // clueChosen (by Ghost)
@@ -254,7 +258,7 @@ module.exports = (io) => {
 
     function advToSecondMurder(accuserId) {
       lobby.game.advanceStage('Second Murder');
-      emitByRole('advanceStage', announce.advanceTo(lobby.game.currentStage, accuserId));
+      emitByRole('advanceStage', announce.advanceTo(lobby.game.currentStage.id, accuserId));
     };
 
     function resolveSecondMurder(targetId) {
@@ -290,8 +294,8 @@ module.exports = (io) => {
     socket.on('accusation', ({accuserSID, accusedId, accusalEv}) => {
       const accuser = getUserBySID(accuserSID);
       isAccusalRight(accusalEv)
-        ? resolveRightAccusal(accuser, accusedId, accusalEv)
-        : resolveWrongAccusal(accuser, accusedId, accusalEv);
+        ? resolveRightAccusal(accuser)
+        : resolveWrongAccusal(accuser);
     });
 
     socket.on('secondMurder', (targetId) => resolveSecondMurder(targetId));

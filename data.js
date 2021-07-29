@@ -86,9 +86,9 @@ function makeGame() {
     keyEvidence: [],
     result: null,
     currentStage: GAME_STAGES[0],
-    advanceStage(stage) {
-      if (stage) {
-        this.currentStage = GAME_STAGES[GAME_STAGES.indexOf(stage)];
+    advanceStage(stageId) {
+      if (stageId) {
+        this.currentStage = GAME_STAGES.find(s => s.id === stageId);
       } else {
         const stageNum = GAME_STAGES.indexOf(this.currentStage);
         this.currentStage = GAME_STAGES[stageNum+1];
