@@ -111,10 +111,10 @@ const announce = (() => {
     return parseSMD(str);
   };
 
-  const ghostAssigned = (userId) => {
+  const ghostAssigned = (userId, unAssign) => {
     let str;
-    !!userId ? str = `_t_${ts()} ^_u_${name(userId)}^ is assigned to Ghost.`
-             : str = `_t_${ts()} ^Ghost unassigned.`;
+    unAssign ? str = `_t_${ts()} ^Ghost unassigned.`
+             : str = `_t_${ts()} ^_u_${name(userId)}^ is assigned to Ghost.`;
     return parseSMD(str);
   };
 

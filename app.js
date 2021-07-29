@@ -12,6 +12,7 @@ const lobbyRoutes = require('./routes/lobby-rts');
 const userRoutes = require('./routes/user-rts');
 const adminRoutes = require('./routes/admin-rts');
 
+const servName = 'MHK';
 const port = 5000;
 
 const whiteList = [process.env.CLIENT_URL_HTTP, process.env.CLIENT_URL_HTTPS];
@@ -84,7 +85,7 @@ mongoose
     useUnifiedTopology: true
   })
   .then(() => {
-    server.listen(process.env.PORT || port, () => console.log(`sgp server listening on port ${port}`));
+    server.listen(process.env.PORT || port, () => console.log(`${servName} listening on port ${port}`));
   })
   .catch(error => console.log(error));
 

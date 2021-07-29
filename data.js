@@ -33,7 +33,6 @@ const makeLobby = (creator) => {
     creatorId: creator.id,
     leader: creator.id,
     users: [creator],
-    assignedToGhost: null,
     gameSettings: {
       assignedToGhost: null,
       hasWitness: false,

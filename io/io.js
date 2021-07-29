@@ -1,7 +1,6 @@
 const intersection = require('lodash.intersection');
 const { getLobbyById, getRoleById } = require('../utils/utils');
 const { announce } = require('../utils/chat-utils');
-const { GAME_OUTCOMES } = require('../utils/constants');
 
 module.exports = (io) => {
 
@@ -133,9 +132,9 @@ module.exports = (io) => {
       lobby.gameSettings.assignedToGhost = null;
     };
 
-    socket.on('ghostAssigned', (data) => {
-      const userId = data[0];
-      userId ? assignNewGhost(userId) : assignNoGhost();
+    socket.on('ghostAssigned', userId => {
+      const unAssign = !userId || (userId === lobby.gameSettings.assignedToGhost);
+      unAssign ? assignNoGhost() : assignNewGhost(userId);
 
       const resData = {
         usersOnline: lobby.users.filter(u => u.isOnline === true),
@@ -146,7 +145,7 @@ module.exports = (io) => {
         'ghostAssigned',
         {
           resData,
-          msg: announce.ghostAssigned(userId)
+          msg: announce.ghostAssigned(userId, unAssign)
         }
       );
     });
