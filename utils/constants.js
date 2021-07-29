@@ -11,9 +11,19 @@ const LOBBIES = {},
       CLUE = 'clue';
 
 const OPT_ROLES = ['witness', 'accomplice'];
+
 const GAME_STAGES = [
-  'Setup','Round 1','Round 2','Round 3'
+  'Setup','Round 1','Round 2','Round 3', 'Second Murder', 'Finale'
 ];
+
+const GAME_OUTCOMES = [
+  'red-win',
+  'red-win-timeout',
+  'red-win-witness_dead',
+  'blue-win',
+  'blue-win-witness_alive'
+];
+
 const USER_COLORS = [
   'red','blue','green','yellow','orange','purple','pink','cyan','emerald','violet','rose','amber'
 ];
@@ -87,10 +97,10 @@ const GHOST_CARD_INFO = [
 const HIDE_FROM = {
   ghost: [],
   killer: [
-    'blueTeam', 'redTeam', 'rolesRef', 'witness', 'hunters'
+    'blueTeam', 'rolesRef', 'witness', 'hunters'
   ],
   accomplice: [
-    'blueTeam', 'redTeam', 'rolesRef', 'witness', 'hunters'
+    'blueTeam', 'rolesRef', 'witness', 'hunters'
   ],
   witness: [
     'blueTeam', 'rolesRef', 'keyEvidence', 'killer', 'accomplice'
@@ -102,6 +112,7 @@ const HIDE_FROM = {
 
 exports.LOBBIES = LOBBIES;
 exports.GAME_STAGES = GAME_STAGES;
+exports.GAME_OUTCOMES = GAME_OUTCOMES;
 exports.OPT_ROLES = OPT_ROLES;
 exports.GHOST = GHOST;
 exports.HUNTER = HUNTER;

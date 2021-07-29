@@ -90,6 +90,12 @@ const getUserById = ({lobbyId, userId}) => {
   return LOBBIES[lobbyId].users.find(user => user.id === userId);
 };
 
+function getRoleById(userId, lobby) {
+  const role = lobby.game.rolesRef.find(ref => ref.user.id === userId).role;
+  if (!!role) return role;
+  return console.log(`${userId} matches no roles in this game`);
+};
+
 exports.omit = omit;
 exports.nullify = nullify;
 exports.shuffle = shuffle;
@@ -97,6 +103,7 @@ exports.shuffleAndBatch = shuffleAndBatch;
 exports.makeGhostCard = makeGhostCard;
 exports.getLobbyById = getLobbyById;
 exports.getUserById = getUserById;
+exports.getRoleById = getRoleById;
 
 // const makeGhostDecks = (ghostCardInfo) => {
 //   const gCards = ghostCardInfo.map(item => makeGhostCard(item));

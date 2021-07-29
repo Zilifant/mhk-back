@@ -1,6 +1,7 @@
 const intersection = require('lodash.intersection');
-const { getLobbyById } = require('../utils/utils');
+const { getLobbyById, getRoleById } = require('../utils/utils');
 const { announce } = require('../utils/chat-utils');
+const { GAME_OUTCOMES } = require('../utils/constants');
 
 module.exports = (io) => {
 
@@ -23,6 +24,7 @@ module.exports = (io) => {
 
       socket.join(lobbyId);
       user.isOnline = true;
+      user.isReady = true; // TEMP
       user.socketId = socket.id;
 
       if (!lobby.leader) {
@@ -84,7 +86,7 @@ module.exports = (io) => {
         'userDisco',
         {
           resData,
-          msg: announce.leave(user.id)
+          msg: announce.leave(user.id, newLeaderId)
         }
       );
       // console.log(`Removed: ${user.id} on: ${socket.id} from: ${lobby.id}`);
@@ -190,19 +192,8 @@ module.exports = (io) => {
     // startGame
 
     socket.on('startGame', (data) => {
-      // console.log('Game started');
-
       lobby.makeGame(data.settings);
-
-      lobby.game.rolesRef.forEach(ref => {
-        io.to(ref.user.socketId).emit(
-          'startGame',
-          {
-            game: lobby.game.viewAs(ref.role),
-            msg: announce.gameStart()
-          }
-        );
-      });
+      emitByRole('startGame', announce.gameStart());
     });
 
     // clearGame
@@ -213,11 +204,8 @@ module.exports = (io) => {
       lobby.game = null;
       lobby.gameOn = false;
       io.in(lobby.id).emit(
-        'gameEnd',
-        {
-          cause: 'emergencyStop',
-          msg: announce.gameEnd('emergencyStop')
-        }
+        'clearGame',
+        { msg: announce.clearGame() }
       );
     });
 
@@ -225,13 +213,7 @@ module.exports = (io) => {
 
     socket.on('advanceStage', () => {
       lobby.game.advanceStage();
-      io.in(lobby.id).emit(
-        'advanceStage',
-        {
-          game: lobby.game,
-          msg: announce.advanceTo(lobby.game.currentStage)
-        }
-      )
+      emitByRole('advanceStage', announce.advanceTo(lobby.game.currentStage));
     });
 
     // keyEvidenceChosen (by killer)
@@ -241,83 +223,88 @@ module.exports = (io) => {
 
       lobby.game.keyEvidence = keyEv;
       lobby.game.advanceStage();
-      io.in(lobby.id).emit(
-        'advanceStage',
-        {
-          game: lobby.game,
-          msg: announce.advanceTo(lobby.game.currentStage)
-        }
-      );
-      io.to(lobby.game.ghost.socketId).emit(
-        'keyEvidenceChosen',
-        { game: lobby.game }
-      );
+      emitByRole('advanceStage', announce.advanceTo(lobby.game.currentStage));
     });
 
     // clueChosen (by Ghost)
 
+    function lockClueCard(clue) {
+      const card = lobby.game.cluesDeck.find(c => c.opts.some(o => o.id === clue));
+      card.isLocked = true;
+    };
+
     socket.on('clueChosen', (data) => {
       const clue = data[0];
-
       // console.log(`Clue chosen: ${clue}`);
-
       lobby.game.confirmedClues.push(clue);
-      const cardToLock = lobby.game.cluesDeck.find(card => card.opts.some(opt => opt.id === clue));
-      cardToLock.isLocked = true;
-      io.in(lobby.id).emit(
-        'clueChosen',
-        {
-          game: lobby.game,
-          msg: announce.clueChosen(clue)
-        }
-      );
+      lockClueCard(clue);
+      emitByRole('clueChosen', announce.clueChosen(clue));
     });
 
     // accusation
 
+    function isAccusalRight(accusalEv) {
+      return intersection(accusalEv, lobby.game.keyEvidence).length === 2;
+    };
+
+    function resolveRightAccusal(accuser) {
+      lobby.game.witness
+        ? advToSecondMurder(accuser.id)
+        : resolveGame('blue-win', accuser.id);
+    };
+
+    function advToSecondMurder(accuserId) {
+      lobby.game.advanceStage('Second Murder');
+      emitByRole('advanceStage', announce.advanceTo(lobby.game.currentStage, accuserId));
+    };
+
+    function resolveSecondMurder(targetId) {
+      lobby.game.witness.id === targetId
+        ? resolveGame('red-win-witness_dead')
+        : resolveGame('blue-win-witness_alive');
+    };
+
+    function resolveWrongAccusal(accuser) {
+      accuser.accusalSpent = true;
+      accuser.canAccuse = false;
+      lobby.game.blueCanAccuse()
+        ? continueRound(accuser.id)
+        : resolveGame('red-win');
+    };
+
+    function continueRound(accuserId) {
+      emitByRole('wrongAccusation', announce.accusationWrong(accuserId));
+    };
+
+    function resolveGame(type, accuserId) {
+      lobby.game.advanceStage('Finale');
+      lobby.game.result = {
+        type: type,
+        winnerIds: [],
+        loserIds: [],
+        keyEv: [],
+        accuserId: accuserId
+      };
+      emitByRole('resolveGame', announce.resolveGame(lobby.game.result));
+    };
+
     socket.on('accusation', ({accuserSID, accusedId, accusalEv}) => {
       const accuser = getUserBySID(accuserSID);
-
-      // console.log(`${accuser.id} accuses: ${accusedId} (${accusalEv[0]}, ${accusalEv[1]})`);
-
-      const correct = intersection(accusalEv, lobby.game.keyEvidence).length === 2;
-      if (correct) {
-        io.in(lobby.id).emit(
-          'gameEnd',
-          {
-            cause: 'accusation',
-            accuserId: accuser.id,
-            killerId: accusedId,
-            keyEv: accusalEv
-          }
-        );
-        io.in(lobby.id).emit(
-          'rightAccusation',
-          {
-            msg: announce.accusationRight(accuser.id, accusedId)
-          }
-        );
-        lobby.game = null;
-        lobby.gameOn = false;
-        // console.log(`${accuser.id} is correct; ${accusedId} loses; game over!`);
-        return;
-      };
-
-      // console.log(`${accuser.id} is incorrect; game continues...`);
-
-      accuser.accusalSpent = true;
-      io.in(lobby.id).emit(
-        'wrongAccusation',
-        {
-          game: lobby.game,
-          msg: announce.accusation({
-            accuser: accuser.id,
-            accusee: accusedId,
-            evidence: accusalEv
-          })
-        }
-      );
+      isAccusalRight(accusalEv)
+        ? resolveRightAccusal(accuser, accusedId, accusalEv)
+        : resolveWrongAccusal(accuser, accusedId, accusalEv);
     });
+
+    socket.on('secondMurder', (targetId) => resolveSecondMurder(targetId));
+
+    function emitByRole(event, msg) {
+      lobby.game.rolesRef.forEach(ref => {
+        io.to(ref.user.socketId).emit(
+          event,
+          { game: lobby.game.viewAs(ref.role), msg }
+        );
+      });
+    };
 
   });
 

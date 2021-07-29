@@ -22,6 +22,7 @@ const makeUser = ({ id, myLobby, lobbyCreator = false }) => {
     isAssignedToGhost: false,
     color: null,
     accusalSpent: null,
+    canAccuse: false,
     hand: null,
   };
 };
@@ -84,15 +85,23 @@ function makeGame() {
     witness: null,
     cluesDeck: [],
     keyEvidence: [],
+    result: null,
     currentStage: GAME_STAGES[0],
-    advanceStage() {
-      const stageNum = GAME_STAGES.indexOf(this.currentStage);
-      this.currentStage = GAME_STAGES[stageNum+1];
+    advanceStage(stage) {
+      if (stage) {
+        this.currentStage = GAME_STAGES[GAME_STAGES.indexOf(stage)];
+      } else {
+        const stageNum = GAME_STAGES.indexOf(this.currentStage);
+        this.currentStage = GAME_STAGES[stageNum+1];
+      };
     },
     viewAs(role) {
       const g = nullify(this, HIDE_FROM[role]);
       g.viewingAs = role;
       return g;
+    },
+    blueCanAccuse() {
+      return this.blueTeam.some(player => !!player.canAccuse);
     }
   };
 
@@ -171,6 +180,7 @@ function createHands(game) {
   game.nonGhosts.forEach(nG => {
     nG.hand = hands[game.nonGhosts.indexOf(nG)];
     nG.accusalSpent = false;
+    nG.canAccuse = true;
   });
 };
 

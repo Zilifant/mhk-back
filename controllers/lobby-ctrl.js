@@ -3,11 +3,10 @@ const HttpError = require('../models/HttpError');
 const { uniqUserID } = require('../utils/uniqUserID');
 const { uniqLobbyID } = require('../utils/uniqLobbyID');
 const { makeLobby, makeUser } = require('../data');
-const { getLobbyById, omit } = require('../utils/utils');
+const { getLobbyById, getRoleById, omit } = require('../utils/utils');
 const { LOBBIES } = require('../utils/constants');
 
 const getLobby = async (req, res, next) => {
-  // console.log('getLobby');
 
   let lobby;
   try {
@@ -19,10 +18,18 @@ const getLobby = async (req, res, next) => {
   };
 
   const resData = lobby.gameOn
-                  ? resWithGame(req.body.userId, lobby)
-                  : lobby
+    ? resWithGame(req.body.userId, lobby)
+    : lobby
 
   res.status(200).json({ lobby: resData });
+};
+
+function resWithGame(userId, lobby) {
+  const role = getRoleById(userId, lobby);
+
+  const lobbyWithGame = omit(lobby, ['game']);
+  lobbyWithGame.game = lobby.game.viewAs(role);
+  return lobbyWithGame;
 };
 
 const createLobby = async (req, res) => {
@@ -48,20 +55,6 @@ const createLobby = async (req, res) => {
     user: newUser,
     lobby: newLobby
   });
-};
-
-function resWithGame(userId, lobby) {
-  const role = getRoleById(userId, lobby);
-
-  const lobbyWithGame = omit(lobby, ['game']);
-  lobbyWithGame.game = lobby.game.viewAs(role);
-  return lobbyWithGame;
-};
-
-function getRoleById(userId, lobby) {
-  const role = lobby.game.rolesRef.find(ref => ref.user.id === userId).role;
-  if (!!role) return role;
-  return console.log(`${userId} matches no roles in this game`);
 };
 
 exports.getLobby = getLobby;

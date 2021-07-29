@@ -5,7 +5,6 @@ const { makeUser } = require('../data');
 const { getLobbyById, getUserById } = require('../utils/utils');
 
 const checkForSess = async (req, res, next) => {
-  console.log('getSession');
 
   if (!req.session.userIdCookie) {
     const error = new HttpError('No active session found.', 404);
