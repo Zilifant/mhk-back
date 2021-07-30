@@ -74,30 +74,35 @@ const GAME_STAGES = [
   }
 ];
 
-const GAME_OUTCOMES = [
-  'red-win',
-  'red-win-timeout',
-  'red-win-witness_dead',
-  'blue-win',
-  'blue-win-witness_alive'
-];
+const GAME_OUTCOMES = {
+  redwin: 'Killer wins! The Hunters used their last accusation.',
+  redwintimeout: 'Killer wins! The Hunters ran out of time.',
+  redwinwitnessdead: 'Killers win! The Witness is dead.',
+  bluewin: 'Hunters and Ghost win!',
+  bluewinwitnessalive: 'Hunters & Ghost win! The Witness survived.'
+};
 
 const USER_COLORS = [
   'red','blue','green','yellow','orange','purple','pink','cyan','emerald','violet','rose','amber'
 ];
 
 const EVIDENCE_CARD_INFO = [
+  'Love Letter', 'Raincoat', 'Broken Glass', 'Wineglass', 'Motor Oil', 'Thread', 'Mirror', 'Fish Tank', 'Tire', 'Bicycle', 'Computer', 'Umbrella', 'Flowers', 'Apple', 'Plane Ticket'
+];
+
+const MEANS_CARD_INFO = [
   'Knife', 'Revolver', 'Pills', 'Falling Debris', 'Animal Bite', 'Power Tool', 'Machine', 'Motor Vehicle', 'Plastic Bag', 'Brick', 'Axe', 'Crowbar', 'Drowned', 'Hunting Rifle', 'Heart Attack'
 ];
 
-const makeEvidenceCard = (info) => {
+const makePlayerCard = (info) => {
   return {
     imgURL: `url.${info}`,
     id: info
   };
 };
 
-const EVIDENCE_DECK = EVIDENCE_CARD_INFO.map(info => makeEvidenceCard(info));
+const EVIDENCE_DECK = EVIDENCE_CARD_INFO.map(info => makePlayerCard(info));
+const MEANS_DECK = MEANS_CARD_INFO.map(info => makePlayerCard(info))
 
 const GHOST_CARD_INFO = [
   {
@@ -188,6 +193,7 @@ exports.KILLER = KILLER;
 exports.ACCOMPLICE = ACCOMPLICE;
 exports.WITNESS = WITNESS;
 exports.EVIDENCE_DECK = EVIDENCE_DECK;
+exports.MEANS_DECK = MEANS_DECK;
 exports.GHOST_CARD_INFO = GHOST_CARD_INFO;
 exports.USER_COLORS = USER_COLORS;
 exports.HIDE_FROM = HIDE_FROM;

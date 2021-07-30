@@ -1,3 +1,4 @@
+const { GAME_OUTCOMES } = require('../utils/constants');
 
 function parseSMDString(str, opts) {
   const defStyle = opts.default || 'default';
@@ -119,7 +120,7 @@ const announce = (() => {
   };
 
   const resolveGame = (result) => {
-    const str = `_t_${ts()} ^Result: ^_k_${result}^.`;
+    const str = `_t_${ts()} ^Result: ^_k_${GAME_OUTCOMES[result]}`;
     return parseSMD(str);
   };
 

@@ -3,7 +3,7 @@ const sample = require('lodash.sample');
 const {
   GAME_STAGES, OPT_ROLES, HIDE_FROM,
   HUNTER, KILLER, GHOST, ACCOMPLICE, WITNESS,
-  EVIDENCE_DECK, GHOST_CARD_INFO
+  EVIDENCE_DECK, MEANS_DECK, GHOST_CARD_INFO
 } = require('./utils/constants');
 const {
   nullify, shuffle, shuffleAndBatch, makeGhostCard
@@ -23,7 +23,7 @@ const makeUser = ({ id, myLobby, lobbyCreator = false }) => {
     color: null,
     accusalSpent: null,
     canAccuse: false,
-    hand: null,
+    hand: {evidence: null, means: null},
   };
 };
 
@@ -150,6 +150,8 @@ function getNonGhosts(game) {
 function assignNGRoles(game, initNGRoles) {
   const shuffledRoles = shuffle(initNGRoles(game));
   game.nonGhosts.forEach((nG, index) => {
+    nG.accusalSpent = false;
+    nG.canAccuse = true;
     if (shuffledRoles[index] === KILLER) return game.killer = nG;
     if (shuffledRoles[index] === WITNESS) return game.witness = nG;
     if (shuffledRoles[index] === ACCOMPLICE) return game.accomplice = nG;
@@ -175,11 +177,11 @@ function createTeamsRef(game) {
 };
 
 function createHands(game) {
-  const hands = shuffleAndBatch(EVIDENCE_DECK, 3);
+  const evidenceCards = shuffleAndBatch(EVIDENCE_DECK, 2),
+        meansCards = shuffleAndBatch(MEANS_DECK, 2);
   game.nonGhosts.forEach(nG => {
-    nG.hand = hands[game.nonGhosts.indexOf(nG)];
-    nG.accusalSpent = false;
-    nG.canAccuse = true;
+    nG.hand.evidence = evidenceCards[game.nonGhosts.indexOf(nG)];
+    nG.hand.means = meansCards[game.nonGhosts.indexOf(nG)];
   });
 };
 

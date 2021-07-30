@@ -24,7 +24,7 @@ module.exports = (io) => {
 
       socket.join(lobbyId);
       user.isOnline = true;
-      user.isReady = true; // TEMP
+      // user.isReady = true; // TEMP
       user.socketId = socket.id;
 
       if (!lobby.leader) {
@@ -253,7 +253,7 @@ module.exports = (io) => {
     function resolveRightAccusal(accuser) {
       lobby.game.witness
         ? advToSecondMurder(accuser.id)
-        : resolveGame('blue-win', accuser.id);
+        : resolveGame('bluewin', accuser.id);
     };
 
     function advToSecondMurder(accuserId) {
@@ -263,8 +263,8 @@ module.exports = (io) => {
 
     function resolveSecondMurder(targetId) {
       lobby.game.witness.id === targetId
-        ? resolveGame('red-win-witness_dead')
-        : resolveGame('blue-win-witness_alive');
+        ? resolveGame('redwinwitnessdead')
+        : resolveGame('bluewinwitnessalive');
     };
 
     function resolveWrongAccusal(accuser) {
@@ -272,7 +272,7 @@ module.exports = (io) => {
       accuser.canAccuse = false;
       lobby.game.blueCanAccuse()
         ? continueRound(accuser.id)
-        : resolveGame('red-win');
+        : resolveGame('redwin');
     };
 
     function continueRound(accuserId) {
@@ -281,14 +281,14 @@ module.exports = (io) => {
 
     function resolveGame(type, accuserId) {
       lobby.game.advanceStage('Finale');
-      lobby.game.result = {
-        type: type,
-        winnerIds: [],
-        loserIds: [],
-        keyEv: [],
-        accuserId: accuserId
-      };
-      emitByRole('resolveGame', announce.resolveGame(lobby.game.result));
+      // lobby.game.result = {
+      //   type: type,
+      //   winnerIds: [],
+      //   loserIds: [],
+      //   keyEv: [],
+      //   accuserId: accuserId
+      // };
+      emitByRole('resolveGame', announce.resolveGame(type));
     };
 
     socket.on('accusation', ({accuserSID, accusedId, accusalEv}) => {
