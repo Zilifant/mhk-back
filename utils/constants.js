@@ -94,15 +94,16 @@ const MEANS_CARD_INFO = [
   'Knife', 'Revolver', 'Pills', 'Falling Debris', 'Animal Bite', 'Power Tool', 'Machine', 'Motor Vehicle', 'Plastic Bag', 'Brick', 'Axe', 'Crowbar', 'Drowned', 'Hunting Rifle', 'Heart Attack'
 ];
 
-const makePlayerCard = (info) => {
+const makePlayerCard = (info, type) => {
   return {
     imgURL: `url.${info}`,
-    id: info
+    id: info,
+    type: type
   };
 };
 
-const EVIDENCE_DECK = EVIDENCE_CARD_INFO.map(info => makePlayerCard(info));
-const MEANS_DECK = MEANS_CARD_INFO.map(info => makePlayerCard(info))
+const EVIDENCE_DECK = EVIDENCE_CARD_INFO.map(info => makePlayerCard(info, 'evidence'));
+const MEANS_DECK = MEANS_CARD_INFO.map(info => makePlayerCard(info, 'means'))
 
 const GHOST_CARD_INFO = [
   {

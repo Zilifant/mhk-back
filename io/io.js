@@ -1,5 +1,5 @@
 const intersection = require('lodash.intersection');
-const { getLobbyById, getRoleById } = require('../utils/utils');
+const { getLobbyById, omit } = require('../utils/utils');
 const { announce } = require('../utils/chat-utils');
 
 module.exports = (io) => {
@@ -11,6 +11,7 @@ module.exports = (io) => {
       return lobby.users.find(u => u.socketId === SID);
     };
 
+    const c = 'c';
     let lobby;
     let game;
 
@@ -24,7 +25,7 @@ module.exports = (io) => {
 
       socket.join(lobbyId);
       user.isOnline = true;
-      // user.isReady = true; // TEMP
+      user.isReady = true; // TEMP
       user.socketId = socket.id;
 
       if (!lobby.leader) {
@@ -32,17 +33,19 @@ module.exports = (io) => {
         user.isLeader = true;
       };
 
-      const resData = {
-        usersOnline: lobby.users.filter(u => u.isOnline === true),
-        user: user
-      };
-      io.in(lobbyId).emit(
-        'userConnected',
-        {
-          resData,
-          msg: announce.join(user.id)
-        }
-      );
+      // const resData = {
+      //   users: lobby.users,
+      //   user: user
+      // };
+      // io.in(lobbyId).emit(
+      //   'userConnected',
+      //   {
+      //     resData,
+      //     msg: announce.join(user.id)
+      //   }
+      // );
+
+      emitByRole(c, announce.join(user.id));
     });
 
     // disconnect
@@ -76,20 +79,20 @@ module.exports = (io) => {
         // console.log(`${newLeaderId} is the new leader of ${lobby.id}`);
       };
 
-      const resData = {
-        usersOnline: lobby.users.filter(u => u.isOnline === true),
-        discoUserId: user.id,
-        newLeaderId
-      };
+      // const resData = {
+      //   users: lobby.users,
+      //   discoUserId: user.id,
+      //   newLeaderId
+      // };
 
-      io.to(lobby.id).emit(
-        'userDisco',
-        {
-          resData,
-          msg: announce.leave(user.id, newLeaderId)
-        }
-      );
-      // console.log(`Removed: ${user.id} on: ${socket.id} from: ${lobby.id}`);
+      // io.to(lobby.id).emit(
+      //   'userDisco',
+      //   {
+      //     resData,
+      //     msg: announce.leave(user.id, newLeaderId)
+      //   }
+      // );
+      emitByRole(c, announce.leave(user.id, newLeaderId));
     });
 
     // readyUnready
@@ -98,20 +101,21 @@ module.exports = (io) => {
       const user = lobby.users.find(u => u.id === userId);
       user.isReady ? user.isReady = false : user.isReady = true;
 
-      const resData = {
-        usersOnline: lobby.users.filter(u => u.isOnline === true),
-        userId: userId,
-        ready: user.isReady,
-        canStart: lobby.canStart()
-      };
-      // console.log(`${userId} is ${user.isReady ? 'ready' : 'not ready'}`);
-      io.in(lobby.id).emit(
-        'readyUnready',
-        {
-          resData,
-          msg: announce.ready(userId, user.isReady)
-        }
-      );
+      // const resData = {
+      //   users: lobby.users,
+      //   userId: userId,
+      //   ready: user.isReady,
+      //   canStart: lobby.canStart()
+      // };
+      // // console.log(`${userId} is ${user.isReady ? 'ready' : 'not ready'}`);
+      // io.in(lobby.id).emit(
+      //   'readyUnready',
+      //   {
+      //     resData,
+      //     msg: announce.ready(userId, user.isReady)
+      //   }
+      // );
+      emitByRole(c, announce.ready(userId, user.isReady));
     });
 
     // ghostAssigned
@@ -137,29 +141,31 @@ module.exports = (io) => {
       const unAssign = !userId || (userId === lobby.gameSettings.assignedToGhost);
       unAssign ? assignNoGhost() : assignNewGhost(userId);
 
-      const resData = {
-        usersOnline: lobby.users.filter(u => u.isOnline === true),
-        assignedToGhost: lobby.gameSettings.assignedToGhost
-      };
+      // const resData = {
+      //   users: lobby.users,
+      //   assignedToGhost: lobby.gameSettings.assignedToGhost
+      // };
 
-      io.in(lobby.id).emit(
-        'ghostAssigned',
-        {
-          resData,
-          msg: announce.ghostAssigned(userId, unAssign)
-        }
-      );
+      // io.in(lobby.id).emit(
+      //   'ghostAssigned',
+      //   {
+      //     resData,
+      //     msg: announce.ghostAssigned(userId, unAssign)
+      //   }
+      // );
+      emitByRole(c, announce.ghostAssigned(userId, unAssign));
     });
 
     // toggle
 
     function emitGameSettingsChange() {
-      io.in(lobby.id).emit(
-        'gameSettingsUpdate',
-        {
-          gameSettings: lobby.gameSettings
-        }
-      );
+      // io.in(lobby.id).emit(
+      //   'gameSettingsUpdate',
+      //   {
+      //     gameSettings: lobby.gameSettings
+      //   }
+      // );
+      emitByRole(c);
     };
 
     function toggleItem(toggledItem) {
@@ -202,12 +208,25 @@ module.exports = (io) => {
     socket.on('clearGame', () => {
       // console.log('Game cleared by leader');
 
+      lobby.game.players.map(player => {
+        player.isReady = false;
+        return player;
+      });
+
+      // const resData = {
+      //   users: lobby.users
+      // };
+
       lobby.game = null;
       lobby.gameOn = false;
-      io.in(lobby.id).emit(
-        'clearGame',
-        { msg: announce.clearGame() }
-      );
+      // io.in(lobby.id).emit(
+      //   'clearGame',
+      //   {
+      //     resData,
+      //     msg: announce.clearGame()
+      //   }
+      // );
+      emitByRole(c, announce.clearGame());
     });
 
     // advanceStage
@@ -222,7 +241,6 @@ module.exports = (io) => {
     // keyEvidenceChosen (by killer)
 
     socket.on('keyEvidenceChosen', (keyEv) => {
-      // console.log(`Key evidence chosen: ${keyEv[0]}, ${keyEv[1]}`);
 
       lobby.game.keyEvidence = keyEv;
       lobby.game.advanceStage();
@@ -301,12 +319,27 @@ module.exports = (io) => {
     socket.on('secondMurder', (targetId) => resolveSecondMurder(targetId));
 
     function emitByRole(event, msg) {
-      lobby.game.rolesRef.forEach(ref => {
-        io.to(ref.user.socketId).emit(
+
+      const emitRedacted = () => {
+        const redactedLobby = omit(lobby, ['game']);
+
+        lobby.game.rolesRef.forEach(ref => {
+          redactedLobby.game = lobby.game.viewAs(ref.role);
+          io.to(ref.user.socketId).emit(
+            event,
+            { lobby: redactedLobby, msg }
+          );
+        });
+      };
+
+      const emitLobby = () => {
+        io.in(lobby.id).emit(
           event,
-          { game: lobby.game.viewAs(ref.role), msg }
+          { lobby, msg }
         );
-      });
+      };
+
+      return lobby.game ? emitRedacted() : emitLobby();
     };
 
   });

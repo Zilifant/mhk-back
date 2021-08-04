@@ -6,8 +6,12 @@ const {
   EVIDENCE_DECK, MEANS_DECK, GHOST_CARD_INFO
 } = require('./utils/constants');
 const {
-  nullify, shuffle, shuffleAndBatch, makeGhostCard
+  nullify,
+  shuffle,
+  shuffleAndBatch,
+  makeGhostCard,
 } = require('./utils/utils');
+const { announce } = require('./utils/chat-utils');
 
 const makeUser = ({ id, myLobby, lobbyCreator = false }) => {
   const userName = id.slice(0,-5);
@@ -61,7 +65,7 @@ const makeLobby = (creator) => {
     makeGame,
     gameOn: false,
     game: null,
-    chat: [],
+    chat: [announce.join(creator.id)],
     createdAt: new Date().toLocaleTimeString()
   };
 };
@@ -208,86 +212,3 @@ function createGhostCardDisplay(game) {
 
 exports.makeUser = makeUser;
 exports.makeLobby = makeLobby;
-
-// if (this.id === 'z') {
-//   game.players.forEach(player => {
-//     if (player.id === 'Kali-0000') return game.killer = player;
-//     if (player.id === 'Gerrard-0000') return game.ghost = player;
-//     return game.hunters.push(player);
-//   });
-//   game.nonGhosts = game.hunters.concat(game.killer);
-// } else if (this.gameSettings.assignedToGhost) {
-//   game.ghost = game.players.find(player => player.id === this.gameSettings.assignedToGhost);
-//   game.nonGhosts = game.players.filter(player => player.id !== this.gameSettings.assignedToGhost);
-
-//   const shuffledRoles = shuffle(ROLES);
-//   game.nonGhosts.forEach((nG, index) => {
-//     if (shuffledRoles[index] === KILLER) return game.killer = nG;
-//     return game.hunters.push(nG);
-//   });
-// } else {
-//   const allRoles = ROLES.concat(GHOST);
-//   const shuffledRoles = shuffle(allRoles)
-//   game.players.forEach((player, index) => {
-//     if (shuffledRoles[index] === KILLER) return game.killer = player;
-//     if (shuffledRoles[index] === GHOST) return game.ghost = player;
-//     return game.hunters.push(player);
-//   })
-//   game.nonGhosts = game.hunters.concat(game.killer);
-// }
-
-// const silas = {
-//   id: 'Silas-0000',
-//   userName: 'Silas',
-//   myLobby: 'z',
-//   isOnline: true,
-//   isLeader: true,
-//   isReady: true,
-//   color: null,
-//   role: null,
-//   socketId: null
-// };
-
-// const sara = {
-//   id: 'Sara-0000',
-//   userName: 'Sara',
-//   myLobby: 'z',
-//   isOnline: true,
-//   isLeader: false,
-//   isReady: true,
-//   color: null,
-//   role: null,
-//   socketId: null
-// };
-
-// LOBBIES[silas.myLobby] = makeLobby(silas);
-// LOBBIES[sara.myLobby].users.push(sara);
-// LOBBIES[silas.myLobby].makeGame();
-// console.log(LOBBIES[silas.myLobby].game.currentStage);
-
-// const { announce } = require('./utils/chat-utils');
-// const x = announce.accusation({accuser: 'Nina', accusee: 'Hel', evidence: ['gun','towel']});
-// const x = announce.userMessage('Harold-9382', 'Hey, how are you??')
-// console.log(x);
-
-// function rolesAssignedGhost(game, ghostId) {
-//   game.ghost = game.players.find(player => player.id === ghostId);
-//   game.nonGhosts = game.players.filter(player => player.id !== ghostId);
-
-//   const shuffledRoles = shuffle(ROLES);
-//   game.nonGhosts.forEach((nG, index) => {
-//     if (shuffledRoles[index] === KILLER) return game.killer = nG;
-//     return game.hunters.push(nG);
-//   });
-// };
-
-// function rolesRandomGhost(game) {
-//   const allRoles = ROLES.concat(GHOST);
-//   const shuffledRoles = shuffle(allRoles)
-//   game.players.forEach((player, index) => {
-//     if (shuffledRoles[index] === KILLER) return game.killer = player;
-//     if (shuffledRoles[index] === GHOST) return game.ghost = player;
-//     return game.hunters.push(player);
-//   })
-//   game.nonGhosts = game.hunters.concat(game.killer);
-// };
