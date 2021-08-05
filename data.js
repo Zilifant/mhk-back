@@ -25,7 +25,6 @@ const makeUser = ({ id, myLobby, lobbyCreator = false }) => {
     isLeader: lobbyCreator,
     isAssignedToGhost: false,
     color: null,
-    accusalSpent: null,
     canAccuse: false,
     hand: {evidence: null, means: null},
   };
@@ -154,7 +153,6 @@ function getNonGhosts(game) {
 function assignNGRoles(game, initNGRoles) {
   const shuffledRoles = shuffle(initNGRoles(game));
   game.nonGhosts.forEach((nG, index) => {
-    nG.accusalSpent = false;
     nG.canAccuse = true;
     if (shuffledRoles[index] === KILLER) return game.killer = nG;
     if (shuffledRoles[index] === WITNESS) return game.witness = nG;
@@ -181,8 +179,8 @@ function createTeamsRef(game) {
 };
 
 function createHands(game) {
-  const evidenceCards = shuffleAndBatch(EVIDENCE_DECK, 2),
-        meansCards = shuffleAndBatch(MEANS_DECK, 2);
+  const evidenceCards = shuffleAndBatch(EVIDENCE_DECK, 4),
+        meansCards = shuffleAndBatch(MEANS_DECK, 4);
   game.nonGhosts.forEach(nG => {
     nG.hand.evidence = evidenceCards[game.nonGhosts.indexOf(nG)];
     nG.hand.means = meansCards[game.nonGhosts.indexOf(nG)];

@@ -17,6 +17,10 @@ const omit = (obj, keys) => {
   return newObj;
 };
 
+const capitalize = (str) => {
+  return str.replace(/\b([a-zÁ-ú])/g, (w) => w.charAt(0).toUpperCase() + w.slice(1));
+};
+
 const shuffle = (array) => {
   let m = array.length, t, i;
   while (m) {
@@ -98,6 +102,7 @@ function getRoleById(userId, lobby) {
 
 exports.omit = omit;
 exports.nullify = nullify;
+exports.capitalize = capitalize;
 exports.shuffle = shuffle;
 exports.shuffleAndBatch = shuffleAndBatch;
 exports.makeGhostCard = makeGhostCard;
