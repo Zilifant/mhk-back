@@ -51,7 +51,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   store: store,
-  cookie: { maxAge: 60 * 60 * 3000 } // 3hr
+  cookie: { maxAge: 60 * 60 * 6000 } // 6hr
 }));
 
 // app.use((req, res, next) => {

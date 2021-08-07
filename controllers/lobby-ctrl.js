@@ -17,14 +17,30 @@ const getLobby = async (req, res, next) => {
     return next(error);
   };
 
-  const resData = lobby.gameOn
-    ? resWithGame(req.body.userId, lobby)
-    : lobby
+  const user = lobby.users.find(u => u.id === req.body.userId);
 
-  res.status(200).json({ lobby: resData });
+  res.status(200).json({ lobby: resData(user, lobby) });
 };
 
-function resWithGame(userId, lobby) {
+function resData(user, lobby) {
+  if (!lobby.game) return lobby;
+  if (!isPlayer(user, lobby)) {
+    assignSpectator(user, lobby);
+    return lobby;
+  }
+  return redactGame(user.id, lobby);
+};
+
+function isPlayer(user, lobby) {
+  return lobby.game.players.some(p => p.id === user.id);
+}
+
+function assignSpectator(user, lobby) {
+  lobby.game.spectators.push(user);
+  lobby.game.rolesRef.push({role: 'spectator', user: user});
+};
+
+function redactGame(userId, lobby) {
   const role = getRoleById(userId, lobby);
 
   const lobbyWithGame = omit(lobby, ['game']);

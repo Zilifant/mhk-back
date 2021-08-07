@@ -1,7 +1,7 @@
 
 const ADJECTIVES = [
   'z'
-  // 'aged', 'ancient', 'billowing', 'bitter', 'black', 'blue', 'broad', 'broken', 'calm', 'cold', 'crimson', 'damp', 'dark', 'delicate', 'dry', 'floral', 'gentle', 'green', 'hidden', 'holy', 'frigid', 'vast', 'transient', 'lingering', 'lucky', 'misty', 'nameless', 'old', 'great', 'patient', 'polished', 'proud', 'purple', 'quiet', 'red', 'restless', 'rough', 'royal', 'shining', 'silent', 'snowy', 'desolate', 'lonely', 'foggy', 'still', 'summer', 'twilight', 'wandering', 'weathered', 'white', 'winter', 'yellow', 'scenic', 'shady', 'lost', 'rugged', 'majestic'
+  // 'aged', 'ancient', 'billowing', 'bitter', 'black', 'blue', 'broad', 'broken', 'calm', 'cold', 'crimson', 'damp', 'dark', 'delicate', 'dry', 'floral', 'gentle', 'green', 'hidden', 'holy', 'frigid', 'vast', 'transient', 'lingering', 'lucky', 'misty', 'nameless', 'old', 'great', 'patient', 'polished', 'proud', 'purple', 'quiet', 'red', 'restless', 'rough', 'royal', 'shining', 'silent', 'snowy', 'desolate', 'lonely', 'foggy', 'still', 'summer', 'twilight', 'wandering', 'weathered', 'white', 'winter', 'yellow', 'scenic', 'shady', 'lost', 'rugged', 'majestic', 'splendid'
 ];
 
 const NOUNS = [

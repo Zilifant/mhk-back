@@ -245,6 +245,7 @@ const GHOST_CARD_INFO = [
 ];
 
 const HIDE_FROM = {
+  spectator: [],
   ghost: [],
   killer: [
     'blueTeam', 'rolesRef', 'witness', 'hunters'

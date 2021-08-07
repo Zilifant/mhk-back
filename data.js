@@ -77,6 +77,7 @@ function makeGame() {
     confirmedClues: [],
     timerSettings: `placeholder`,
     rolesRef: [],
+    spectators: [],
     blueTeam: [],
     redTeam: [],
     nonGhosts: [],
