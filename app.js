@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const http = require("http");
 const socketio = require('socket.io')
@@ -38,7 +37,6 @@ require('./io/io')(io);
 
 app.use(cors(corsOpts));
 app.use(express.json());
-app.use(cookieParser());
 // resave false so session will only be saved if something in the session changes, not on every req; saveuninit false so session not saved before a req where it doesn't need to be saved
 // note: add cookie: {} to config session cookie
 const store = new MongoDBStore({
@@ -46,12 +44,23 @@ const store = new MongoDBStore({
   collection: 'sessions'
 });
 
+const isDevMode = process.env.DB_NAME === 'sgpdb'
+console.log(`DevMode: ${isDevMode}`);
+
+if (!isDevMode) {
+  app.set('trust proxy', 1);
+}
+
 app.use(session({
   secret: 'xyz',
   resave: false,
   saveUninitialized: false,
   store: store,
-  cookie: { maxAge: 60 * 60 * 6000 } // 6hr
+  cookie: {
+    httpOnly: true,
+    secure: !isDevMode,
+    maxAge: 60 * 60 * 6000 // 6hr
+  }
 }));
 
 // app.use((req, res, next) => {
@@ -85,7 +94,10 @@ mongoose
     useUnifiedTopology: true
   })
   .then(() => {
-    server.listen(process.env.PORT || port, () => console.log(`${servName} listening on port ${port}`));
+    server.listen(
+      process.env.PORT || port,
+      console.log(`${servName} listening on port ${process.env.PORT || port}`)
+    );
   })
   .catch(error => console.log(error));
 

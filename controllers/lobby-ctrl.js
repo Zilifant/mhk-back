@@ -17,6 +17,11 @@ const getLobby = async (req, res, next) => {
     return next(error);
   };
 
+  if (!lobby) {
+    const error = new HttpError('No lobby with that name.', 404);
+    return next(error);
+  };
+
   const user = lobby.users.find(u => u.id === req.body.userId);
 
   res.status(200).json({ lobby: resData(user, lobby) });
@@ -66,6 +71,11 @@ const createLobby = async (req, res) => {
 
   req.session.userIdCookie = userId;
   req.session.userLobbyCookie = lobbyId;
+  console.log(req.session);
+
+  // req.cookieSession.userIdCookie = userId;
+  // req.cookieSession.userLobbyCookie = lobbyId;
+  // console.log(req.cookieSession);
 
   res.status(201).json({
     user: newUser,

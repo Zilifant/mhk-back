@@ -51,7 +51,7 @@ module.exports = (io) => {
     // disconnect
 
     socket.on('disconnect', () => {
-      console.log(`Socket: ${socket.id} disconnected`);
+      // console.log(`Socket: ${socket.id} disconnected`);
 
       let user;
 
