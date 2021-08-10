@@ -6,6 +6,7 @@ const socketio = require('socket.io')
 const { instrument } = require('@socket.io/admin-ui');
 const mongoose = require('mongoose');
 const MongoDBStore = require('connect-mongodb-session')(session);
+const { DEVMODE } = require('./utils/constants');
 
 const lobbyRoutes = require('./routes/lobby-rts');
 const userRoutes = require('./routes/user-rts');
@@ -45,12 +46,9 @@ const store = new MongoDBStore({
   collection: 'sessions'
 });
 
-const isDevMode = process.env.DB_NAME === 'sgpdb'
-console.log(`DevMode: ${isDevMode}`);
-
-if (!isDevMode) {
-  app.set('trust proxy', 1);
-}
+// if (!DEVMODE) {
+//   app.set('trust proxy', 1);
+// }
 
 app.use(session({
   secret: 'xyz',
@@ -59,7 +57,7 @@ app.use(session({
   store: store,
   cookie: {
     httpOnly: true,
-    secure: true,
+    secure: !DEVMODE,
     maxAge: 60 * 60 * 6000 // 6hr
   }
 }));

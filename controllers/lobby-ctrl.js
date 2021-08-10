@@ -4,7 +4,7 @@ const { uniqUserID } = require('../utils/uniqUserID');
 const { uniqLobbyID } = require('../utils/uniqLobbyID');
 const { makeLobby, makeUser } = require('../data');
 const { getLobbyById, getRoleById, omit } = require('../utils/utils');
-const { LOBBIES } = require('../utils/constants');
+const { LOBBIES, DEVMODE } = require('../utils/constants');
 
 const getLobby = async (req, res, next) => {
 
@@ -57,7 +57,7 @@ const createLobby = async (req, res) => {
   // console.log('createLobby');
 
   const userId = uniqUserID(req.body.userName);
-  const lobbyId = uniqLobbyID();
+  const lobbyId = DEVMODE ? 'z' : uniqLobbyID();
 
   const newUser = makeUser({
     id: userId,

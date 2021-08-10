@@ -1,5 +1,7 @@
 // constants
 
+const DEVMODE = process.env.DB_NAME === 'sgpdb'
+
 const LOBBIES = {},
       GHOST = 'ghost',
       HUNTER = 'hunter',
@@ -261,6 +263,7 @@ const HIDE_FROM = {
   ]
 };
 
+exports.DEVMODE = DEVMODE;
 exports.LOBBIES = LOBBIES;
 exports.GAME_STAGES = GAME_STAGES;
 exports.GAME_OUTCOMES = GAME_OUTCOMES;
