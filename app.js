@@ -20,6 +20,7 @@ const corsOpts = {
     if (whiteList.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
+      console.log(`Origin: ${origin} not allowed by CORS.`);
       callback(new Error(`Origin: ${origin} not allowed by CORS.`));
     };
   },
@@ -58,7 +59,7 @@ app.use(session({
   store: store,
   cookie: {
     httpOnly: true,
-    secure: !isDevMode,
+    secure: false,
     maxAge: 60 * 60 * 6000 // 6hr
   }
 }));
