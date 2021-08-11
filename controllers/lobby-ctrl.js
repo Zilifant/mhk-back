@@ -3,7 +3,7 @@ const HttpError = require('../models/HttpError');
 const { uniqUserID } = require('../utils/uniqUserID');
 const { uniqLobbyID } = require('../utils/uniqLobbyID');
 const { makeLobby, makeUser } = require('../data');
-const { getLobbyById, getRoleById, omit } = require('../utils/utils');
+const { getLobbyById, getRoleById, omit, cookieSettings } = require('../utils/utils');
 const { LOBBIES, DEVMODE } = require('../utils/constants');
 
 const getLobby = async (req, res, next) => {
@@ -71,11 +71,7 @@ const createLobby = async (req, res) => {
 
   res
   .status(201)
-  .cookie('userData', `${userId}--${lobbyId}`, {
-    maxAge: 60 * 60 * 5000, // 5 hours
-    secure: true,
-    httpOnly: true
-  })
+  .cookie('userData', `${userId}--${lobbyId}`, cookieSettings)
   .json({
     user: newUser,
     lobby: newLobby

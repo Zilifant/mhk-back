@@ -104,6 +104,14 @@ const createCookie = (user, lobby) => {
   
 }
 
+const cookieSettings = {
+  maxAge: 60 * 60 * 5000, // 5 hours
+  httpOnly: true,
+  sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
+  secure: process.env.NODE_ENV === "production"
+}
+
+exports.cookieSettings = cookieSettings;
 exports.omit = omit;
 exports.nullify = nullify;
 exports.capitalize = capitalize;

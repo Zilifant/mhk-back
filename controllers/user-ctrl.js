@@ -2,7 +2,7 @@
 const HttpError = require('../models/HttpError');
 const { uniqUserID } = require('../utils/uniqUserID');
 const { makeUser } = require('../data');
-const { getLobbyById, getUserById } = require('../utils/utils');
+const { getLobbyById, getUserById, cookieSettings } = require('../utils/utils');
 
 // const checkForSess = async (req, res, next) => {
 
@@ -93,11 +93,7 @@ const addUserToLobby = async (req, res, next) => {
 
   res
   .status(201)
-  .cookie('userData', `${userId}--${lobby.id}`, {
-    maxAge: 60 * 60 * 5000, // 5 hours
-    secure: true,
-    httpOnly: true
-  })
+  .cookie('userData', `${userId}--${lobby.id}`, cookieSettings)
   .json({
     user: newUser,
     lobby: lobby
