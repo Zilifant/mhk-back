@@ -95,6 +95,7 @@ const addUserToLobby = async (req, res, next) => {
   .status(201)
   .cookie('userData', `${userId}--${lobby.id}`, {
     maxAge: 60 * 60 * 5000, // 5 hours
+    secure: true,
     httpOnly: true
   })
   .json({

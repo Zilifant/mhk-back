@@ -73,6 +73,7 @@ const createLobby = async (req, res) => {
   .status(201)
   .cookie('userData', `${userId}--${lobbyId}`, {
     maxAge: 60 * 60 * 5000, // 5 hours
+    secure: true,
     httpOnly: true
   })
   .json({
