@@ -6,7 +6,7 @@ const socketio = require('socket.io')
 const { instrument } = require('@socket.io/admin-ui');
 const mongoose = require('mongoose');
 // const MongoDBStore = require('connect-mongodb-session')(session);
-// const { DEVMODE } = require('./utils/constants');
+const { DEVMODE } = require('./utils/constants');
 
 const lobbyRoutes = require('./routes/lobby-rts');
 const userRoutes = require('./routes/user-rts');
@@ -46,9 +46,9 @@ app.use(express.json());
 //   collection: 'sessions'
 // });
 
-// if (!DEVMODE) {
-//   app.set('trust proxy', 1);
-// }
+if (!DEVMODE) {
+  app.set('trust proxy', 1);
+}
 
 // app.use(session({
 //   secret: 'xyz',
