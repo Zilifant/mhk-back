@@ -71,11 +71,6 @@ const createLobby = async (req, res) => {
 
   req.session.userIdCookie = userId;
   req.session.userLobbyCookie = lobbyId;
-  console.log(req.session);
-
-  // req.cookieSession.userIdCookie = userId;
-  // req.cookieSession.userLobbyCookie = lobbyId;
-  // console.log(req.cookieSession);
 
   res.status(201).json({
     user: newUser,

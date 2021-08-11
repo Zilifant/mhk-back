@@ -2,9 +2,9 @@ const intersection = require('lodash.intersection');
 const { getLobbyById, omit } = require('../utils/utils');
 const { announce } = require('../utils/chat-utils');
 
-module.exports = (io) => {
+module.exports = io => {
 
-  io.on('connection', (socket) => {
+  io.on('connection', socket => {
     // console.log(`Socket: ${socket.id} connected`);
 
     function getUserBySID(SID) {
@@ -95,9 +95,21 @@ module.exports = (io) => {
       emitByRole(c, announce.leave(user.id, newLeaderId));
     });
 
+    // giveLeader
+
+    socket.on('giveLeadership', newLeaderId => {
+      const newLeader = lobby.users.find(u => u.id === newLeaderId);
+      const oldLeader = lobby.users.find(u => u.id === lobby.leader);
+      lobby.leader = newLeaderId;
+      newLeader.isLeader = true;
+      oldLeader.isLeader = false;
+
+      emitByRole(c, announce.newLeader(newLeaderId));
+    });
+
     // readyUnready
 
-    socket.on('readyUnready', ({ userId }) => {
+    socket.on('readyUnready', userId => {
       const user = lobby.users.find(u => u.id === userId);
       user.isReady ? user.isReady = false : user.isReady = true;
 
@@ -186,7 +198,7 @@ module.exports = (io) => {
 
     // newMessage
 
-    socket.on('newMessage', (data) => {
+    socket.on('newMessage', data => {
       const msg = announce.userMessage(data.sender, data.text)
       lobby.chat.push(msg);
       io.in(lobby.id).emit(
@@ -197,7 +209,7 @@ module.exports = (io) => {
 
     // startGame
 
-    socket.on('startGame', (data) => {
+    socket.on('startGame', data => {
       lobby.makeGame(data.settings);
       game = lobby.game;
       emitByRole('startGame', announce.gameStart());
@@ -231,7 +243,7 @@ module.exports = (io) => {
 
     // advanceStage
 
-    socket.on('advanceStage', (data) => {
+    socket.on('advanceStage', data => {
       lobby.game.advanceStage();
       const newStage = lobby.game.currentStage;
       if (!!newStage.onStart) newStage.onStart(lobby.game, data);
@@ -254,7 +266,7 @@ module.exports = (io) => {
       card.isLocked = true;
     };
 
-    socket.on('clueChosen', (data) => {
+    socket.on('clueChosen', data => {
       const clue = data[0];
       // console.log(`Clue chosen: ${clue}`);
       lobby.game.confirmedClues.push(clue);
@@ -316,7 +328,7 @@ module.exports = (io) => {
         : resolveWrongAccusal(accuser);
     });
 
-    socket.on('secondMurder', (targetId) => resolveSecondMurder(targetId));
+    socket.on('secondMurder', targetId => resolveSecondMurder(targetId));
 
     function emitByRole(event, msg) {
 
