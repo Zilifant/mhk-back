@@ -64,7 +64,7 @@ const makeLobby = (creator) => {
     makeGame,
     gameOn: false,
     game: null,
-    chat: [announce.join(creator.id)],
+    chat: [announce.welcome(creator.myLobby)],
     createdAt: new Date().toLocaleTimeString()
   };
 };
@@ -169,7 +169,6 @@ function createRolesRef(game) {
   ];
   game.hunters.forEach(h => game.rolesRef.push({role: HUNTER, user: h}));
   OPT_ROLES.forEach(role => {
-    console.log(game[role]);
     if (!!game[role]) game.rolesRef.push({role: role, user: game[role]});
   });
 };

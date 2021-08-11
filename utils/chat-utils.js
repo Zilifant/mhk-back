@@ -50,6 +50,12 @@ const name = (userId) => userId.slice(0,-5);
 
 const announce = (() => {
 
+  const welcome = (lobby) => {
+    const lobbyId = lobby === 'z' ? 'splendid-monolith-9978' : lobby
+    const str = `_t_${ts()} ^_m_Welcome to ^_k_${lobbyId}^.`;
+    return parseSMD(str);
+  }
+
   const userMessage = (user, text) => {
     const str = `_t_${ts()} ^_u_${name(user)}^_m_: ${text}`;
     return parseSMD(str);
@@ -62,7 +68,7 @@ const announce = (() => {
 
   const leave = (user, newLeader) => {
     let str;
-    !!newLeader ? str = `_t_${ts()} ^_u_${name(user)}^ left; ^_u_${name(user)}^ is the new leader.`
+    !!newLeader ? str = `_t_${ts()} ^_u_${name(user)}^ left; ^_u_${name(newLeader)}^ is the new leader.`
                 : str = `_t_${ts()} ^_u_${name(user)}^ left.`;
     return parseSMD(str);
   };
@@ -126,6 +132,7 @@ const announce = (() => {
 
   return {
     userMessage,
+    welcome,
     join, leave, ready,
     ghostAssigned,
     newLeader,

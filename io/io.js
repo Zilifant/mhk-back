@@ -16,7 +16,7 @@ module.exports = io => {
     let game;
 
     socket.on('connectToLobby', ({ userId, lobbyId }) => {
-      // console.log(`Connecting: ${userId} to: ${lobbyId} on: ${socket.id}`);
+      console.log(`Connecting: ${userId} to: ${lobbyId} on: ${socket.id}`);
 
       lobby = getLobbyById(lobbyId);
       const user = lobby.users.find(u => u.id === userId);

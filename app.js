@@ -1,12 +1,12 @@
 const express = require('express');
 const cors = require('cors');
-const session = require('express-session');
+// const session = require('express-session');
 const http = require("http");
 const socketio = require('socket.io')
 const { instrument } = require('@socket.io/admin-ui');
 const mongoose = require('mongoose');
-const MongoDBStore = require('connect-mongodb-session')(session);
-const { DEVMODE } = require('./utils/constants');
+// const MongoDBStore = require('connect-mongodb-session')(session);
+// const { DEVMODE } = require('./utils/constants');
 
 const lobbyRoutes = require('./routes/lobby-rts');
 const userRoutes = require('./routes/user-rts');
@@ -41,26 +41,26 @@ app.use(cors(corsOpts));
 app.use(express.json());
 // resave false so session will only be saved if something in the session changes, not on every req; saveuninit false so session not saved before a req where it doesn't need to be saved
 // note: add cookie: {} to config session cookie
-const store = new MongoDBStore({
-  uri: process.env.DB_URL,
-  collection: 'sessions'
-});
+// const store = new MongoDBStore({
+//   uri: process.env.DB_URL,
+//   collection: 'sessions'
+// });
 
 // if (!DEVMODE) {
 //   app.set('trust proxy', 1);
 // }
 
-app.use(session({
-  secret: 'xyz',
-  resave: false,
-  saveUninitialized: false,
-  store: store,
-  cookie: {
-    httpOnly: true,
-    secure: !DEVMODE,
-    maxAge: 60 * 60 * 6000 // 6hr
-  }
-}));
+// app.use(session({
+//   secret: 'xyz',
+//   resave: false,
+//   saveUninitialized: false,
+//   store: store,
+//   cookie: {
+//     httpOnly: true,
+//     secure: !DEVMODE,
+//     maxAge: 60 * 60 * 6000 // 6hr
+//   }
+// }));
 
 // app.use((req, res, next) => {
 //   // res.setHeader('Access-Control-Allow-Origin', '*');

@@ -69,10 +69,13 @@ const createLobby = async (req, res) => {
 
   LOBBIES[newLobby.id] = newLobby;
 
-  req.session.userIdCookie = userId;
-  req.session.userLobbyCookie = lobbyId;
-
-  res.status(201).json({
+  res
+  .status(201)
+  .cookie('userData', `${userId}--${lobbyId}`, {
+    maxAge: 60 * 60 * 5000, // 5 hours
+    httpOnly: true
+  })
+  .json({
     user: newUser,
     lobby: newLobby
   });

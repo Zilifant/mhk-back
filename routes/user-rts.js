@@ -12,7 +12,7 @@ router.post(
 
 router.get(
   '/session',
-  userControl.checkForSess
+  userControl.checkForCookie
 );
 
 module.exports = router;

@@ -94,11 +94,15 @@ const getUserById = ({lobbyId, userId}) => {
   return LOBBIES[lobbyId].users.find(user => user.id === userId);
 };
 
-function getRoleById(userId, lobby) {
+const getRoleById = (userId, lobby) => {
   const role = lobby.game.rolesRef.find(ref => ref.user.id === userId).role;
   if (!!role) return role;
   return console.log(`${userId} matches no roles in this game`);
 };
+
+const createCookie = (user, lobby) => {
+  
+}
 
 exports.omit = omit;
 exports.nullify = nullify;
