@@ -213,7 +213,7 @@ module.exports = io => {
     socket.on('startGame', data => {
       lobby.makeGame(data.settings);
       game = lobby.game;
-      emitByRole('startGame', announce.gameStart());
+      emitByRole('startGame', announce.advanceTo(game.currentStage));
     });
 
     // clearGame
@@ -248,7 +248,7 @@ module.exports = io => {
       lobby.game.advanceStage();
       const newStage = lobby.game.currentStage;
       if (!!newStage.onStart) newStage.onStart(lobby.game, data);
-      emitByRole('advanceStage', announce.advanceTo(newStage.id));
+      emitByRole('advanceStage', announce.advanceTo(newStage));
     });
 
     // keyEvidenceChosen (by killer)
@@ -257,7 +257,7 @@ module.exports = io => {
 
       lobby.game.keyEvidence = keyEv;
       lobby.game.advanceStage();
-      emitByRole('advanceStage', announce.advanceTo(lobby.game.currentStage.id));
+      emitByRole('advanceStage', announce.advanceTo(lobby.game.currentStage));
     });
 
     // clueChosen (by Ghost)
@@ -288,8 +288,8 @@ module.exports = io => {
     };
 
     function advToSecondMurder(accuserId) {
-      lobby.game.advanceStage('Second Murder');
-      emitByRole('advanceStage', announce.advanceTo(lobby.game.currentStage.id, accuserId));
+      lobby.game.advanceStage('second-murder');
+      emitByRole('advanceStage', announce.advanceTo(lobby.game.currentStage, accuserId));
     };
 
     function resolveSecondMurder(targetId) {
@@ -311,7 +311,6 @@ module.exports = io => {
     };
 
     function resolveGame(type, accuserId) {
-      lobby.game.advanceStage('Finale');
       // lobby.game.result = {
       //   type: type,
       //   winnerIds: [],
@@ -319,7 +318,8 @@ module.exports = io => {
       //   keyEv: [],
       //   accuserId: accuserId
       // };
-      emitByRole('resolveGame', announce.resolveGame(type));
+      lobby.game.advanceStage('game-over');
+      emitByRole('resolveGame', announce.resolveGame(type, accuserId));
     };
 
     socket.on('accusation', ({accuserSID, accusedId, accusalEv}) => {

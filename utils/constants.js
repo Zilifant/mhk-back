@@ -27,12 +27,12 @@ function removeClueCard(game, cardId) {
 const GAME_STAGES = [
   {
     type: 'setup',
-    id: 'Setup',
+    id: 'setup',
     display: 'Setup',
   },
   {
     type: 'round',
-    id: 'Round 1',
+    id: 'round-1',
     roundNum: 1,
     display: 'Round 1',
   },
@@ -45,7 +45,7 @@ const GAME_STAGES = [
   },
   {
     type: 'round',
-    id: 'Round 2',
+    id: 'round-2',
     roundNum: 2,
     display: 'Round 2',
     onStart: (game, cardId) => removeClueCard(game, cardId),
@@ -59,20 +59,20 @@ const GAME_STAGES = [
   },
   {
     type: 'round',
-    id: 'Round 3',
+    id: 'round-3',
     roundNum: 3,
     display: 'Round 3',
     onStart: (game, cardId) => removeClueCard(game, cardId),
   },
   {
     type: 'special',
-    id: 'Second Murder',
+    id: 'second-murder',
     display: 'Second Murder'
   },
   {
     type: 'postgame',
-    id: 'Finale',
-    display: 'Finale',
+    id: 'game-over',
+    display: 'Game Over',
   }
 ];
 
@@ -81,7 +81,7 @@ const GAME_OUTCOMES = {
   redwintimeout: 'Killer wins! The Hunters ran out of time.',
   redwinwitnessdead: 'Killers win! The Witness is dead.',
   bluewin: 'Hunters and Ghost win!',
-  bluewinwitnessalive: 'Hunters & Ghost win! The Witness survived.'
+  bluewinwitnessalive: 'Hunters and Ghost win! The Witness survived.'
 };
 
 const USER_COLORS = [
