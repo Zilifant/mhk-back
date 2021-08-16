@@ -1,6 +1,7 @@
 const intersection = require('lodash.intersection');
 const { getLobbyById, omit } = require('../utils/utils');
 const { announce } = require('../utils/chat-utils');
+const { DEVMODE } = require('../utils/constants');
 
 module.exports = io => {
 
@@ -13,19 +14,19 @@ module.exports = io => {
 
     const c = 'c';
     let lobby;
-    let game;
+    // let game;
 
     socket.on('connectToLobby', ({ userId, lobbyId }) => {
       console.log(`Connecting: ${userId} to: ${lobbyId} on: ${socket.id}`);
 
       lobby = getLobbyById(lobbyId);
-      const user = lobby.users.find(u => u.id === userId);
+      const user = lobby?.users.find(u => u.id === userId);
 
       if (!user) return console.log(`${userId} not in ${lobbyId}'s user list`)
 
       socket.join(lobbyId);
       user.isOnline = true;
-      user.isReady = true; // TEMP
+      user.isReady = DEVMODE; // users start ready in dev mode
       user.socketId = socket.id;
 
       if (!lobby.leader) {

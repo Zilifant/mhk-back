@@ -100,10 +100,6 @@ const getRoleById = (userId, lobby) => {
   return console.log(`${userId} matches no roles in this game`);
 };
 
-const createCookie = (user, lobby) => {
-  
-}
-
 const cookieSettings = {
   maxAge: 60 * 60 * 5000, // 5 hours
   httpOnly: true,

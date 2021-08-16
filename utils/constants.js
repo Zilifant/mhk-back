@@ -1,6 +1,6 @@
 // constants
 
-const DEVMODE = process.env.DB_NAME === 'sgpdb'
+const DEVMODE = process.env.NODE_ENV !== "production"
 
 const LOBBIES = {},
       GHOST = 'ghost',
@@ -92,7 +92,7 @@ const EVIDENCE_CARD_INFO = [
   'Love Letter',
   'Raincoat',
   'Broken Glass',
-  'Wineglass',
+  'Wine Glass',
   'Motor Oil',
   'Thread',
   'Mirror',
@@ -158,7 +158,7 @@ const MEANS_CARD_INFO = [
   'plague',
   'dumbbell',
   'ice skates',
-  'candlestick',
+  'candle stick',
   'matches',
   'belt',
   'venomous insect',
