@@ -36,6 +36,7 @@ const io = socketio(server, {
 });
 
 require('./io/io')(io);
+require('./data')(io);
 
 app.use(cors(corsOpts));
 app.use(express.json());

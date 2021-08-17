@@ -166,7 +166,9 @@ module.exports = io => {
       //     msg: announce.ghostAssigned(userId, unAssign)
       //   }
       // );
-      emitByRole(c, announce.ghostAssigned(userId, unAssign));
+      emitByRole(c,
+        announce.ghostAssigned(userId, unAssign),
+        {type: 'ghostAssigned', args: [userId, unAssign]});
     });
 
     // toggle
@@ -196,6 +198,17 @@ module.exports = io => {
     };
 
     socket.on('toggle', toggledItem => toggleItem(toggledItem));
+
+    function chooseTimer(duration) {
+      const timer = lobby.gameSettings.timer;
+      timer.duration = duration;
+      duration === 'off'
+        ? timer.on = false
+        : timer.on = true;
+      emitGameSettingsChange();
+    };
+
+    socket.on('chooseTimer', duration => chooseTimer(duration));
 
     // newMessage
 
@@ -331,7 +344,7 @@ module.exports = io => {
 
     socket.on('secondMurder', targetId => resolveSecondMurder(targetId));
 
-    function emitByRole(event, msg) {
+    function emitByRole(event, msg, msgData) {
 
       const emitRedacted = () => {
         const redactedLobby = omit(lobby, ['game']);
@@ -340,7 +353,7 @@ module.exports = io => {
           redactedLobby.game = lobby.game.viewAs(ref.role);
           io.to(ref.user.socketId).emit(
             event,
-            { lobby: redactedLobby, msg }
+            { lobby: redactedLobby, msg, msgData }
           );
         });
       };
@@ -348,7 +361,7 @@ module.exports = io => {
       const emitLobby = () => {
         io.in(lobby.id).emit(
           event,
-          { lobby, msg }
+          { lobby, msg, msgData }
         );
       };
 

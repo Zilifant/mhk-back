@@ -11,7 +11,16 @@ const {
   shuffleAndBatch,
   makeGhostCard,
 } = require('./utils/utils');
+const { timer } = require('./utils/timer');
 const { announce } = require('./utils/chat-utils');
+// const { testF } = require('./io/io');
+
+// module.exports = io => {
+//   function testF(x) {
+//     console.log(x);
+//   }
+//   exports.testF = testF;
+// }
 
 const makeUser = ({ id, myLobby, lobbyCreator = false }) => {
   const userName = id.slice(0,-5);
@@ -40,10 +49,11 @@ const makeLobby = (creator) => {
       assignedToGhost: null,
       hasWitness: false,
       hasAccomplice: false,
-      hasTimer: false,
-      timerSettings: {
-        minutes: 3,
-        soft: true,
+      timer: {
+        on: false,
+        duration: 'off',
+        durationOpts: ['off', 1, 2, 3, 4, 5],
+        soft: null,
       }
     },
     numOnline() {
@@ -75,7 +85,6 @@ function makeGame() {
     settings: this.gameSettings,
     players: this.usersReady(),
     confirmedClues: [],
-    timerSettings: `placeholder`,
     rolesRef: [],
     spectators: [],
     blueTeam: [],
@@ -105,7 +114,8 @@ function makeGame() {
     },
     blueCanAccuse() {
       return this.blueTeam.some(player => !!player.canAccuse);
-    }
+    },
+    timer
   };
 
   initRoles(game);

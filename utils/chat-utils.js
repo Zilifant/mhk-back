@@ -26,8 +26,6 @@ function parseSMDString({str, meta}, opts) {
 
     return createStyleObj(a[1], a[0]);
   });
-  console.log(metaData);
-  console.log(result);
   return [metaData, ...result];
 };
 
