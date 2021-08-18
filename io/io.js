@@ -14,7 +14,7 @@ module.exports = io => {
 
     const c = 'c';
     let lobby;
-    // let game;
+    let game;
 
     socket.on('connectToLobby', ({ userId, lobbyId }) => {
       console.log(`Connecting: ${userId} to: ${lobbyId} on: ${socket.id}`);
@@ -221,11 +221,20 @@ module.exports = io => {
       );
     });
 
+    // socket.on('startTimer', (duration) => {
+    //   lobby.setTimer({
+    //     lobbyId: lobby.id,
+    //     duration,
+    //     io: io
+    //   })
+    // })
+
     // startGame
 
     socket.on('startGame', data => {
       lobby.makeGame(data.settings);
       game = lobby.game;
+
       emitByRole('startGame', announce.advanceTo(game.currentStage));
     });
 
@@ -234,10 +243,12 @@ module.exports = io => {
     socket.on('clearGame', () => {
       // console.log('Game cleared by leader');
 
-      lobby.game.players.map(player => {
-        player.isReady = false;
-        return player;
-      });
+      if (!DEVMODE) {
+        lobby.game.players.map(player => {
+          player.isReady = false;
+          return player;
+        });
+      };
 
       // const resData = {
       //   users: lobby.users
@@ -258,7 +269,7 @@ module.exports = io => {
     // advanceStage
 
     socket.on('advanceStage', data => {
-      lobby.game.advanceStage();
+      lobby.game.advanceStage(null, io);
       const newStage = lobby.game.currentStage;
       if (!!newStage.onStart) newStage.onStart(lobby.game, data);
       emitByRole('advanceStage', announce.advanceTo(newStage));
@@ -269,7 +280,7 @@ module.exports = io => {
     socket.on('keyEvidenceChosen', (keyEv) => {
 
       lobby.game.keyEvidence = keyEv;
-      lobby.game.advanceStage();
+      lobby.game.advanceStage(null, io);
       emitByRole('advanceStage', announce.advanceTo(lobby.game.currentStage));
     });
 
@@ -301,7 +312,7 @@ module.exports = io => {
     };
 
     function advToSecondMurder(accuserId) {
-      lobby.game.advanceStage('second-murder');
+      lobby.game.advanceStage('second-murder', io);
       emitByRole('advanceStage', announce.advanceTo(lobby.game.currentStage, accuserId));
     };
 
@@ -331,7 +342,7 @@ module.exports = io => {
       //   keyEv: [],
       //   accuserId: accuserId
       // };
-      lobby.game.advanceStage('game-over');
+      lobby.game.advanceStage('game-over', io);
       emitByRole('resolveGame', announce.resolveGame(type, accuserId));
     };
 

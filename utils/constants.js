@@ -27,17 +27,20 @@ function removeClueCard(game, cardId) {
 const GAME_STAGES = [
   {
     type: 'setup',
+    timed: false,
     id: 'setup',
     display: 'Setup',
   },
   {
     type: 'round',
+    timed: true,
     id: 'round-1',
     roundNum: 1,
     display: 'Round 1',
   },
   {
     type: 'liminal',
+    timed: false,
     id: 'round-2-start',
     roundNum: 2,
     display: 'Round 2',
@@ -45,6 +48,7 @@ const GAME_STAGES = [
   },
   {
     type: 'round',
+    timed: true,
     id: 'round-2',
     roundNum: 2,
     display: 'Round 2',
@@ -52,6 +56,7 @@ const GAME_STAGES = [
   },
   {
     type: 'liminal',
+    timed: false,
     id: 'round-3-start',
     roundNum: 3,
     display: 'Round 3',
@@ -59,6 +64,7 @@ const GAME_STAGES = [
   },
   {
     type: 'round',
+    timed: true,
     id: 'round-3',
     roundNum: 3,
     display: 'Round 3',
@@ -66,11 +72,13 @@ const GAME_STAGES = [
   },
   {
     type: 'special',
+    timed: false,
     id: 'second-murder',
     display: 'Second Murder'
   },
   {
     type: 'postgame',
+    timed: false,
     id: 'game-over',
     display: 'Game Over',
   }

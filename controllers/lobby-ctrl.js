@@ -6,27 +6,6 @@ const { makeLobby, makeUser } = require('../data');
 const { getLobbyById, getRoleById, omit, cookieSettings } = require('../utils/utils');
 const { LOBBIES, DEVMODE } = require('../utils/constants');
 
-const getLobby = async (req, res, next) => {
-
-  let lobby;
-  try {
-    lobby = await getLobbyById(req.params.lobbyUrlRoute);
-  } catch (err) {
-    console.log(err);
-    const error = new HttpError('Could not find lobby.', 500);
-    return next(error);
-  };
-
-  if (!lobby) {
-    const error = new HttpError('No lobby with that name.', 404);
-    return next(error);
-  };
-
-  const user = lobby.users.find(u => u.id === req.body.userId);
-
-  res.status(200).json({ lobby: resData(user, lobby) });
-};
-
 function resData(user, lobby) {
   if (!lobby.game) return lobby;
   if (!isPlayer(user, lobby)) {
@@ -53,30 +32,65 @@ function redactGame(userId, lobby) {
   return lobbyWithGame;
 };
 
-const createLobby = async (req, res) => {
-  // console.log('createLobby');
+module.exports = () => {
 
-  const userId = uniqUserID(req.body.userName);
-  const lobbyId = DEVMODE ? 'z' : uniqLobbyID();
+  const getLobby = async (req, res, next) => {
+  
+    let lobby;
+    try {
+      lobby = await getLobbyById(req.params.lobbyUrlRoute);
+    } catch (err) {
+      console.log(err);
+      const error = new HttpError('Could not find lobby.', 500);
+      return next(error);
+    };
+  
+    if (!lobby) {
+      const error = new HttpError('No lobby with that name.', 404);
+      return next(error);
+    };
+  
+    const user = lobby.users.find(u => u.id === req.body.userId);
+  
+    res.status(200).json({ lobby: resData(user, lobby) });
+  };
 
-  const newUser = makeUser({
-    id: userId,
-    myLobby: lobbyId,
-    lobbyCreator: true
-  });
+  const createLobby = async (req, res) => {
+    // console.log('createLobby');
+  
+    const userId = uniqUserID(req.body.userName);
+    const lobbyId = DEVMODE ? 'z' : uniqLobbyID();
+  
+    const newUser = makeUser({
+      id: userId,
+      myLobby: lobbyId,
+      lobbyCreator: true
+    });
+  
+    const newLobby = makeLobby(newUser);
+  
+    LOBBIES[newLobby.id] = newLobby;
+  
+    res
+    .status(201)
+    .cookie('userData', `${userId}--${lobbyId}`, cookieSettings)
+    .json({
+      user: newUser,
+      lobby: newLobby
+    });
+  };
 
-  const newLobby = makeLobby(newUser);
+  return {
+    getLobby,
+    createLobby
+  }
 
-  LOBBIES[newLobby.id] = newLobby;
-
-  res
-  .status(201)
-  .cookie('userData', `${userId}--${lobbyId}`, cookieSettings)
-  .json({
-    user: newUser,
-    lobby: newLobby
-  });
 };
 
-exports.getLobby = getLobby;
-exports.createLobby = createLobby;
+// module.exports = {
+//   getLobby,
+//   createLobby
+// }
+
+// exports.getLobby = getLobby;
+// exports.createLobby = createLobby;

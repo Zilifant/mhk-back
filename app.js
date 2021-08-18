@@ -8,10 +8,6 @@ const mongoose = require('mongoose');
 // const MongoDBStore = require('connect-mongodb-session')(session);
 const { DEVMODE } = require('./utils/constants');
 
-const lobbyRoutes = require('./routes/lobby-rts');
-const userRoutes = require('./routes/user-rts');
-const adminRoutes = require('./routes/admin-rts');
-
 const servName = 'MHK';
 const port = 5000;
 
@@ -36,7 +32,10 @@ const io = socketio(server, {
 });
 
 require('./io/io')(io);
-require('./data')(io);
+
+const lobbyRoutes = require('./routes/lobby-rts')(io);
+const userRoutes = require('./routes/user-rts');
+const adminRoutes = require('./routes/admin-rts');
 
 app.use(cors(corsOpts));
 app.use(express.json());

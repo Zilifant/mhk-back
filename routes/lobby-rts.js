@@ -1,26 +1,29 @@
 const express = require('express');
 const { check } = require('express-validator');
 
-const lobbyControl = require('../controllers/lobby-ctrl');
+module.exports = () => {
 
-const router = express.Router();
+  const { createLobby, getLobby } = require('../controllers/lobby-ctrl')();
 
-// router.get(
-//   '/:lobbyUrlRoute',
-//   lobbyControl.getLobby
-// );
+  // function newLobby() {
+  //   return lobbyControl.createLobby()
+  // }
 
-// create new lobby
-router.post(
-  '/new',
-  [ check('userName').not().isEmpty() ],
-  lobbyControl.createLobby
-);
+  const router = express.Router();
 
-// get lobby (needs to know userId to recieve user/role-specific lobby/game data)
-router.post(
-  '/:lobbyUrlRoute',
-  lobbyControl.getLobby
-);
+  // create new lobby
+  router.post(
+    '/new',
+    [ check('userName').not().isEmpty() ],
+    createLobby
+  );
 
-module.exports = router;
+  // get lobby (needs to know userId to recieve user/role-specific lobby/game data)
+  router.post(
+    '/:lobbyUrlRoute',
+    getLobby
+  );
+
+  return router
+
+}

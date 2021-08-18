@@ -40,7 +40,6 @@ function parseCookies(c) {
 const checkForCookie = async (req, res, next) => {
 
   const cookies = req.get('Cookie');
-  console.log(cookies);
 
   if (!cookies) {
     const error = new HttpError('No cookie found.', 404);
@@ -50,7 +49,6 @@ const checkForCookie = async (req, res, next) => {
   let user;
   if (cookies) {
     const data = parseCookies(cookies);
-    console.log(data);
     try {
       user = await getUserById({
         userId: data.userId,
