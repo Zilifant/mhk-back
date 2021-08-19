@@ -67,7 +67,7 @@ const makeLobby = (creator) => {
     makeGame,
     gameOn: false,
     game: null,
-    chat: [announce.welcome(creator.myLobby)],
+    chat: [{type: 'welcome', args: [creator.myLobby]}],
     createdAt: new Date().toLocaleTimeString()
   };
 };
@@ -131,19 +131,17 @@ function handleTimer(game, io) {
     };
     game.timer.run(timerData);
     game.timer.running = true;
-    console.log(game.timer);
   };
   if (!game.currentStage.timed && game.timer.running === true) {
     console.log(!!io);
     game.timer.clear(game.lobbyId, io);
     game.timer.running = false;
-    console.log(game.timer);
   }
 };
 
 function initRoles(game) {
   selectGhost(game);
-  assignNGRoles(game, initNGRoles, assignDevLobbyRoles);
+  assignNGRoles(game, initNGRoles);
   createRolesRef(game);
   createTeamsRef(game);
 };
@@ -176,12 +174,12 @@ function getNonGhosts(game) {
   return game.players.filter(player => player.id !== game.ghost.id);
 };
 
-function assignNGRoles(game, initNGRoles, assignDevLobbyRoles) {
-  if (game.lobbyId === 'z') {
-    game.nonGhosts = getNonGhosts(game);
-    assignDevLobbyRoles(game);
-    return
-  }
+function assignNGRoles(game, initNGRoles) {
+  // if (game.lobbyId === 'z') {
+  //   game.nonGhosts = getNonGhosts(game);
+  //   assignDevLobbyRoles(game);
+  //   return
+  // }
   const shuffledRoles = shuffle(initNGRoles(game));
   game.nonGhosts.forEach((nG, index) => {
     nG.canAccuse = true;
@@ -192,16 +190,16 @@ function assignNGRoles(game, initNGRoles, assignDevLobbyRoles) {
   });
 };
 
-function assignDevLobbyRoles(game) {
-  return game.nonGhosts.forEach((nG) => {
-    nG.canAccuse = true;
-    if (['Felix-0000', 'Hanna-0000', 'Diedre-0000'].includes(nG.id)) {
-      return game.hunters.push(nG);
-    }
-    game.killer = nG;
-    return
-  })
-}
+// function assignDevLobbyRoles(game) {
+//   return game.nonGhosts.forEach((nG) => {
+//     nG.canAccuse = true;
+//     if (['Felix-0000', 'Hanna-0000', 'Diedre-0000'].includes(nG.id)) {
+//       return game.hunters.push(nG);
+//     }
+//     game.killer = nG;
+//     return
+//   })
+// }
 
 function createRolesRef(game) {
   game.rolesRef = [
@@ -252,34 +250,34 @@ function createGhostCardDisplay(game) {
 exports.makeUser = makeUser;
 exports.makeLobby = makeLobby;
 
-if (DEVMODE) devLobby();
+// if (DEVMODE) devLobby();
 
-function devLobby() {
-  const lobbyId = 'z';
+// function devLobby() {
+//   const lobbyId = 'z';
 
-  const newUser = makeUser({
-    id: 'Dev-0000',
-    myLobby: lobbyId,
-    lobbyCreator: false
-  });
+//   const newUser = makeUser({
+//     id: 'Dev-0000',
+//     myLobby: lobbyId,
+//     lobbyCreator: false
+//   });
   
-  const newLobby = makeLobby(newUser);
+//   const newLobby = makeLobby(newUser);
   
-  newLobby.leader = null;
+//   newLobby.leader = null;
   
-  LOBBIES[newLobby.id] = newLobby;
+//   LOBBIES[newLobby.id] = newLobby;
   
-  const users = ['Felix-0000', 'Hanna-0000', 'Diedre-0000']
+//   const users = ['Felix-0000', 'Hanna-0000', 'Diedre-0000']
   
-  const addUser = (userId, makeUser, lobby) => {
-    const newUser = makeUser({
-      id: userId,
-      myLobby: newLobby.id
-    });
-    newUser.isOnline = true;
-    newUser.isReady = true;
-    lobby.users.push(newUser);
-  }
+//   const addUser = (userId, makeUser, lobby) => {
+//     const newUser = makeUser({
+//       id: userId,
+//       myLobby: newLobby.id
+//     });
+//     newUser.isOnline = true;
+//     newUser.isReady = true;
+//     lobby.users.push(newUser);
+//   }
   
-  users.forEach(user => addUser(user, makeUser, newLobby))
-};
+//   users.forEach(user => addUser(user, makeUser, newLobby))
+// };

@@ -3,8 +3,8 @@
 const timers = {}
 
 function run({lobbyId, duration, io}) {
-  console.log(`${duration} minute timer started.`);
-  let timer = duration * 5,
+  console.log(`${duration} minute timer started`);
+  let timer = duration * 60,
       minutes,
       seconds;
   timers[lobbyId] = setInterval(() => {
@@ -15,23 +15,21 @@ function run({lobbyId, duration, io}) {
       seconds = seconds < 10 ? '0' + seconds : seconds;
       const string = minutes + ':' + seconds;
 
-      if (!io) return console.log('Timer error: no io');
+      if (!io) return console.log('Timer Error: no io');
 
       if (--timer < 0) {
-          io.in(lobbyId).emit('lastTick', string);
-          // console.log(string);
-          clearInterval(timers[lobbyId])
-          // this.clear(t);
+        io.in(lobbyId).emit('tick', string);
+        clearInterval(timers[lobbyId])
       }
-      // console.log(string);
       io.in(lobbyId).emit('tick', string);
+
   }, 1000);
 };
 
 function clear(lobbyId, io) {
-  console.log(!!io);
   clearInterval(timers[lobbyId]);
   io.in(lobbyId).emit('clear');
+  console.log('Timer cleared');
 }
 
 const timer = {

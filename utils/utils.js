@@ -80,7 +80,7 @@ const makeGhostCard = (item) => {
 
 const getLobbyById = id => {
   if (!LOBBIES[id]) {
-    console.log(`Lobby: ${id} no longer exists`);
+    console.log(`Lobby: ${id} not found`);
     return;
   };
   return LOBBIES[id];
@@ -88,7 +88,7 @@ const getLobbyById = id => {
 
 const getUserById = ({lobbyId, userId}) => {
   if (!LOBBIES[lobbyId]) {
-    console.log(`Lobby: ${lobbyId} no longer exists`);
+    console.log(`Lobby: ${lobbyId} not found`);
     return;
   };
   return LOBBIES[lobbyId].users.find(user => user.id === userId);
