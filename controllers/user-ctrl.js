@@ -42,8 +42,9 @@ const checkForCookie = async (req, res, next) => {
   const cookies = req.get('Cookie');
 
   if (!cookies) {
-    const error = new HttpError('No cookie found.', 404);
-    return next(error);
+    res.status(200).json({ user: null })
+    // const error = new HttpError('No cookie found.', 404);
+    // return next(error);
   };
 
   let user;
