@@ -100,6 +100,15 @@ const getRoleById = (userId, lobby) => {
   return console.log(`${userId} matches no roles in this game`);
 };
 
+const msg = (type, args, senderId = 'app') => {
+  return {
+    type,
+    senderId,
+    args,
+    time: new Date().toLocaleTimeString().slice(0,-6)
+  }
+};
+
 const cookieSettings = {
   maxAge: 60 * 60 * 5000, // 5 hours
   httpOnly: true,
@@ -117,6 +126,7 @@ exports.makeGhostCard = makeGhostCard;
 exports.getLobbyById = getLobbyById;
 exports.getUserById = getUserById;
 exports.getRoleById = getRoleById;
+exports.msg = msg;
 
 // const makeGhostDecks = (ghostCardInfo) => {
 //   const gCards = ghostCardInfo.map(item => makeGhostCard(item));

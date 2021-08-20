@@ -1,8 +1,6 @@
 const intersection = require('lodash.intersection');
-const { getLobbyById, omit } = require('../utils/utils');
+const { getLobbyById, omit, msg } = require('../utils/utils');
 const { DEVMODE } = require('../utils/constants');
-
-const msg = (type, args) => { return {type, args} };
 
 const emitSimply = [
   'userConnected', 'userDisconnected', 'giveLeadership', 'ghostAssigned', 'gameSettingsChange', 'startGame', 'readyUnready', 'clearGame', 'advanceStage', 'clueChosen', 'wrongAccusation', 'resolveGame'
@@ -262,7 +260,7 @@ module.exports = io => {
     // newMessage
 
     socket.on('newMessage', data => {
-      const message = msg('userMessage', [data.sender, data.text]);
+      const message = msg('userMessage', [data.senderId, data.text], data.senderId);
       lobby.chat.push(message);
       io.in(lobby.id).emit('newMessage', message);
     });

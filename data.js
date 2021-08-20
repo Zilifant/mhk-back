@@ -10,10 +10,9 @@ const {
   shuffle,
   shuffleAndBatch,
   makeGhostCard,
+  msg
 } = require('./utils/utils');
 const { timer } = require('./utils/timer');
-const { announce } = require('./utils/chat-utils');
-// const { devLobby } = require('./utils/dev')();
 
 const makeUser = ({ id, myLobby, lobbyCreator = false }) => {
   const userName = id.slice(0,-5);
@@ -67,7 +66,7 @@ const makeLobby = (creator) => {
     makeGame,
     gameOn: false,
     game: null,
-    chat: [{type: 'welcome', args: [creator.myLobby]}],
+    chat: [msg('welcome')],
     createdAt: new Date().toLocaleTimeString()
   };
 };
