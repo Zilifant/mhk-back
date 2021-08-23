@@ -66,7 +66,7 @@ const makeLobby = (creator) => {
     makeGame,
     gameOn: false,
     game: null,
-    chat: [msg('welcome')],
+    chat: [msg('welcome', [])],
     createdAt: new Date().toLocaleTimeString()
   };
 };
