@@ -78,7 +78,8 @@ const makeGhostCard = (item) => {
   };
 };
 
-const getLobbyById = id => {
+const getLobbyById = lobbyId => {
+  const id = lobbyId.toLowerCase();
   if (!LOBBIES[id]) {
     console.log(`Lobby: ${id} not found`);
     return;
