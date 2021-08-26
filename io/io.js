@@ -294,9 +294,12 @@ module.exports = io => {
       }]);
       io.in(lobby.id).emit('announcement', {msg: message});
 
-      isAccusalRight(accusalEv)
+      // suspensful delay
+      setTimeout(() => {
+        isAccusalRight(accusalEv)
         ? resolveRightAccusal(accuser)
         : resolveWrongAccusal(accuser);
+      }, 3000);
     });
 
     socket.on('secondMurder', targetId => resolveSecondMurder(targetId));
