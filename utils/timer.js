@@ -22,6 +22,7 @@ function run({lobbyId, duration, io}) {
         clearInterval(timers[lobbyId])
       }
       io.in(lobbyId).emit('tick', string);
+      console.log(string);
 
   }, 1000);
 };

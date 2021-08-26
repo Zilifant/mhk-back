@@ -1,6 +1,8 @@
 
 const { LOBBIES } = require('./constants');
 
+const have = (x) => !!x ? true : console.log(`Error: ${x} is falsy.`);
+
 const nullify = (obj, keys) => {
   const newObj = Object.assign({}, obj);
   keys.forEach(key => {
@@ -103,10 +105,10 @@ const getRoleById = (userId, lobby) => {
 
 const msg = (type, args, senderId = 'app') => {
   return {
+    time: new Date().toLocaleTimeString().slice(0,-6),
     type,
-    senderId,
     args,
-    time: new Date().toLocaleTimeString().slice(0,-6)
+    senderId,
   }
 };
 
@@ -128,6 +130,7 @@ exports.getLobbyById = getLobbyById;
 exports.getUserById = getUserById;
 exports.getRoleById = getRoleById;
 exports.msg = msg;
+exports.have = have;
 
 // const makeGhostDecks = (ghostCardInfo) => {
 //   const gCards = ghostCardInfo.map(item => makeGhostCard(item));

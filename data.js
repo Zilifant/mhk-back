@@ -25,6 +25,7 @@ const makeUser = ({ id, myLobby, lobbyCreator = false }) => {
     isReady: false,
     isLeader: lobbyCreator,
     isAssignedToGhost: false,
+    connectionTime: null,
     color: null,
     canAccuse: false,
     hand: {evidence: null, means: null},
@@ -42,10 +43,9 @@ const makeLobby = (creator) => {
       hasWitness: false,
       hasAccomplice: false,
       timer: {
-        on: true,
-        duration: 1,
-        durationOpts: ['off', 1, 2, 3, 4, 5],
-        soft: null,
+        on: false,
+        duration: 0,
+        durationOpts: [0, 1, 2, 3, 4, 5],
       }
     },
     numOnline() {
@@ -66,7 +66,7 @@ const makeLobby = (creator) => {
     makeGame,
     gameOn: false,
     game: null,
-    chat: [msg('welcome', [])],
+    chat: [],
     createdAt: new Date().toLocaleTimeString()
   };
 };

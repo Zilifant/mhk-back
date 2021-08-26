@@ -1,9 +1,13 @@
 const intersection = require('lodash.intersection');
-const { getLobbyById, omit, msg } = require('../utils/utils');
+const { getLobbyById, omit, msg, have } = require('../utils/utils');
 const { DEVMODE } = require('../utils/constants');
 
 const emitSimply = [
   'userConnected', 'userDisconnected', 'giveLeadership', 'ghostAssigned', 'gameSettingsChange', 'startGame', 'readyUnready', 'clearGame', 'advanceStage', 'clueChosen', 'wrongAccusation', 'resolveGame'
+];
+
+const saveToChat = [
+  'startGame', 'clearGame', 'advanceStage', 'wrongAccusation', 'resolveGame'
 ];
 
 module.exports = io => {
@@ -28,20 +32,26 @@ module.exports = io => {
       user.isOnline = true;
       user.isReady = DEVMODE; // users start ready in dev mode
       user.socketId = socket.id;
+      user.connectionTime = Date.now();
 
       if (!lobby.leader) {
         lobby.leader = userId;
         user.isLeader = true;
       };
 
-      emitByRole('userConnected', msg('join', [user.id]));
+      const data = {
+        event: 'userConnected',
+        user: user
+      }
+
+      emitByRole('userConnected', msg('join', [user.id]), data);
     });
 
     // disconnect
 
     socket.on('disconnect', () => {
 
-      let user;
+      let user, newLeaderId;
 
       try {
         user = getUserBySID(socket.id);
@@ -52,20 +62,28 @@ module.exports = io => {
       user.isOnline = false;
       user.isReady = false;
 
-      const needNewLeader = user.isLeader && (lobby.numOnline() >= 1);
-
-      let newLeaderId;
-
-      if (!needNewLeader) {
-        newLeaderId = null;
-      } else {
-        const newLeader = lobby.users.find(u => u.isOnline === true);
-        user.isLeader = false;
-        newLeader.isLeader = true;
-        lobby.leader = newLeader.id;
-        newLeaderId = newLeader.id;
+      function makeNewLeader() {
+        const needNewLeader = user.isLeader && (lobby.numOnline() >= 1);
+        if (!needNewLeader) {
+          newLeaderId = null;
+        } else {
+          const newLeader = lobby.users.find(u => u.isOnline === true);
+          user.isLeader = false;
+          newLeader.isLeader = true;
+          lobby.leader = newLeader.id;
+          newLeaderId = newLeader.id;
+        };
       };
 
+      function unAssignToGhost() {
+        if (user.isAssignedToGhost) {
+          user.isAssignedToGhost === false;
+          lobby.gameSettings.assignedToGhost = null;
+        };
+      };
+
+      makeNewLeader();
+      unAssignToGhost();
       emitByRole('userDisconnected', msg('leave', [user.id, newLeaderId]));
     });
 
@@ -84,6 +102,8 @@ module.exports = io => {
     // readyUnready
 
     socket.on('readyUnready', userId => {
+      if (!have(lobby)) return;
+
       const user = lobby.users.find(u => u.id === userId);
       user.isReady ? user.isReady = false : user.isReady = true;
 
@@ -110,6 +130,8 @@ module.exports = io => {
     };
 
     socket.on('ghostAssigned', userId => {
+      if (!have(lobby)) return;
+
       const unAssign = !userId || (userId === lobby.gameSettings.assignedToGhost);
       unAssign ? assignNoGhost() : assignNewGhost(userId);
 
@@ -123,6 +145,8 @@ module.exports = io => {
     };
 
     function toggleItem(toggledItem) {
+      if (!have(lobby)) return;
+
       switch (toggledItem) {
         case `witness`:
           lobby.gameSettings.hasWitness = !lobby.gameSettings.hasWitness;
@@ -139,9 +163,11 @@ module.exports = io => {
     socket.on('toggle', toggledItem => toggleItem(toggledItem));
 
     function chooseTimer(duration) {
+      if (!have(lobby)) return;
+
       const timer = lobby.gameSettings.timer;
       timer.duration = duration;
-      duration === 'off'
+      duration === 0
         ? timer.on = false
         : timer.on = true;
       emitGameSettingsChange();
@@ -152,6 +178,8 @@ module.exports = io => {
     // startGame
 
     socket.on('startGame', data => {
+      if (!have(lobby)) return;
+
       lobby.makeGame(data.settings);
       game = lobby.game;
 
@@ -161,6 +189,7 @@ module.exports = io => {
     // clearGame
 
     socket.on('clearGame', () => {
+      if (!have(lobby)) return;
 
       if (!DEVMODE) {
         lobby.game.players.map(player => {
@@ -178,6 +207,8 @@ module.exports = io => {
     // advanceStage
 
     socket.on('advanceStage', data => {
+      if (!have(lobby)) return;
+
       lobby.game.advanceStage(null, io);
       const newStage = lobby.game.currentStage;
       if (!!newStage.onStart) newStage.onStart(lobby.game, data);
@@ -188,6 +219,7 @@ module.exports = io => {
     // keyEvidenceChosen (by killer)
 
     socket.on('keyEvidenceChosen', (keyEv) => {
+      if (!have(lobby)) return;
 
       lobby.game.keyEvidence = keyEv;
       lobby.game.advanceStage(null, io);
@@ -202,6 +234,8 @@ module.exports = io => {
     };
 
     socket.on('clueChosen', data => {
+      if (!have(lobby)) return;
+
       const clue = data[0];
       lobby.game.confirmedClues.push(clue);
       lockClueCard(clue);
@@ -248,8 +282,18 @@ module.exports = io => {
       emitByRole('resolveGame', msg('resolveGame', [type, accuserId]));
     };
 
-    socket.on('accusation', ({accuserSID, accusalEv}) => {
+    socket.on('accusation', ({accuserSID, accusedId, accusalEv}) => {
+      if (!have(lobby)) return;
+
       const accuser = getUserBySID(accuserSID);
+
+      const message = msg('accusation', [{
+        accuser: accuser.id,
+        accusee: accusedId,
+        evidence: accusalEv
+      }]);
+      io.in(lobby.id).emit('announcement', {msg: message});
+
       isAccusalRight(accusalEv)
         ? resolveRightAccusal(accuser)
         : resolveWrongAccusal(accuser);
@@ -260,12 +304,20 @@ module.exports = io => {
     // newMessage
 
     socket.on('newMessage', data => {
+      if (!have(lobby)) return;
+
       const message = msg('userMessage', [data.senderId, data.text], data.senderId);
       lobby.chat.push(message);
       io.in(lobby.id).emit('newMessage', message);
     });
 
-    function emitByRole(e, msg) {
+    function saveAnnouncement(msg) {
+      lobby.chat.push(msg);
+    }
+
+    function emitByRole(e, msg, data) {
+
+      if (saveToChat.includes(e)) saveAnnouncement(msg);
 
       // currently redundant
       const event = emitSimply.includes(e) ? 'updateLobby' : e;
@@ -277,7 +329,7 @@ module.exports = io => {
           redactedLobby.game = lobby.game.viewAs(ref.role);
           io.to(ref.user.socketId).emit(
             event,
-            { lobby: redactedLobby, msg }
+            { lobby: redactedLobby, msg, data }
           );
         });
       };
@@ -285,7 +337,7 @@ module.exports = io => {
       const emitLobby = () => {
         io.in(lobby.id).emit(
           event,
-          { lobby, msg }
+          { lobby, msg, data }
         );
       };
 
