@@ -92,7 +92,7 @@ const GAME_OUTCOMES = {
   bluewinwitnessalive: 'Hunters and Ghost win! The Witness survived.'
 };
 
-const USER_COLORS = [
+const COLORS = [
   'red','blue','green','yellow','orange','purple','pink','cyan','emerald','violet','rose','amber'
 ];
 
@@ -284,5 +284,5 @@ exports.WITNESS = WITNESS;
 exports.EVIDENCE_DECK = EVIDENCE_DECK;
 exports.MEANS_DECK = MEANS_DECK;
 exports.GHOST_CARD_INFO = GHOST_CARD_INFO;
-exports.USER_COLORS = USER_COLORS;
+exports.COLORS = COLORS;
 exports.HIDE_FROM = HIDE_FROM;

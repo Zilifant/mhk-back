@@ -3,14 +3,13 @@ const sample = require('lodash.sample');
 const {
   GAME_STAGES, OPT_ROLES, HIDE_FROM,
   HUNTER, KILLER, GHOST, ACCOMPLICE, WITNESS,
-  EVIDENCE_DECK, MEANS_DECK, GHOST_CARD_INFO, DEVMODE, LOBBIES
+  EVIDENCE_DECK, MEANS_DECK, GHOST_CARD_INFO, COLORS
 } = require('./utils/constants');
 const {
   nullify,
   shuffle,
   shuffleAndBatch,
   makeGhostCard,
-  msg
 } = require('./utils/utils');
 const { timer } = require('./utils/timer');
 
@@ -33,7 +32,7 @@ const makeUser = ({ id, myLobby, lobbyCreator = false }) => {
 };
 
 const makeLobby = (creator) => {
-  return {
+  const lobby = {
     id: creator.myLobby,
     creatorId: creator.id,
     leader: creator.id,
@@ -57,8 +56,14 @@ const makeLobby = (creator) => {
     usersOnline() {
       return this.users.filter(u => u.isOnline === true);
     },
+    usersOffline() {
+      return this.users.filter(u => u.isOnline === false);
+    },
     usersReady() {
       return this.users.filter(u => u.isReady === true);
+    },
+    usersUnReady() {
+      return this.users.filter(u => u.isReady === false);
     },
     canStart() {
       return (this.numReady() >= 3) && (this.numReady() === this.numOnline());
@@ -69,6 +74,20 @@ const makeLobby = (creator) => {
     chat: [],
     createdAt: new Date().toLocaleTimeString()
   };
+
+  initColors(lobby);
+
+  return lobby;
+};
+
+function initColors(lobby) {
+  lobby.colors = COLORS.map(col => {
+    return {
+      id: col,
+      isAssigned: false,
+      assignedTo: []
+    };
+  });
 };
 
 function makeGame() {

@@ -35,7 +35,7 @@ function redactGame(userId, lobby) {
 module.exports = () => {
 
   const getLobby = async (req, res, next) => {
-  
+
     let lobby;
     try {
       lobby = await getLobbyById(req.params.lobbyUrlRoute);

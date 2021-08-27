@@ -1,4 +1,5 @@
 const intersection = require('lodash.intersection');
+const sample = require('lodash.sample');
 const { getLobbyById, omit, msg, have } = require('../utils/utils');
 const { DEVMODE } = require('../utils/constants');
 
@@ -18,6 +19,35 @@ module.exports = io => {
       return lobby.users.find(u => u.socketId === SID);
     };
 
+    function assignColor(user) {
+
+      function assignNewColor() {
+        const color = sample(availCols)
+        color.isAssigned = true;
+        color.assignedTo.push(user.id);
+        user.color = color;
+        console.log(color);
+      };
+  
+      function assignDupeColor() {
+        const oUCols = lobby.usersOffline().map(oU => oU.color);
+        const color = oUCols.find(c.assignedTo.length === 1);
+        color.assignedTo.push(user.id);
+        user.color = color;
+        console.log(color);
+      };
+
+      const availCols = lobby.colors.filter(c => !c.isAssigned);
+
+      return !!availCols.length ? assignNewColor() : assignDupeColor();
+    };
+
+    function unAssignColor(user) {
+      user.color.isAssigned = false;
+      user.color.assignedTo = null;
+      user.color = null;
+    };
+
     let lobby;
     let game;
 
@@ -33,6 +63,8 @@ module.exports = io => {
       user.isReady = DEVMODE; // users start ready in dev mode
       user.socketId = socket.id;
       user.connectionTime = Date.now();
+
+      if (!user.color) assignColor(user);
 
       if (!lobby.leader) {
         lobby.leader = userId;
@@ -61,6 +93,8 @@ module.exports = io => {
 
       user.isOnline = false;
       user.isReady = false;
+
+      // unAssignColor(user);
 
       function makeNewLeader() {
         const needNewLeader = user.isLeader && (lobby.numOnline() >= 1);
