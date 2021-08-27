@@ -1,6 +1,6 @@
 const intersection = require('lodash.intersection');
 const sample = require('lodash.sample');
-const { getLobbyById, omit, msg, have } = require('../utils/utils');
+const { getLobbyById, getUserById, omit, msg, have } = require('../utils/utils');
 const { DEVMODE } = require('../utils/constants');
 
 const emitSimply = [
@@ -42,12 +42,6 @@ module.exports = io => {
       return !!availCols.length ? assignNewColor() : assignDupeColor();
     };
 
-    function unAssignColor(user) {
-      user.color.isAssigned = false;
-      user.color.assignedTo = null;
-      user.color = null;
-    };
-
     let lobby;
     let game;
 
@@ -56,7 +50,7 @@ module.exports = io => {
       lobby = getLobbyById(lobbyId);
       const user = lobby?.users.find(u => u.id === userId);
 
-      if (!user) return console.log(`${userId} not in ${lobbyId}'s user list`)
+      if (!user) return console.log(`${userId} not in ${lobbyId}'s user list`);
 
       socket.join(lobbyId);
       user.isOnline = true;
@@ -71,19 +65,23 @@ module.exports = io => {
         user.isLeader = true;
       };
 
+      const args = [
+        [user.id, user.color.id]
+      ];
+
       const data = {
         event: 'userConnected',
         user: user
-      }
+      };
 
-      emitByRole('userConnected', msg('join', [user.id]), data);
+      emitByRole('userConnected', msg('join', args), data);
     });
 
     // disconnect
 
     socket.on('disconnect', () => {
 
-      let user, newLeaderId;
+      let user, newLeaderId, newLeader;
 
       try {
         user = getUserBySID(socket.id);
@@ -101,7 +99,7 @@ module.exports = io => {
         if (!needNewLeader) {
           newLeaderId = null;
         } else {
-          const newLeader = lobby.users.find(u => u.isOnline === true);
+          newLeader = lobby.users.find(u => u.isOnline === true);
           user.isLeader = false;
           newLeader.isLeader = true;
           lobby.leader = newLeader.id;
@@ -118,7 +116,13 @@ module.exports = io => {
 
       makeNewLeader();
       unAssignToGhost();
-      emitByRole('userDisconnected', msg('leave', [user.id, newLeaderId]));
+
+      const args = [
+        [user.id, user.color.id],
+        [newLeader?.id, newLeader?.color.id]
+      ];
+
+      emitByRole('userDisconnected', msg('leave', args));
     });
 
     // giveLeader
@@ -130,7 +134,11 @@ module.exports = io => {
       newLeader.isLeader = true;
       oldLeader.isLeader = false;
 
-      emitByRole('giveLeadership', msg('newLeader', [newLeaderId]));
+      const args = [
+        [newLeader.id, newLeader.color.id]
+      ];
+
+      emitByRole('giveLeadership', msg('newLeader', args));
     });
 
     // readyUnready
@@ -141,7 +149,12 @@ module.exports = io => {
       const user = lobby.users.find(u => u.id === userId);
       user.isReady ? user.isReady = false : user.isReady = true;
 
-      emitByRole('readyUnready', msg('ready', [userId, user.isReady]));
+      const args = [
+        [user.id, user.color.id],
+        user.isReady
+      ];
+
+      emitByRole('readyUnready', msg('ready', args));
     });
 
     // ghostAssigned
@@ -156,11 +169,20 @@ module.exports = io => {
       const newGhost = lobby.users.find(u => u.id === userId);
       newGhost.isAssignedToGhost = true;
       lobby.gameSettings.assignedToGhost = userId;
+
+      const args = [
+        [newGhost.id, newGhost.color.id],
+        false
+      ];
+
+      emitByRole('ghostAssigned', msg('ghostAssigned', args));
     };
 
     function assignNoGhost() {
       unAssignGhost();
       lobby.gameSettings.assignedToGhost = null;
+
+      emitByRole('ghostAssigned', msg('ghostAssigned', [[null, null], true]));
     };
 
     socket.on('ghostAssigned', userId => {
@@ -168,8 +190,6 @@ module.exports = io => {
 
       const unAssign = !userId || (userId === lobby.gameSettings.assignedToGhost);
       unAssign ? assignNoGhost() : assignNewGhost(userId);
-
-      emitByRole('ghostAssigned', msg('ghostAssigned', [userId, unAssign]));
     });
 
     // toggle
@@ -285,7 +305,7 @@ module.exports = io => {
     function resolveRightAccusal(accuser) {
       lobby.game.witness
         ? advToSecondMurder(accuser.id)
-        : resolveGame('bluewin', accuser.id);
+        : resolveGame('bluewin');
     };
 
     function advToSecondMurder(accuserId) {
@@ -303,27 +323,31 @@ module.exports = io => {
       accuser.accusalSpent = true;
       accuser.canAccuse = false;
       lobby.game.blueCanAccuse()
-        ? continueRound(accuser.id)
+        ? continueRound(accuser)
         : resolveGame('redwin');
     };
 
-    function continueRound(accuserId) {
-      emitByRole('wrongAccusation', msg('accusationWrong', [accuserId]));
+    function continueRound(user) {
+      const args = [
+        [user.id, user.color.id]
+      ];
+      emitByRole('wrongAccusation', msg('accusationWrong', args));
     };
 
-    function resolveGame(type, accuserId) {
+    function resolveGame(result) {
       lobby.game.advanceStage('game-over', io);
-      emitByRole('resolveGame', msg('resolveGame', [type, accuserId]));
+      emitByRole('resolveGame', msg('resolveGame', [result]));
     };
 
     socket.on('accusation', ({accuserSID, accusedId, accusalEv}) => {
       if (!have(lobby)) return;
 
       const accuser = getUserBySID(accuserSID);
+      const accused = getUserById({lobbyId: lobby.id, userId: accusedId});
 
       const message = msg('accusation', [{
-        accuser: accuser.id,
-        accusee: accusedId,
+        accuser: [accuser.id, accuser.color.id],
+        accusee: [accused.id, accused.color.id],
         evidence: accusalEv
       }]);
       io.in(lobby.id).emit('announcement', {msg: message});
@@ -343,7 +367,14 @@ module.exports = io => {
     socket.on('newMessage', data => {
       if (!have(lobby)) return;
 
-      const message = msg('userMessage', [data.senderId, data.text], data.senderId);
+      const user = getUserById({lobbyId: lobby.id, userId: data.senderId});
+
+      const args = [
+        [user.id, user.color.id],
+        data.text
+      ];
+
+      const message = msg('userMessage', args, data.senderId);
       lobby.chat.push(message);
       io.in(lobby.id).emit('newMessage', message);
     });
