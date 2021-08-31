@@ -4,7 +4,7 @@ const cors = require('cors');
 const http = require("http");
 const socketio = require('socket.io')
 const { instrument } = require('@socket.io/admin-ui');
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 // const MongoDBStore = require('connect-mongodb-session')(session);
 const { DEVMODE } = require('./utils/constants');
 
@@ -87,19 +87,24 @@ app.use((error, req, res, next) => {
   res.json({message: error.message || 'An unknown error occurred!'});
 });
 
-mongoose
-  .connect(process.env.DB_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
-  .then(() => {
-    server.listen(
-      process.env.PORT || port,
-      console.log(`${servName} listening on port ${process.env.PORT || port}`)
-    );
-  })
-  .catch(error => console.log(error));
+// mongoose
+//   .connect(process.env.DB_URL, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true
+//   })
+//   .then(() => {
+//     server.listen(
+//       process.env.PORT || port,
+//       console.log(`${servName} listening on port ${process.env.PORT || port}`)
+//     );
+//   })
+//   .catch(error => console.log(error));
 
-// server.listen(process.env.PORT || port, () => console.log(`sgp server listening on port ${port}`)
+server.listen(
+  process.env.PORT || port,
+  console.log(`${servName} listening on port ${process.env.PORT || port}`)
+);
+
+// server.listen(process.env.PORT || port, () => console.log(`sgp server listening on port ${port}`));
 
 instrument(io, { auth: false });
