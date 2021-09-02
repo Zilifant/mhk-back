@@ -103,10 +103,11 @@ const getRoleById = (userId, lobby) => {
   return console.log(`${userId} matches no roles in this game`);
 };
 
-const msg = (type, args, senderId = 'app') => {
+const msg = (type, args, isInGame, senderId = 'app') => {
   return {
     time: new Date().toLocaleTimeString().slice(0,-6),
     type,
+    isInGame,
     args,
     senderId,
   }

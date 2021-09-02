@@ -74,25 +74,25 @@ module.exports = io => {
         user: user
       };
 
-      emitByRole('userConnected', msg('join', args), data);
+      emitByRole('userConnected', msg('join', args, false), data);
     });
 
     // disconnect
 
     socket.on('disconnect', () => {
 
-      let user, newLeaderId, newLeader;
+      let user, newLeader;
 
       try {
         user = getUserBySID(socket.id);
+        console.log(user);
       } catch (err) {
         return console.log(`Cannot find user on Socket: ${socket.id}`);
       };
 
+      if (!user) return console.log(`Error: cannot find user for Socket: ${socket.id}`);
       user.isOnline = false;
       user.isReady = false;
-
-      // unAssignColor(user);
 
       function makeNewLeader() {
         const needNewLeader = user.isLeader && (lobby.numOnline() >= 1);
@@ -122,7 +122,7 @@ module.exports = io => {
         [newLeader?.id, newLeader?.color.id]
       ];
 
-      emitByRole('userDisconnected', msg('leave', args));
+      emitByRole('userDisconnected', msg('leave', args, false));
     });
 
     // giveLeader
@@ -138,7 +138,7 @@ module.exports = io => {
         [newLeader.id, newLeader.color.id]
       ];
 
-      emitByRole('giveLeadership', msg('newLeader', args));
+      emitByRole('giveLeadership', msg('newLeader', args, false));
     });
 
     // readyUnready
@@ -154,7 +154,7 @@ module.exports = io => {
         user.isReady
       ];
 
-      emitByRole('readyUnready', msg('ready', args));
+      emitByRole('readyUnready', msg('ready', args, false));
     });
 
     // ghostAssigned
@@ -175,14 +175,14 @@ module.exports = io => {
         false
       ];
 
-      emitByRole('ghostAssigned', msg('ghostAssigned', args));
+      emitByRole('ghostAssigned', msg('ghostAssigned', args, false));
     };
 
     function assignNoGhost() {
       unAssignGhost();
       lobby.gameSettings.assignedToGhost = null;
 
-      emitByRole('ghostAssigned', msg('ghostAssigned', [[null, null], true]));
+      emitByRole('ghostAssigned', msg('ghostAssigned', [[null, null], true], false));
     };
 
     socket.on('ghostAssigned', userId => {
@@ -237,7 +237,7 @@ module.exports = io => {
       lobby.makeGame(data.settings);
       game = lobby.game;
 
-      emitByRole('startGame', msg('advanceTo', [lobby.game.currentStage]));
+      emitByRole('startGame', msg('advanceTo', [lobby.game.currentStage], true));
     });
 
     // clearGame
@@ -255,7 +255,7 @@ module.exports = io => {
       lobby.game = null;
       lobby.gameOn = false;
 
-      emitByRole('clearGame', msg('clearGame', []));
+      emitByRole('clearGame', msg('clearGame', [], true));
     });
 
     // advanceStage
@@ -267,7 +267,7 @@ module.exports = io => {
       const newStage = lobby.game.currentStage;
       if (!!newStage.onStart) newStage.onStart(lobby.game, data);
       console.log(newStage.id);
-      emitByRole('advanceStage', msg('advanceTo', [lobby.game.currentStage]));
+      emitByRole('advanceStage', msg('advanceTo', [lobby.game.currentStage], true));
     });
 
     // keyEvidenceChosen (by killer)
@@ -277,7 +277,7 @@ module.exports = io => {
 
       lobby.game.keyEvidence = keyEv;
       lobby.game.advanceStage(null, io);
-      emitByRole('advanceStage', msg('advanceTo', [lobby.game.currentStage]));
+      emitByRole('advanceStage', msg('advanceTo', [lobby.game.currentStage], true));
     });
 
     // clueChosen (by Ghost)
@@ -293,7 +293,7 @@ module.exports = io => {
       const clue = data[0];
       lobby.game.confirmedClues.push(clue);
       lockClueCard(clue);
-      emitByRole('clueChosen', msg('clueChosen', [clue]));
+      emitByRole('clueChosen', msg('clueChosen', [clue], true));
     });
 
     // accusation
@@ -310,7 +310,7 @@ module.exports = io => {
 
     function advToSecondMurder(accuserId) {
       lobby.game.advanceStage('second-murder', io);
-      emitByRole('advanceStage', msg('advanceTo', [lobby.game.currentStage, accuserId]));
+      emitByRole('advanceStage', msg('advanceTo', [lobby.game.currentStage, accuserId], true));
     };
 
     function resolveSecondMurder(targetId) {
@@ -331,12 +331,12 @@ module.exports = io => {
       const args = [
         [user.id, user.color.id]
       ];
-      emitByRole('wrongAccusation', msg('accusationWrong', args));
+      emitByRole('wrongAccusation', msg('accusationWrong', args, true));
     };
 
     function resolveGame(result) {
       lobby.game.advanceStage('game-over', io);
-      emitByRole('resolveGame', msg('resolveGame', [result]));
+      emitByRole('resolveGame', msg('resolveGame', [result], true));
     };
 
     socket.on('accusation', ({accuserSID, accusedId, accusalEv}) => {
@@ -349,7 +349,7 @@ module.exports = io => {
         accuser: [accuser.id, accuser.color.id],
         accusee: [accused.id, accused.color.id],
         evidence: accusalEv
-      }]);
+      }], true);
       io.in(lobby.id).emit('announcement', {msg: message});
 
       // suspensful delay
@@ -374,7 +374,7 @@ module.exports = io => {
         data.text
       ];
 
-      const message = msg('userMessage', args, data.senderId);
+      const message = msg('userMessage', args, false, data.senderId);
       lobby.chat.push(message);
       io.in(lobby.id).emit('newMessage', message);
     });
