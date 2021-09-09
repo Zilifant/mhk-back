@@ -35,7 +35,7 @@ function run({lobbyId, duration, io}) {
   timers[lobbyId] = setInterval(() => {
     if (!io) return console.log('Timer Error: no io');
 
-    if (--timer < 0) {
+    if (--timer <= 0) {
       io.in(lobbyId).emit('tenSec', timer);
       clearInterval(timers[lobbyId])
     }
