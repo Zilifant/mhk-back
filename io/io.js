@@ -242,7 +242,7 @@ module.exports = io => {
 
     // clearGame
 
-    socket.on('clearGame', () => {
+    function clearGame() {
       if (!have(lobby)) return;
 
       if (!DEVMODE) {
@@ -252,10 +252,15 @@ module.exports = io => {
         });
       };
 
+      if (lobby.game.timerIsRunning) lobby.game.timer.clear(lobby.id, io);
+
       lobby.game = null;
       lobby.gameOn = false;
       lobby.resetSettings();
+    }
 
+    socket.on('clearGame', () => {
+      clearGame();
       emitByRole('clearGame', msg('clearGame', [], true));
     });
 

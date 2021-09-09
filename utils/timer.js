@@ -2,6 +2,37 @@
 
 const timers = {}
 
+function run({lobbyId, duration, io}) {
+  console.log(`${duration} min timer started in ${lobbyId}`);
+
+  let timer = duration * 6;
+
+  timers[lobbyId] = setInterval(() => {
+    if (!io) return console.log('Timer Error: no io');
+
+    if (--timer <= 0) {
+      io.in(lobbyId).emit('tenSec', timer);
+      clearInterval(timers[lobbyId])
+    }
+    io.in(lobbyId).emit('tenSec', timer);
+    console.log(timer);
+
+  }, 10000);
+};
+
+function clear(lobbyId, io) {
+  clearInterval(timers[lobbyId]);
+  io.in(lobbyId).emit('clear');
+  console.log(`timer cleared in ${lobbyId}`);
+}
+
+const timer = {
+  run,
+  clear
+}
+
+exports.timer = timer;
+
 // function run({lobbyId, duration, io}) {
 //   console.log(`${duration} minute timer started`);
 //   let timer = duration * 60,
@@ -26,36 +57,3 @@ const timers = {}
 
 //   }, 1000);
 // };
-
-function run({lobbyId, duration, io}) {
-  console.log(`${duration} minute 10-sec timer started`);
-
-  let timer = duration * 6;
-
-  timers[lobbyId] = setInterval(() => {
-    if (!io) return console.log('Timer Error: no io');
-
-    if (--timer <= 0) {
-      io.in(lobbyId).emit('tenSec', timer);
-      clearInterval(timers[lobbyId])
-    }
-    io.in(lobbyId).emit('tenSec', timer);
-    console.log(timer);
-
-  }, 10000);
-};
-
-function clear(lobbyId, io) {
-  clearInterval(timers[lobbyId]);
-  io.in(lobbyId).emit('clear');
-  console.log('Timer cleared');
-}
-
-const timer = {
-  running: false,
-  current: null,
-  run,
-  clear
-}
-
-exports.timer = timer;

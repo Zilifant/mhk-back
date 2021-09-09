@@ -93,7 +93,8 @@ function initSettings(lobby) {
     timer: {
       on: false,
       duration: 0,
-      durationOpts: [0, 1, 2, 3, 4, 5],
+      minDuration: 0,
+      maxDuration: 5
     }
   };
   lobby.gameSettings = defaultSettings;
@@ -148,7 +149,8 @@ function makeGame() {
     blueCanAccuse() {
       return this.blueTeam.some(player => !!player.canAccuse);
     },
-    timer
+    timer,
+    timerIsRunning: false
   };
 
   initRoles(game);
@@ -167,13 +169,13 @@ function handleTimer(game, io) {
       io: io
     };
     game.timer.run(timerData);
-    game.timer.running = true;
+    game.timerIsRunning = true;
   };
-  if (!game.currentStage.timed && game.timer.running === true) {
+  if (!game.currentStage.timed && game.timerIsRunning === true) {
     console.log(!!io);
     game.timer.clear(game.lobbyId, io);
-    game.timer.running = false;
-  }
+    game.timerIsRunning = false;
+  };
 };
 
 function initRoles(game) {
