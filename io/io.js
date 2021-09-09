@@ -1,7 +1,7 @@
 const intersection = require('lodash.intersection');
 const sample = require('lodash.sample');
 const { getLobbyById, getUserById, omit, msg, have } = require('../utils/utils');
-const { DEVMODE } = require('../utils/constants');
+const { DEVMODE, DEFAULT_GAME_SETTINGS } = require('../utils/constants');
 
 const emitSimply = [
   'userConnected', 'userDisconnected', 'giveLeadership', 'ghostAssigned', 'gameSettingsChange', 'startGame', 'readyUnready', 'clearGame', 'advanceStage', 'clueChosen', 'wrongAccusation', 'resolveGame'
@@ -254,6 +254,7 @@ module.exports = io => {
 
       lobby.game = null;
       lobby.gameOn = false;
+      lobby.resetSettings();
 
       emitByRole('clearGame', msg('clearGame', [], true));
     });

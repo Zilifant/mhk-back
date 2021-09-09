@@ -84,6 +84,17 @@ const GAME_STAGES = [
   }
 ];
 
+const DEFAULT_GAME_SETTINGS = {
+  assignedToGhost: null,
+  hasWitness: false,
+  hasAccomplice: false,
+  timer: {
+    on: false,
+    duration: 0,
+    durationOpts: [0, 1, 2, 3, 4, 5],
+  }
+};
+
 const GAME_OUTCOMES = {
   redwin: 'Killer wins! The Hunters used their last accusation.',
   redwintimeout: 'Killer wins! The Hunters ran out of time.',
@@ -286,3 +297,4 @@ exports.MEANS_DECK = MEANS_DECK;
 exports.GHOST_CARD_INFO = GHOST_CARD_INFO;
 exports.COLORS = COLORS;
 exports.HIDE_FROM = HIDE_FROM;
+exports.DEFAULT_GAME_SETTINGS = DEFAULT_GAME_SETTINGS;

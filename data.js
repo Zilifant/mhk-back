@@ -1,7 +1,7 @@
 
 const sample = require('lodash.sample');
 const {
-  GAME_STAGES, OPT_ROLES, HIDE_FROM,
+  GAME_STAGES, OPT_ROLES, HIDE_FROM, DEFAULT_GAME_SETTINGS,
   HUNTER, KILLER, GHOST, ACCOMPLICE, WITNESS,
   EVIDENCE_DECK, MEANS_DECK, GHOST_CARD_INFO, COLORS
 } = require('./utils/constants');
@@ -37,16 +37,6 @@ const makeLobby = (creator) => {
     creatorId: creator.id,
     leader: creator.id,
     users: [creator],
-    gameSettings: {
-      assignedToGhost: null,
-      hasWitness: false,
-      hasAccomplice: false,
-      timer: {
-        on: false,
-        duration: 0,
-        durationOpts: [0, 1, 2, 3, 4, 5],
-      }
-    },
     numOnline() {
       return this.users.filter(u => u.isOnline === true).length;
     },
@@ -68,16 +58,45 @@ const makeLobby = (creator) => {
     canStart() {
       return (this.numReady() >= 3) && (this.numReady() === this.numOnline());
     },
+    resetSettings() {
+      return initSettings(this)
+    },
     makeGame,
     gameOn: false,
     game: null,
     chat: [],
-    createdAt: new Date().toLocaleTimeString()
+    createdAt: new Date().toLocaleTimeString(),
+    defaultSettings: {
+      assignedToGhost: null,
+      hasWitness: false,
+      hasAccomplice: false,
+      timer: {
+        on: false,
+        duration: 0,
+        durationOpts: [0, 1, 2, 3, 4, 5],
+      }
+    },
+    gameSettings: { ...this.defaultSettings },
   };
 
   initColors(lobby);
+  initSettings(lobby);
 
   return lobby;
+};
+
+function initSettings(lobby) {
+  const defaultSettings = {
+    assignedToGhost: null,
+    hasWitness: false,
+    hasAccomplice: false,
+    timer: {
+      on: false,
+      duration: 0,
+      durationOpts: [0, 1, 2, 3, 4, 5],
+    }
+  };
+  lobby.gameSettings = defaultSettings;
 };
 
 function initColors(lobby) {
