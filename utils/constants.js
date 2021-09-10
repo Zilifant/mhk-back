@@ -10,7 +10,9 @@ const LOBBIES = {},
       WITNESS = 'witness'
       CAUSE = 'cause',
       LOCATION = 'location',
-      CLUE = 'clue';
+      CLUE = 'clue',
+      MIN_PLAYER_COUNT = 3,
+      MIN_PLAYER_COUNT_FOR_ADV_ROLES = 4;
 
 const OPT_ROLES = ['witness', 'accomplice'];
 
@@ -298,3 +300,5 @@ exports.GHOST_CARD_INFO = GHOST_CARD_INFO;
 exports.COLORS = COLORS;
 exports.HIDE_FROM = HIDE_FROM;
 exports.DEFAULT_GAME_SETTINGS = DEFAULT_GAME_SETTINGS;
+exports.MIN_PLAYER_COUNT = MIN_PLAYER_COUNT;
+exports.MIN_PLAYER_COUNT_FOR_ADV_ROLES = MIN_PLAYER_COUNT_FOR_ADV_ROLES;

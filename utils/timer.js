@@ -1,23 +1,35 @@
 // timer
 
-const timers = {}
+const { getLobbyById } = require('../utils/utils');
+
+const timers = {};
 
 function run({lobbyId, duration, io}) {
+
+  const lobby = getLobbyById(lobbyId);
+  if (!lobby) return;
+
   console.log(`${duration} min timer started in ${lobbyId}`);
 
   let timer = duration * 6;
+
+  io.in(lobbyId).emit('timerStarted');
 
   timers[lobbyId] = setInterval(() => {
     if (!io) return console.log('Timer Error: no io');
 
     if (--timer <= 0) {
-      io.in(lobbyId).emit('tenSec', timer);
-      clearInterval(timers[lobbyId])
+      console.log(timer);
+      io.in(lobbyId).emit('timeUp', timer);
+      clearInterval(timers[lobbyId]);
+      lobby.game.timerIsRunning = false;
+      return;
     }
-    io.in(lobbyId).emit('tenSec', timer);
-    console.log(timer);
 
-  }, 10000);
+    console.log(timer);
+    io.in(lobbyId).emit('tenSec', timer);
+
+  }, 3000);
 };
 
 function clear(lobbyId, io) {

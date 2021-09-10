@@ -1,17 +1,22 @@
 
 const sample = require('lodash.sample');
+
+const { timer } = require('./utils/timer');
+const { l } = require('./utils/lobby-module');
+
 const {
-  GAME_STAGES, OPT_ROLES, HIDE_FROM, DEFAULT_GAME_SETTINGS,
+  GAME_STAGES, OPT_ROLES, HIDE_FROM,
   HUNTER, KILLER, GHOST, ACCOMPLICE, WITNESS,
-  EVIDENCE_DECK, MEANS_DECK, GHOST_CARD_INFO, COLORS
+  EVIDENCE_DECK, MEANS_DECK, GHOST_CARD_INFO, COLORS,
+  MIN_PLAYER_COUNT, MIN_PLAYER_COUNT_FOR_ADV_ROLES
 } = require('./utils/constants');
+
 const {
   nullify,
   shuffle,
   shuffleAndBatch,
   makeGhostCard,
 } = require('./utils/utils');
-const { timer } = require('./utils/timer');
 
 const makeUser = ({ id, myLobby, lobbyCreator = false }) => {
   const userName = id.slice(0,-5);
@@ -55,11 +60,21 @@ const makeLobby = (creator) => {
     usersUnReady() {
       return this.users.filter(u => u.isReady === false);
     },
+    canUseAdvRoles() {
+      return this.numOnline() >= MIN_PLAYER_COUNT_FOR_ADV_ROLES;
+    },
+    minPlayersOnline() {
+      return this.numOnline() >= MIN_PLAYER_COUNT;
+    },
+    minPlayersReady() {
+      return this.numReady() >= MIN_PLAYER_COUNT;
+    },
     canStart() {
       return (this.numReady() >= 3) && (this.numReady() === this.numOnline());
     },
     resetSettings() {
-      return initSettings(this)
+      l.unAssignGhost(this);
+      return initSettings(this);
     },
     makeGame,
     gameOn: false,
@@ -130,6 +145,7 @@ function makeGame() {
     cluesDeck: [],
     keyEvidence: [],
     result: null,
+    isResolvingAccusal: false,
     currentStage: GAME_STAGES[0],
     advanceStage(stageId, io) {
       if (stageId) {
@@ -150,7 +166,8 @@ function makeGame() {
       return this.blueTeam.some(player => !!player.canAccuse);
     },
     timer,
-    timerIsRunning: false
+    timerIsRunning: false,
+    currentTimer: null
   };
 
   initRoles(game);

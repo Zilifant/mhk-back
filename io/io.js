@@ -1,23 +1,20 @@
 const intersection = require('lodash.intersection');
 const sample = require('lodash.sample');
 const { getLobbyById, getUserById, omit, msg, have } = require('../utils/utils');
-const { DEVMODE, DEFAULT_GAME_SETTINGS } = require('../utils/constants');
+const { DEVMODE } = require('../utils/constants');
+const { l } = require('../utils/lobby-module');
 
 const emitSimply = [
-  'userConnected', 'userDisconnected', 'giveLeadership', 'ghostAssigned', 'gameSettingsChange', 'startGame', 'readyUnready', 'clearGame', 'advanceStage', 'clueChosen', 'wrongAccusation', 'resolveGame'
+  'userConnected', 'userDisconnected', 'giveLeadership', 'ghostAssigned', 'gameSettingsChange', 'startGame', 'readyUnready', 'clearGame', 'advanceStage', 'clueChosen', 'newAccusal', 'wrongAccusation', 'resolveGame'
 ];
 
 const saveToChat = [
-  'startGame', 'clearGame', 'advanceStage', 'wrongAccusation', 'resolveGame'
+  'startGame', 'clearGame', 'advanceStage', 'newAccusal', 'wrongAccusation', 'resolveGame'
 ];
 
 module.exports = io => {
 
   io.on('connection', socket => {
-
-    function getUserBySID(SID) {
-      return lobby.users.find(u => u.socketId === SID);
-    };
 
     function assignColor(user) {
 
@@ -81,41 +78,16 @@ module.exports = io => {
 
     socket.on('disconnect', () => {
 
-      let user, newLeader;
-
-      try {
-        user = getUserBySID(socket.id);
-        console.log(user);
-      } catch (err) {
-        return console.log(`Cannot find user on Socket: ${socket.id}`);
-      };
+      const user = l.identifyDisconnectedUser(lobby, socket);
 
       if (!user) return console.log(`Error: cannot find user for Socket: ${socket.id}`);
-      user.isOnline = false;
-      user.isReady = false;
 
-      function makeNewLeader() {
-        const needNewLeader = user.isLeader && (lobby.numOnline() >= 1);
-        if (!needNewLeader) {
-          newLeaderId = null;
-        } else {
-          newLeader = lobby.users.find(u => u.isOnline === true);
-          user.isLeader = false;
-          newLeader.isLeader = true;
-          lobby.leader = newLeader.id;
-          newLeaderId = newLeader.id;
-        };
-      };
+      l.removeUserFromLists(user);
+      l.unAssignToGhost(lobby, user);
 
-      function unAssignToGhost() {
-        if (user.isAssignedToGhost) {
-          user.isAssignedToGhost === false;
-          lobby.gameSettings.assignedToGhost = null;
-        };
-      };
+      const newLeader = l.makeNewLeader(lobby, user);
 
-      makeNewLeader();
-      unAssignToGhost();
+      l.reconcileAdvRolesSettings(lobby);
 
       const args = [
         [user.id, user.color.id],
@@ -159,13 +131,8 @@ module.exports = io => {
 
     // ghostAssigned
 
-    function unAssignGhost() {
-      const formerGhost = lobby.users.find(u => u.isAssignedToGhost === true);
-      if (formerGhost) formerGhost.isAssignedToGhost = false;
-    };
-
     function assignNewGhost(userId) {
-      unAssignGhost();
+      l.unAssignGhost(lobby);
       const newGhost = lobby.users.find(u => u.id === userId);
       newGhost.isAssignedToGhost = true;
       lobby.gameSettings.assignedToGhost = userId;
@@ -179,7 +146,7 @@ module.exports = io => {
     };
 
     function assignNoGhost() {
-      unAssignGhost();
+      l.unAssignGhost(lobby);
       lobby.gameSettings.assignedToGhost = null;
 
       emitByRole('ghostAssigned', msg('ghostAssigned', [[null, null], true], false));
@@ -326,8 +293,6 @@ module.exports = io => {
     };
 
     function resolveWrongAccusal(accuser) {
-      accuser.accusalSpent = true;
-      accuser.canAccuse = false;
       lobby.game.blueCanAccuse()
         ? continueRound(accuser)
         : resolveGame('redwin');
@@ -348,18 +313,25 @@ module.exports = io => {
     socket.on('accusation', ({accuserSID, accusedId, accusalEv}) => {
       if (!have(lobby)) return;
 
-      const accuser = getUserBySID(accuserSID);
+      lobby.game.isResolvingAccusal = true;
+
+      const accuser = l.getUserBySID(lobby, accuserSID);
       const accused = getUserById({lobbyId: lobby.id, userId: accusedId});
+
+      accuser.accusalSpent = true;
+      accuser.canAccuse = false;
 
       const message = msg('accusation', [{
         accuser: [accuser.id, accuser.color.id],
         accusee: [accused.id, accused.color.id],
         evidence: accusalEv
       }], true);
-      io.in(lobby.id).emit('announcement', {msg: message});
+      emitByRole('newAccusal', message);
+      // io.in(lobby.id).emit('announcement', {msg: message});
 
       // suspensful delay
       setTimeout(() => {
+        lobby.game.isResolvingAccusal = false;
         isAccusalRight(accusalEv)
         ? resolveRightAccusal(accuser)
         : resolveWrongAccusal(accuser);
