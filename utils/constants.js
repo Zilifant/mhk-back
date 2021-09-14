@@ -106,7 +106,8 @@ const GAME_OUTCOMES = {
 };
 
 const COLORS = [
-  'red','blue','green','yellow','orange','purple','pink','cyan','emerald','violet','rose','amber'
+  'red','blue',
+  // 'green','yellow','orange','purple','pink','cyan','emerald','violet','rose','amber'
 ];
 
 const EVIDENCE_CARD_INFO = [

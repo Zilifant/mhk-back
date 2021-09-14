@@ -44,14 +44,14 @@ module.exports = () => {
       const error = new HttpError('Could not find lobby.', 500);
       return next(error);
     };
-  
+
     if (!lobby) {
       const error = new HttpError('No lobby with that name.', 404);
       return next(error);
     };
-  
+
     const user = lobby.users.find(u => u.id === req.body.userId);
-  
+
     res.status(200).json({ lobby: resData(user, lobby) });
   };
 
@@ -59,6 +59,7 @@ module.exports = () => {
     // console.log('createLobby');
   
     const userId = uniqUserID(req.body.userName);
+    const isStreamer = req.body.isStreamer;
     const lobbyId = DEVMODE ? 'z' : uniqLobbyID();
   
     const newUser = makeUser({
@@ -73,7 +74,7 @@ module.exports = () => {
   
     res
     .status(201)
-    .cookie('userData', `${userId}--${lobbyId}`, cookieSettings)
+    .cookie('userData', `${userId}--${lobbyId}--${isStreamer}`, cookieSettings)
     .json({
       user: newUser,
       lobby: newLobby

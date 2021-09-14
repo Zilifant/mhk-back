@@ -23,15 +23,18 @@ module.exports = io => {
         color.isAssigned = true;
         color.assignedTo.push(user.id);
         user.color = color;
-        console.log(color);
       };
   
       function assignDupeColor() {
         const oUCols = lobby.usersOffline().map(oU => oU.color);
-        const color = oUCols.find(c.assignedTo.length === 1);
+        const pickDupeColor = () => {
+          const col = oUCols.find(c => c.assignedTo.length === 1);
+          // handle edge case where all colors are picked twice
+          return !!col ? col : sample(lobby.colors);
+        };
+        const color = pickDupeColor();
         color.assignedTo.push(user.id);
         user.color = color;
-        console.log(color);
       };
 
       const availCols = lobby.colors.filter(c => !c.isAssigned);
@@ -40,20 +43,21 @@ module.exports = io => {
     };
 
     let lobby;
-    let game;
 
     socket.on('connectToLobby', ({ userId, lobbyId }) => {
 
       lobby = getLobbyById(lobbyId);
       const user = lobby?.users.find(u => u.id === userId);
 
-      if (!user) return console.log(`${userId} not in ${lobbyId}'s user list`);
+      if (!user) return console.log(`${userId} not in ${lobbyId} user list`);
 
       socket.join(lobbyId);
       user.isOnline = true;
       user.isReady = DEVMODE; // users start ready in dev mode
       user.socketId = socket.id;
       user.connectionTime = Date.now();
+
+      console.log(`${user.id} connected`);
 
       if (!user.color) assignColor(user);
 

@@ -15,7 +15,7 @@ const lobbyModule = (() => {
     let user;
     try {
       user = getUserBySID(lobby, socket.id);
-      console.log(user.id);
+      console.log(`${user.id} disconnected`);
     } catch (err) {
       return console.log(`Cannot find user on Socket: ${socket.id}`);
     };

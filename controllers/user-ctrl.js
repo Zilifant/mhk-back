@@ -33,8 +33,9 @@ function parseCookies(c) {
   if (!userData) return console.log(`parseCookies Error; c = ${c}`);
   return {
     userId: userData.split('--')[0],
-    lobbyId: userData.split('--')[1]
-  }
+    lobbyId: userData.split('--')[1],
+    isStreamer: userData.split('--')[2]
+  };
 };
 
 const checkForCookie = async (req, res, next) => {
@@ -42,7 +43,7 @@ const checkForCookie = async (req, res, next) => {
   const cookies = req.get('Cookie');
 
   if (!cookies) {
-    return res.status(200).json({ user: null })
+    return res.status(200).json({ user: null });
     // const error = new HttpError('No cookie found.', 404);
     // return next(error);
   };
@@ -53,7 +54,8 @@ const checkForCookie = async (req, res, next) => {
     try {
       user = await getUserById({
         userId: data.userId,
-        lobbyId: data.lobbyId
+        lobbyId: data.lobbyId,
+        isStreamer: data.isStreamer
       });
     } catch (err) {
       console.log(err);
@@ -82,6 +84,7 @@ const addUserToLobby = async (req, res, next) => {
   };
 
   const userId = uniqUserID(req.body.userName);
+  const isStreamer = req.body.isStreamer;
 
   const newUser = makeUser({
     id: userId,
@@ -92,7 +95,7 @@ const addUserToLobby = async (req, res, next) => {
 
   res
   .status(201)
-  .cookie('userData', `${userId}--${lobby.id}`, cookieSettings)
+  .cookie('userData', `${userId}--${lobby.id}--${isStreamer}`, cookieSettings)
   .json({
     user: newUser,
     lobby: lobby
