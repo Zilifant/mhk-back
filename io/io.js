@@ -49,7 +49,7 @@ module.exports = io => {
       lobby = getLobbyById(lobbyId);
       const user = lobby?.users.find(u => u.id === userId);
 
-      if (!user) return console.log(`${userId} not in ${lobbyId} user list`);
+      if (!user) return console.log(`ERR! IO: ${userId} not in ${lobbyId} user list`);
 
       socket.join(lobbyId);
       user.isOnline = true;
@@ -57,7 +57,7 @@ module.exports = io => {
       user.socketId = socket.id;
       user.connectionTime = Date.now();
 
-      console.log(`${user.id} connected`);
+      console.log(`IO: ${user.id} connected`);
 
       if (!user.color) assignColor(user);
 
@@ -84,12 +84,12 @@ module.exports = io => {
 
       const user = l.identifyDisconnectedUser(lobby, socket);
 
-      if (!user) return console.log(`Error: cannot find user for Socket: ${socket.id}`);
+      if (!user) return console.log(`ERR! cannot find user for socket: ${socket.id}`);
 
       l.removeUserFromLists(user);
       l.unAssignToGhost(lobby, user);
 
-      const newLeader = l.makeNewLeader(lobby, user);
+      const newLeader = user.isLeader ? l.changeLeader(lobby, user) : null;
 
       l.reconcileAdvRolesSettings(lobby);
 
