@@ -65,16 +65,17 @@ module.exports = () => {
     const newUser = makeUser({
       id: userId,
       myLobby: lobbyId,
+      isStreamer,
       lobbyCreator: true
     });
-  
+
     const newLobby = makeLobby(newUser);
   
     LOBBIES[newLobby.id] = newLobby;
   
     res
     .status(201)
-    .cookie('userData', `${userId}--${lobbyId}--${isStreamer}`, cookieSettings)
+    .cookie('userData', `${userId}--${lobbyId}`, cookieSettings)
     .json({
       user: newUser,
       lobby: newLobby

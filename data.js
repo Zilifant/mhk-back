@@ -18,7 +18,7 @@ const {
   makeGhostCard,
 } = require('./utils/utils');
 
-const makeUser = ({ id, myLobby, lobbyCreator = false }) => {
+const makeUser = ({ id, myLobby, isStreamer, lobbyCreator = false }) => {
   const userName = id.slice(0,-5);
   return {
     id,
@@ -28,6 +28,7 @@ const makeUser = ({ id, myLobby, lobbyCreator = false }) => {
     isOnline: false,
     isReady: false,
     isLeader: lobbyCreator,
+    isStreamer,
     isAssignedToGhost: false,
     connectionTime: null,
     color: null,

@@ -33,8 +33,7 @@ function parseCookies(c) {
   if (!userData) return console.log(`parseCookies Error; c = ${c}`);
   return {
     userId: userData.split('--')[0],
-    lobbyId: userData.split('--')[1],
-    isStreamer: userData.split('--')[2]
+    lobbyId: userData.split('--')[1]
   };
 };
 
@@ -54,8 +53,7 @@ const checkForCookie = async (req, res, next) => {
     try {
       user = await getUserById({
         userId: data.userId,
-        lobbyId: data.lobbyId,
-        isStreamer: data.isStreamer
+        lobbyId: data.lobbyId
       });
     } catch (err) {
       console.log(err);
@@ -88,14 +86,15 @@ const addUserToLobby = async (req, res, next) => {
 
   const newUser = makeUser({
     id: userId,
-    myLobby: lobby.id
+    myLobby: lobby.id,
+    isStreamer
   });
 
   lobby.users.push(newUser);
 
   res
   .status(201)
-  .cookie('userData', `${userId}--${lobby.id}--${isStreamer}`, cookieSettings)
+  .cookie('userData', `${userId}--${lobby.id}`, cookieSettings)
   .json({
     user: newUser,
     lobby: lobby
