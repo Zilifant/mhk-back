@@ -5,10 +5,6 @@ module.exports = () => {
 
   const { createLobby, getLobby } = require('../controllers/lobby-ctrl')();
 
-  // function newLobby() {
-  //   return lobbyControl.createLobby()
-  // }
-
   const router = express.Router();
 
   // create new lobby
