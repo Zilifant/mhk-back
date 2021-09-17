@@ -2,7 +2,7 @@ const intersection = require('lodash.intersection');
 const sample = require('lodash.sample');
 const { getLobbyById, getUserById, omit, msg, have } = require('../utils/utils');
 const { DEVMODE } = require('../utils/constants');
-const { l } = require('../utils/lobby-module');
+const l = require('../utils/lobby-module')();
 
 const emitSimply = [
   'userConnected', 'userDisconnected', 'giveLeadership', 'ghostAssigned', 'gameSettingsChange', 'startGame', 'readyUnready', 'clearGame', 'advanceStage', 'clueChosen', 'newAccusal', 'wrongAccusation', 'resolveGame'
@@ -13,6 +13,10 @@ const saveToChat = [
 ];
 
 module.exports = io => {
+
+  function clgIO(io) {
+    console.log(io);
+  };
 
   io.on('connection', socket => {
 

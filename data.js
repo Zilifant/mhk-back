@@ -2,7 +2,7 @@
 const sample = require('lodash.sample');
 
 const { timer } = require('./utils/timer');
-const { l } = require('./utils/lobby-module');
+const l = require('./utils/lobby-module')();
 
 const {
   GAME_STAGES, OPT_ROLES, HIDE_FROM,

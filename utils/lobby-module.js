@@ -5,7 +5,7 @@
 //   MIN_PLAYER_COUNT_FOR_ADV_ROLES
 // } = require('../utils/constants');
 
-const lobbyModule = (() => {
+module.exports = () => {
 
   function getUserBySID(lobby, SID) {
     return lobby.users.find(u => u.socketId === SID);
@@ -74,6 +74,4 @@ const lobbyModule = (() => {
     unAssignGhost
   };
 
-})();
-
-exports.l = lobbyModule;
+};
