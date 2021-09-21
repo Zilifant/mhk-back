@@ -14,10 +14,6 @@ const saveToChat = [
 
 module.exports = io => {
 
-  function clgIO(io) {
-    console.log(io);
-  };
-
   io.on('connection', socket => {
 
     function assignColor(user) {
