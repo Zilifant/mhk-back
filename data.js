@@ -79,7 +79,8 @@ const makeLobby = (creator) => {
       return (this.numReady() >= 3) && (this.numReady() === this.numOnline());
     },
     resetSettings() {
-      l.unAssignGhost(this);
+      const ghost = this.users.find(u => u.isAssignedToGhost === true);
+      if (ghost) ghost.isAssignedToGhost = false;
       return initSettings(this);
     },
     makeGame,
