@@ -1,7 +1,7 @@
 
 const { LOBBIES } = require('./constants');
 
-const have = (x) => !!x ? true : console.log(`Error: ${x} is falsy.`);
+const have = (x) => !!x ? true : console.log(`ERR! have = ${x}`);
 
 const nullify = (obj, keys) => {
   const newObj = Object.assign({}, obj);
@@ -83,7 +83,7 @@ const makeGhostCard = (item) => {
 const getLobbyById = lobbyId => {
   const id = lobbyId.toLowerCase();
   if (!LOBBIES[id]) {
-    console.log(`Lobby: ${id} not found`);
+    console.log(`ERR! getLobbyById: lobby '${id}' not found`);
     return;
   };
   return LOBBIES[id];
@@ -91,7 +91,7 @@ const getLobbyById = lobbyId => {
 
 const getUserById = ({lobbyId, userId}) => {
   if (!LOBBIES[lobbyId]) {
-    console.log(`Lobby: ${lobbyId} not found`);
+    console.log(`ERR! getUserById: lobby '${lobbyId}' not found`);
     return;
   };
   return LOBBIES[lobbyId].users.find(user => user.id === userId);
@@ -100,7 +100,7 @@ const getUserById = ({lobbyId, userId}) => {
 const getRoleById = (userId, lobby) => {
   const role = lobby.game.rolesRef.find(ref => ref.user.id === userId).role;
   if (!!role) return role;
-  return console.log(`${userId} matches no roles in this game`);
+  return console.log(`ERR! getRoleById: role '${userId}' matches no roles in this game`);
 };
 
 const msg = (type, args, isInGame, senderId = 'app') => {

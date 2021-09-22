@@ -1,5 +1,4 @@
 const intersection = require('lodash.intersection');
-const sample = require('lodash.sample');
 const { getLobbyById, getUserById, omit, msg, have } = require('../utils/utils');
 const { DEVMODE } = require('../utils/constants');
 const l = require('../utils/lobby-module')();
@@ -16,55 +15,18 @@ module.exports = io => {
 
   io.on('connection', socket => {
 
-    function assignColor(user) {
-
-      function assignNewColor() {
-        const color = sample(availCols)
-        color.isAssigned = true;
-        color.assignedTo.push(user.id);
-        user.color = color;
-      };
-  
-      function assignDupeColor() {
-        const oUCols = lobby.usersOffline().map(oU => oU.color);
-        const pickDupeColor = () => {
-          const col = oUCols.find(c => c.assignedTo.length === 1);
-          // handle edge case where all colors are picked twice
-          return !!col ? col : sample(lobby.colors);
-        };
-        const color = pickDupeColor();
-        color.assignedTo.push(user.id);
-        user.color = color;
-      };
-
-      const availCols = lobby.colors.filter(c => !c.isAssigned);
-
-      return !!availCols.length ? assignNewColor() : assignDupeColor();
-    };
-
     let lobby;
 
+    // User connects
+
     socket.on('connectToLobby', ({ userId, lobbyId }) => {
-
       lobby = getLobbyById(lobbyId);
+      if (!have(lobby)) return;
+
       const user = lobby?.users.find(u => u.id === userId);
+      if (!user) return console.log(`ERR! connect: '${userId}' not in '${lobbyId}' user list`);
 
-      if (!user) return console.log(`ERR! IO: ${userId} not in ${lobbyId} user list`);
-
-      socket.join(lobbyId);
-      user.isOnline = true;
-      user.isReady = DEVMODE; // users start ready in dev mode
-      user.socketId = socket.id;
-      user.connectionTime = Date.now();
-
-      console.log(`IO: ${user.id} connected`);
-
-      if (!user.color) assignColor(user);
-
-      if (!lobby.leader) {
-        lobby.leader = userId;
-        user.isLeader = true;
-      };
+      l.connectToLobby(lobby, user, socket);
 
       const args = [
         [user.id, user.color.id]
@@ -78,20 +40,17 @@ module.exports = io => {
       emitByRole('userConnected', msg('join', args, false), data);
     });
 
-    // disconnect
+    // User disconnects
 
     socket.on('disconnect', () => {
+      if (!have(lobby)) return;
 
       const user = l.identifyDisconnectedUser(lobby, socket);
+      if (!user) return console.log(`ERR! disconnect: no user for socket '${socket.id}'`);
 
-      if (!user) return console.log(`ERR! cannot find user for socket: ${socket.id}`);
-
-      l.removeUserFromLists(user);
-      l.unAssignToGhost(lobby, user);
+      l.disconnectFromLobby(lobby, user);
 
       const newLeader = user.isLeader ? l.changeLeader(lobby, user) : null;
-
-      l.reconcileAdvRolesSettings(lobby);
 
       const args = [
         [user.id, user.color.id],
@@ -101,14 +60,14 @@ module.exports = io => {
       emitByRole('userDisconnected', msg('leave', args, false));
     });
 
-    // giveLeader
+    // Leader gives leadership to another user
 
     socket.on('giveLeadership', newLeaderId => {
-      const newLeader = lobby.users.find(u => u.id === newLeaderId);
-      const oldLeader = lobby.users.find(u => u.id === lobby.leader);
-      lobby.leader = newLeaderId;
-      newLeader.isLeader = true;
-      oldLeader.isLeader = false;
+      if (!have(lobby)) return;
+
+      const newLeader = lobby.getUserById(newLeaderId);
+
+      l.giveLeadership(lobby, newLeader);
 
       const args = [
         [newLeader.id, newLeader.color.id]
@@ -117,13 +76,13 @@ module.exports = io => {
       emitByRole('giveLeadership', msg('newLeader', args, false));
     });
 
-    // readyUnready
+    // User becomes ready/unready
 
     socket.on('readyUnready', userId => {
       if (!have(lobby)) return;
 
-      const user = lobby.users.find(u => u.id === userId);
-      user.isReady ? user.isReady = false : user.isReady = true;
+      const user = lobby.getUserById(userId);
+      user.isReady = !user.isReady;
 
       const args = [
         [user.id, user.color.id],
@@ -133,34 +92,21 @@ module.exports = io => {
       emitByRole('readyUnready', msg('ready', args, false));
     });
 
-    // ghostAssigned
-
-    function assignNewGhost(userId) {
-      l.unAssignGhost(lobby);
-      const newGhost = lobby.users.find(u => u.id === userId);
-      newGhost.isAssignedToGhost = true;
-      lobby.gameSettings.assignedToGhost = userId;
-
-      const args = [
-        [newGhost.id, newGhost.color.id],
-        false
-      ];
-
-      emitByRole('ghostAssigned', msg('ghostAssigned', args, false));
-    };
-
-    function assignNoGhost() {
-      l.unAssignGhost(lobby);
-      lobby.gameSettings.assignedToGhost = null;
-
-      emitByRole('ghostAssigned', msg('ghostAssigned', [[null, null], true], false));
-    };
+    // Leader assigns/unassigns ghost role
 
     socket.on('ghostAssigned', userId => {
       if (!have(lobby)) return;
 
       const unAssign = !userId || (userId === lobby.gameSettings.assignedToGhost);
-      unAssign ? assignNoGhost() : assignNewGhost(userId);
+      const newGhost = !unAssign ? lobby.getUserById(userId) : null;
+
+      l.assignGhost(lobby, newGhost);
+
+      const args = newGhost
+        ? [[newGhost.id, newGhost.color.id], false]
+        : [[null, null], true]
+
+      emitByRole('ghostAssigned', msg('ghostAssigned', args, false));
     });
 
     // toggle
@@ -181,7 +127,7 @@ module.exports = io => {
           lobby.gameSettings.hasAccomplice = !lobby.gameSettings.hasAccomplice;
           emitGameSettingsChange();
           break;
-        default: return console.log(`toggleItem Error: toggledItem = ${toggledItem}`);
+        default: return console.log(`ERR! toggleItem: toggled item is '${toggledItem}'`);
       };
     };
 

@@ -43,6 +43,11 @@ const makeLobby = (creator) => {
     creatorId: creator.id,
     leader: creator.id,
     users: [creator],
+    getUserById(id) {
+      const user = this.users.find(u => u.id === id);
+      if (!user) console.log(`ERR! ${this.id}: user '${id}' not found`);
+      return user;
+    },
     numOnline() {
       return this.users.filter(u => u.isOnline === true).length;
     },
