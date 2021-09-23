@@ -1,7 +1,8 @@
 const intersection = require('lodash.intersection');
 const { getLobbyById, getUserById, omit, msg, have } = require('../utils/utils');
-const { DEVMODE } = require('../utils/constants');
+// const { DEVMODE } = require('../utils/constants');
 const l = require('../utils/lobby-module')();
+const g = require('../utils/game-module')();
 
 const emitSimply = [
   'userConnected', 'userDisconnected', 'giveLeadership', 'ghostAssigned', 'gameSettingsChange', 'startGame', 'readyUnready', 'clearGame', 'advanceStage', 'clueChosen', 'newAccusal', 'wrongAccusation', 'resolveGame'
@@ -104,119 +105,79 @@ module.exports = io => {
 
       const args = newGhost
         ? [[newGhost.id, newGhost.color.id], false]
-        : [[null, null], true]
+        : [[null, null], true];
 
       emitByRole('ghostAssigned', msg('ghostAssigned', args, false));
     });
 
-    // toggle
+    // Update a game setting
 
-    function emitGameSettingsChange() {
+    socket.on('toggle', setting => {
+      if (!have(lobby)) return;
+
+      l.updateSetting(lobby, setting);
+
       emitByRole('gameSettingsChange');
-    };
+    });
 
-    function toggleItem(toggledItem) {
+    // Update game timer setting
+
+    socket.on('chooseTimer', duration => {
       if (!have(lobby)) return;
 
-      switch (toggledItem) {
-        case `witness`:
-          lobby.gameSettings.hasWitness = !lobby.gameSettings.hasWitness;
-          emitGameSettingsChange();
-          break;
-        case `accomplice`:
-          lobby.gameSettings.hasAccomplice = !lobby.gameSettings.hasAccomplice;
-          emitGameSettingsChange();
-          break;
-        default: return console.log(`ERR! toggleItem: toggled item is '${toggledItem}'`);
-      };
-    };
+      l.updateTimer(lobby, duration);
 
-    socket.on('toggle', toggledItem => toggleItem(toggledItem));
+      emitByRole('gameSettingsChange');
+    });
 
-    function chooseTimer(duration) {
-      if (!have(lobby)) return;
-
-      const timer = lobby.gameSettings.timer;
-      timer.duration = duration;
-      duration === 0
-        ? timer.on = false
-        : timer.on = true;
-      emitGameSettingsChange();
-    };
-
-    socket.on('chooseTimer', duration => chooseTimer(duration));
-
-    // startGame
+    // Start game
 
     socket.on('startGame', data => {
       if (!have(lobby)) return;
 
       lobby.makeGame(data.settings);
-      game = lobby.game;
 
       emitByRole('startGame', msg('advanceTo', [lobby.game.currentStage], true));
     });
 
-    // clearGame
-
-    function clearGame() {
-      if (!have(lobby)) return;
-
-      if (!DEVMODE) {
-        lobby.game.players.map(player => {
-          player.isReady = false;
-          return player;
-        });
-      };
-
-      if (lobby.game.timerIsRunning) lobby.game.timer.clear(lobby.id, io);
-
-      lobby.game = null;
-      lobby.gameOn = false;
-      lobby.resetSettings();
-    }
+    // Clear game
 
     socket.on('clearGame', () => {
-      clearGame();
+      if (!have(lobby)) return;
+
+      l.clearGame(lobby, io);
+
       emitByRole('clearGame', msg('clearGame', [], true));
     });
 
-    // advanceStage
+    // Advance game stage
 
     socket.on('advanceStage', data => {
       if (!have(lobby)) return;
 
-      lobby.game.advanceStage(null, io);
-      const newStage = lobby.game.currentStage;
-      if (!!newStage.onStart) newStage.onStart(lobby.game, data);
-      console.log(newStage.id);
+      g.advanceToNextStage(lobby.game, io, data);
+
       emitByRole('advanceStage', msg('advanceTo', [lobby.game.currentStage], true));
     });
 
-    // keyEvidenceChosen (by killer)
+    // Key evidence chosen by killer
 
     socket.on('keyEvidenceChosen', (keyEv) => {
       if (!have(lobby)) return;
 
-      lobby.game.keyEvidence = keyEv;
-      lobby.game.advanceStage(null, io);
+      g.advanceOnKeyEvChosen(lobby.game, io, keyEv)
+
       emitByRole('advanceStage', msg('advanceTo', [lobby.game.currentStage], true));
     });
 
-    // clueChosen (by Ghost)
-
-    function lockClueCard(clue) {
-      const card = lobby.game.cluesDeck.find(c => c.opts.some(o => o.id === clue));
-      card.isLocked = true;
-    };
+    // Clue chosen by ghost
 
     socket.on('clueChosen', data => {
       if (!have(lobby)) return;
 
-      const clue = data[0];
-      lobby.game.confirmedClues.push(clue);
-      lockClueCard(clue);
-      emitByRole('clueChosen', msg('clueChosen', [clue], true));
+      g.confirmClueChoice(lobby.game, data[0]);
+
+      emitByRole('clueChosen', msg('clueChosen', [data[0]], true));
     });
 
     // accusation

@@ -2,10 +2,11 @@
 const sample = require('lodash.sample');
 
 const { timer } = require('./utils/timer');
-const l = require('./utils/lobby-module')();
+// const l = require('./utils/lobby-module')();
+const g = require('./utils/game-module')();
 
 const {
-  GAME_STAGES, OPT_ROLES, HIDE_FROM,
+  OPT_ROLES, HIDE_FROM,
   HUNTER, KILLER, GHOST, ACCOMPLICE, WITNESS,
   EVIDENCE_DECK, MEANS_DECK, GHOST_CARD_INFO, COLORS,
   MIN_PLAYER_COUNT, MIN_PLAYER_COUNT_FOR_ADV_ROLES
@@ -153,13 +154,13 @@ function makeGame() {
     keyEvidence: [],
     result: null,
     isResolvingAccusal: false,
-    currentStage: GAME_STAGES[0],
+    currentStage: g.STAGES[0],
     advanceStage(stageId, io) {
       if (stageId) {
-        this.currentStage = GAME_STAGES.find(s => s.id === stageId);
+        this.currentStage = g.STAGES.find(s => s.id === stageId);
       } else {
-        const stageNum = GAME_STAGES.indexOf(this.currentStage);
-        this.currentStage = GAME_STAGES[stageNum+1];
+        const stageNum = g.STAGES.indexOf(this.currentStage);
+        this.currentStage = g.STAGES[stageNum+1];
       };
 
       if (this.settings.timer.on) handleTimer(this, io);

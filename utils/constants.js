@@ -16,76 +16,6 @@ const LOBBIES = {},
 
 const OPT_ROLES = ['witness', 'accomplice'];
 
-function newClueCard(game, i) {
-  game.cluesDeck[i].isDisplayed = true;
-  game.cluesDeck[i].isNew = true;
-  game.cluesDeck[i-1].isNew = false;
-};
-
-function removeClueCard(game, cardId) {
-  game.cluesDeck.find(card => card.id === cardId).isDisplayed = false;
-};
-
-const GAME_STAGES = [
-  {
-    type: 'setup',
-    timed: false,
-    id: 'setup',
-    display: 'Setup',
-  },
-  {
-    type: 'round',
-    timed: true,
-    id: 'round-1',
-    roundNum: 1,
-    display: 'Round 1',
-  },
-  {
-    type: 'liminal',
-    timed: false,
-    id: 'round-2-start',
-    roundNum: 2,
-    display: 'Round 2',
-    onStart: (game) => newClueCard(game, 6),
-  },
-  {
-    type: 'round',
-    timed: true,
-    id: 'round-2',
-    roundNum: 2,
-    display: 'Round 2',
-    onStart: (game, cardId) => removeClueCard(game, cardId),
-  },
-  {
-    type: 'liminal',
-    timed: false,
-    id: 'round-3-start',
-    roundNum: 3,
-    display: 'Round 3',
-    onStart: (game) => newClueCard(game, 7),
-  },
-  {
-    type: 'round',
-    timed: true,
-    id: 'round-3',
-    roundNum: 3,
-    display: 'Round 3',
-    onStart: (game, cardId) => removeClueCard(game, cardId),
-  },
-  {
-    type: 'special',
-    timed: false,
-    id: 'second-murder',
-    display: 'Second Murder'
-  },
-  {
-    type: 'postgame',
-    timed: false,
-    id: 'game-over',
-    display: 'Game Over',
-  }
-];
-
 const DEFAULT_GAME_SETTINGS = {
   assignedToGhost: null,
   hasWitness: false,
@@ -286,7 +216,6 @@ const HIDE_FROM = {
 
 exports.DEVMODE = DEVMODE;
 exports.LOBBIES = LOBBIES;
-exports.GAME_STAGES = GAME_STAGES;
 exports.GAME_OUTCOMES = GAME_OUTCOMES;
 exports.OPT_ROLES = OPT_ROLES;
 exports.GHOST = GHOST;

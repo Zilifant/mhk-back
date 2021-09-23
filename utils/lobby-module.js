@@ -142,14 +142,59 @@ module.exports = () => {
     };
   };
 
+  // Update a game setting
+
+  function updateSetting(lobby, setting) {
+    switch (setting) {
+      case `witness`:
+        lobby.gameSettings.hasWitness = !lobby.gameSettings.hasWitness;
+        break;
+      case `accomplice`:
+        lobby.gameSettings.hasAccomplice = !lobby.gameSettings.hasAccomplice;
+        break;
+      default: return console.log(`ERR! toggleItem: toggled item is '${setting}'`);
+    };
+  };
+
+  // Update game timer setting
+
+  function updateTimer(lobby, duration) {
+    const timer = lobby.gameSettings.timer;
+    timer.duration = duration;
+    duration === 0
+      ? timer.on = false
+      : timer.on = true;
+  };
+
+  // Clear game
+
+  function clearGame(lobby, io) {
+
+    if (!DEVMODE) {
+      lobby.game.players.map(player => {
+        player.isReady = false;
+        return player;
+      });
+    };
+
+    if (lobby.game.timerIsRunning) lobby.game.timer.clear(lobby.id, io);
+
+    lobby.game = null;
+    lobby.gameOn = false;
+    lobby.resetSettings();
+  };
+
   return {
+    getUserBySID,
     connectToLobby,
     disconnectFromLobby,
     giveLeadership,
-    getUserBySID,
-    identifyDisconnectedUser,
     changeLeader,
-    assignGhost
+    assignGhost,
+    identifyDisconnectedUser,
+    updateSetting,
+    updateTimer,
+    clearGame,
   };
 
 };
