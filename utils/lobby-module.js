@@ -7,8 +7,8 @@ module.exports = () => {
 
   // Utilities
 
-  function getUserBySID(lobby, SID) {
-    return lobby.users.find(u => u.socketId === SID);
+  function getUserById(lobby, userId) {
+    return lobby.users.find(user => user.id === userId);
   };
 
   // User connects
@@ -185,7 +185,7 @@ module.exports = () => {
   };
 
   return {
-    getUserBySID,
+    getUserById,
     connectToLobby,
     disconnectFromLobby,
     giveLeadership,

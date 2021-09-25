@@ -221,13 +221,13 @@ module.exports = io => {
       emitByRole('resolveGame', msg('resolveGame', [result], true));
     };
 
-    socket.on('accusation', ({accuserSID, accusedId, accusalEv}) => {
+    socket.on('accusation', ({accuserId, accusedId, accusalEv}) => {
       if (!have(lobby)) return;
 
       lobby.game.isResolvingAccusal = true;
 
-      const accuser = l.getUserBySID(lobby, accuserSID);
-      const accused = getUserById({lobbyId: lobby.id, userId: accusedId});
+      const accuser = l.getUserById(lobby, accuserId);
+      const accused = l.getUserById(lobby, accusedId);
 
       accuser.accusalSpent = true;
       accuser.canAccuse = false;
@@ -238,7 +238,6 @@ module.exports = io => {
         evidence: accusalEv
       }], true);
       emitByRole('newAccusal', message);
-      // io.in(lobby.id).emit('announcement', {msg: message});
 
       // suspensful delay
       setTimeout(() => {
