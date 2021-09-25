@@ -34,7 +34,7 @@ const makeUser = ({ id, myLobby, isStreamer, lobbyCreator = false }) => {
     connectionTime: null,
     color: null,
     canAccuse: false,
-    hand: {evidence: null, means: null},
+    hand: { means: null, evidence: null },
   };
 };
 
@@ -197,7 +197,7 @@ function handleTimer(game, io) {
     game.timerIsRunning = true;
   };
   if (!game.currentStage.timed && game.timerIsRunning === true) {
-    console.log(!!io);
+    // console.log(!!io);
     game.timer.clear(game.lobbyId, io);
     game.timerIsRunning = false;
   };
@@ -282,11 +282,11 @@ function createTeamsRef(game) {
 };
 
 function createHands(game) {
-  const evidenceCards = shuffleAndBatch(EVIDENCE_DECK, 4),
-        meansCards = shuffleAndBatch(MEANS_DECK, 4);
+  const meansCards = shuffleAndBatch(MEANS_DECK, 4),
+        evidenceCards = shuffleAndBatch(EVIDENCE_DECK, 4);
   game.nonGhosts.forEach(nG => {
-    nG.hand.evidence = evidenceCards[game.nonGhosts.indexOf(nG)];
     nG.hand.means = meansCards[game.nonGhosts.indexOf(nG)];
+    nG.hand.evidence = evidenceCards[game.nonGhosts.indexOf(nG)];
   });
 };
 
