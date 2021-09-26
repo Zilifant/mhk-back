@@ -103,7 +103,7 @@ const getRoleById = (userId, lobby) => {
   return console.log(`ERR! getRoleById: role '${userId}' matches no roles in this game`);
 };
 
-const msg = (type, args, isInGame, senderId = 'app') => {
+const msg = ({type, args=[], isInGame, senderId='app'}) => {
   return {
     time: new Date().toLocaleTimeString().slice(0,-6),
     type,
@@ -114,7 +114,7 @@ const msg = (type, args, isInGame, senderId = 'app') => {
 };
 
 const cookieSettings = {
-  maxAge: 60 * 60 * 5000, // 5 hours
+  maxAge: 60 * 60 * 7000, // 7 hours
   httpOnly: true,
   sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
   secure: process.env.NODE_ENV === "production"

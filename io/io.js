@@ -38,7 +38,13 @@ module.exports = io => {
         user: user
       };
 
-      emitByRole('userConnected', msg('join', args, false), data);
+      const msgData = {
+        type: 'join',
+        args,
+        isInGame: false,
+      }
+
+      emitByRole('userConnected', msg(msgData), data);
     });
 
     // User disconnects
@@ -58,7 +64,13 @@ module.exports = io => {
         [newLeader?.id, newLeader?.color.id]
       ];
 
-      emitByRole('userDisconnected', msg('leave', args, false));
+      const msgData = {
+        type: 'leave',
+        args,
+        isInGame: false,
+      }
+
+      emitByRole('userDisconnected', msg(msgData));
     });
 
     // Leader gives leadership to another user
@@ -66,7 +78,7 @@ module.exports = io => {
     socket.on('giveLeadership', newLeaderId => {
       if (!have(lobby)) return;
 
-      const newLeader = lobby.getUserById(newLeaderId);
+      const newLeader = lobby.getUserBy(newLeaderId);
 
       l.giveLeadership(lobby, newLeader);
 
@@ -74,7 +86,13 @@ module.exports = io => {
         [newLeader.id, newLeader.color.id]
       ];
 
-      emitByRole('giveLeadership', msg('newLeader', args, false));
+      const msgData = {
+        type: 'newLeader',
+        args,
+        isInGame: false,
+      }
+
+      emitByRole('giveLeadership', msg(msgData));
     });
 
     // User becomes ready/unready
@@ -82,7 +100,7 @@ module.exports = io => {
     socket.on('readyUnready', userId => {
       if (!have(lobby)) return;
 
-      const user = lobby.getUserById(userId);
+      const user = lobby.getUserBy(userId);
       user.isReady = !user.isReady;
 
       const args = [
@@ -90,7 +108,13 @@ module.exports = io => {
         user.isReady
       ];
 
-      emitByRole('readyUnready', msg('ready', args, false));
+      const msgData = {
+        type: 'ready',
+        args,
+        isInGame: false,
+      }
+
+      emitByRole('readyUnready', msg(msgData));
     });
 
     // Leader assigns/unassigns ghost role
@@ -99,7 +123,7 @@ module.exports = io => {
       if (!have(lobby)) return;
 
       const unAssign = !userId || (userId === lobby.gameSettings.assignedToGhost);
-      const newGhost = !unAssign ? lobby.getUserById(userId) : null;
+      const newGhost = !unAssign ? lobby.getUserBy(userId) : null;
 
       l.assignGhost(lobby, newGhost);
 
@@ -107,7 +131,13 @@ module.exports = io => {
         ? [[newGhost.id, newGhost.color.id], false]
         : [[null, null], true];
 
-      emitByRole('ghostAssigned', msg('ghostAssigned', args, false));
+      const msgData = {
+        type: 'ghostAssigned',
+        args,
+        isInGame: false,
+      }
+
+      emitByRole('ghostAssigned', msg(msgData));
     });
 
     // Update a game setting
@@ -137,7 +167,13 @@ module.exports = io => {
 
       lobby.makeGame(data.settings);
 
-      emitByRole('startGame', msg('advanceTo', [lobby.game.currentStage], true));
+      const msgData = {
+        type: 'advanceTo',
+        args: [lobby.game.currentStage],
+        isInGame: true,
+      };
+
+      emitByRole('startGame', msg(msgData));
     });
 
     // Clear game
@@ -147,7 +183,12 @@ module.exports = io => {
 
       l.clearGame(lobby, io);
 
-      emitByRole('clearGame', msg('clearGame', [], true));
+      const msgData = {
+        type: 'clearGame',
+        isInGame: true,
+      };
+
+      emitByRole('clearGame', msg(msgData));
     });
 
     // Advance game stage
@@ -157,7 +198,13 @@ module.exports = io => {
 
       g.advanceToNextStage(lobby.game, io, data);
 
-      emitByRole('advanceStage', msg('advanceTo', [lobby.game.currentStage], true));
+      const msgData = {
+        type: 'advanceTo',
+        args: [lobby.game.currentStage],
+        isInGame: true,
+      };
+
+      emitByRole('advanceStage', msg(msgData));
     });
 
     // Key evidence chosen by killer
@@ -165,9 +212,15 @@ module.exports = io => {
     socket.on('keyEvidenceChosen', (keyEv) => {
       if (!have(lobby)) return;
 
-      g.advanceOnKeyEvChosen(lobby.game, io, keyEv)
+      g.advanceOnKeyEvChosen(lobby.game, io, keyEv);
 
-      emitByRole('advanceStage', msg('advanceTo', [lobby.game.currentStage], true));
+      const msgData = {
+        type: 'advanceTo',
+        args: [lobby.game.currentStage],
+        isInGame: true,
+      };
+
+      emitByRole('advanceStage', msg(msgData));
     });
 
     // Clue chosen by ghost
@@ -177,7 +230,13 @@ module.exports = io => {
 
       g.confirmClueChoice(lobby.game, data[0]);
 
-      emitByRole('clueChosen', msg('clueChosen', [data[0]], true));
+      const msgData = {
+        type: 'clueChosen',
+        args: [data[0]],
+        isInGame: true,
+      };
+
+      emitByRole('clueChosen', msg(msgData));
     });
 
     // accusation
@@ -194,7 +253,14 @@ module.exports = io => {
 
     function advToSecondMurder(accuserId) {
       lobby.game.advanceStage('second-murder', io);
-      emitByRole('advanceStage', msg('advanceTo', [lobby.game.currentStage, accuserId], true));
+
+      const msgData = {
+        type: 'advanceTo',
+        args: [lobby.game.currentStage, accuserId],
+        isInGame: true,
+      };
+
+      emitByRole('advanceStage', msg(msgData));
     };
 
     function resolveSecondMurder(targetId) {
@@ -213,12 +279,26 @@ module.exports = io => {
       const args = [
         [user.id, user.color.id]
       ];
-      emitByRole('wrongAccusation', msg('accusationWrong', args, true));
+
+      const msgData = {
+        type: 'accusationWrong',
+        args,
+        isInGame: true,
+      };
+
+      emitByRole('wrongAccusation', msg(msgData));
     };
 
     function resolveGame(result) {
       lobby.game.advanceStage('game-over', io);
-      emitByRole('resolveGame', msg('resolveGame', [result], true));
+
+      const msgData = {
+        type: 'resolveGame',
+        args: [result],
+        isInGame: true,
+      };
+
+      emitByRole('resolveGame', msg(msgData));
     };
 
     socket.on('accusation', ({accuserId, accusedId, accusalEv}) => {
@@ -226,18 +306,23 @@ module.exports = io => {
 
       lobby.game.isResolvingAccusal = true;
 
-      const accuser = l.getUserById(lobby, accuserId);
-      const accused = l.getUserById(lobby, accusedId);
+      const accuser = lobby.getUserBy(accuserId);
+      const accused = lobby.getUserBy(accusedId);
 
       accuser.accusalSpent = true;
       accuser.canAccuse = false;
 
-      const message = msg('accusation', [{
-        accuser: [accuser.id, accuser.color.id],
-        accusee: [accused.id, accused.color.id],
-        evidence: accusalEv
-      }], true);
-      emitByRole('newAccusal', message);
+      const msgData = {
+        type: 'accusation',
+        args: [{
+          accuser: [accuser.id, accuser.color.id],
+          accusee: [accused.id, accused.color.id],
+          evidence: accusalEv
+        }],
+        isInGame: true,
+      };
+
+      emitByRole('newAccusal', msg(msgData));
 
       // suspensful delay
       setTimeout(() => {
@@ -252,17 +337,25 @@ module.exports = io => {
 
     // newMessage
 
-    socket.on('newMessage', data => {
+    socket.on('newMessage', ({senderId, text}) => {
       if (!have(lobby)) return;
 
-      const user = getUserById({lobbyId: lobby.id, userId: data.senderId});
+      const user = lobby.getUserBy(senderId);
 
       const args = [
         [user.id, user.color.id],
-        data.text
+        text
       ];
 
-      const message = msg('userMessage', args, false, data.senderId);
+      const msgData = {
+        type: 'userMessage',
+        args,
+        isInGame: false,
+        senderId
+      }
+
+      const message = msg(msgData);
+
       lobby.chat.push(message);
       io.in(lobby.id).emit('newMessage', message);
     });
