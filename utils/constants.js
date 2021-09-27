@@ -74,7 +74,7 @@ const EVIDENCE_CARD_INFO = [
   'gloves',
   'mosquito netting',
   'candy',
-  'needle & thread',
+  'sewing kit',
   'watch',
   'antique furniture',
   'white powder',
@@ -131,8 +131,8 @@ const makePlayerCard = (info, type) => {
   };
 };
 
-const EVIDENCE_DECK = EVIDENCE_CARD_INFO.map(info => makePlayerCard(info, 'evidence'));
 const MEANS_DECK = MEANS_CARD_INFO.map(info => makePlayerCard(info, 'means'))
+const EVIDENCE_DECK = EVIDENCE_CARD_INFO.map(info => makePlayerCard(info, 'evidence'));
 
 const GHOST_CARD_INFO = [
   {

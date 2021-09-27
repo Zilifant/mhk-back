@@ -68,7 +68,7 @@ module.exports = () => {
   function identifyDisconnectedUser(lobby, socket) {
     let user;
     try {
-      user = getUserBySID(lobby, socket.id);
+      user = lobby.getUserBy(socket.id, 'socketId');
       console.log(`IO: ${user.id} disconnected`);
     } catch (err) {
       return console.log(`ERR! idDisconnectedUser: no user for socket '${socket.id}'`);
