@@ -101,7 +101,7 @@ module.exports = () => {
 
   function unAssignToGhost(lobby, user) {
     if (user.isAssignedToGhost) {
-      user.isAssignedToGhost === false;
+      user.isAssignedToGhost = false;
       lobby.gameSettings.assignedToGhost = null;
     };
   };
