@@ -1,5 +1,5 @@
-const intersection = require('lodash.intersection');
-const { getLobbyById, getUserById, omit, msg, have } = require('../utils/utils');
+
+const { getLobbyById, omit, msg, have } = require('../utils/utils');
 // const { DEVMODE } = require('../utils/constants');
 const l = require('../utils/lobby-module')();
 const g = require('../utils/game-module')();
@@ -241,99 +241,26 @@ module.exports = io => {
 
     // accusation
 
-    function isAccusalRight(accusalEv) {
-      return intersection(accusalEv, lobby.game.keyEvidence).length === 2;
-    };
-
-    function resolveRightAccusal(accuser) {
-      lobby.game.witness
-        ? advToSecondMurder(accuser.id)
-        : resolveGame('bluewin');
-    };
-
-    function advToSecondMurder(accuserId) {
-      lobby.game.advanceStage('second-murder', io);
-
-      const msgData = {
-        type: 'advanceTo',
-        args: [lobby.game.currentStage, accuserId],
-        isInGame: true,
-      };
-
-      emitByRole('advanceStage', msg(msgData));
-    };
-
-    function resolveSecondMurder(targetId) {
-      lobby.game.witness.id === targetId
-        ? resolveGame('redwinwitnessdead')
-        : resolveGame('bluewinwitnessalive');
-    };
-
-    function resolveWrongAccusal(accuser) {
-      lobby.game.blueCanAccuse()
-        ? continueRound(accuser)
-        : resolveGame('redwin');
-    };
-
-    function continueRound(user) {
-      const args = [
-        [user.id, user.color.id]
-      ];
-
-      const msgData = {
-        type: 'accusationWrong',
-        args,
-        isInGame: true,
-      };
-
-      emitByRole('wrongAccusation', msg(msgData));
-    };
-
-    function resolveGame(result) {
-      lobby.game.advanceStage('game-over', io);
-
-      const msgData = {
-        type: 'resolveGame',
-        args: [result],
-        isInGame: true,
-      };
-
-      emitByRole('resolveGame', msg(msgData));
-    };
-
     socket.on('accusation', ({accuserId, accusedId, accusalEv}) => {
       if (!have(lobby)) return;
-
-      lobby.game.isResolvingAccusal = true;
 
       const accuser = lobby.getUserBy(accuserId);
       const accused = lobby.getUserBy(accusedId);
 
-      accuser.accusalSpent = true;
-      accuser.canAccuse = false;
-
-      const msgData = {
-        type: 'accusation',
-        args: [{
-          accuser: [accuser.id, accuser.color.id],
-          accusee: [accused.id, accused.color.id],
-          evidence: accusalEv
-        }],
-        isInGame: true,
-      };
+      const msgData = g.announceAccusal({lobby, accuser, accused, accusalEv});
 
       emitByRole('newAccusal', msg(msgData));
 
-      // suspensful delay
+      const [result, message] = g.resolveAccusal(lobby.game, accusalEv, accuser, io);
+
+      // suspenseful delay
       setTimeout(() => {
         lobby.game.isResolvingAccusal = false;
-        isAccusalRight(accusalEv)
-        ? resolveRightAccusal(accuser)
-        : resolveWrongAccusal(accuser);
+        emitByRole(result, message);
       }, 3000);
     });
 
-    socket.on('secondMurder', targetId => resolveSecondMurder(targetId));
+    socket.on('secondMurder', targetId => g.resolveSecondMurder(lobby.game, targetId, io));
 
     // newMessage
 

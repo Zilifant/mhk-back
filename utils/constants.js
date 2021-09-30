@@ -27,14 +27,6 @@ const DEFAULT_GAME_SETTINGS = {
   }
 };
 
-const GAME_OUTCOMES = {
-  redwin: 'Killer wins! The Hunters used their last accusation.',
-  redwintimeout: 'Killer wins! The Hunters ran out of time.',
-  redwinwitnessdead: 'Killers win! The Witness is dead.',
-  bluewin: 'Hunters and Ghost win!',
-  bluewinwitnessalive: 'Hunters and Ghost win! The Witness survived.'
-};
-
 const COLORS = [
   'red','blue','green','yellow','orange','purple','pink','cyan','emerald','violet','rose','amber'
 ];
@@ -216,7 +208,6 @@ const HIDE_FROM = {
 
 exports.DEVMODE = DEVMODE;
 exports.LOBBIES = LOBBIES;
-exports.GAME_OUTCOMES = GAME_OUTCOMES;
 exports.OPT_ROLES = OPT_ROLES;
 exports.GHOST = GHOST;
 exports.HUNTER = HUNTER;

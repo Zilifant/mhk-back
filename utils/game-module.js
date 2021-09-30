@@ -1,5 +1,8 @@
 // game utilities module
 
+const intersection = require('lodash.intersection');
+const { msg } = require('../utils/utils');
+
 module.exports = () => {
 
   function newClueCard(game, i) {
@@ -93,11 +96,102 @@ module.exports = () => {
     lockClueCard(clue);
   };
 
+  // Accusation
+
+  function announceAccusal({ lobby, accuser, accused, accusalEv }) {
+
+    lobby.game.isResolvingAccusal = true;
+
+    accuser.accusalSpent = true;
+    accuser.canAccuse = false;
+
+    return {
+      type: 'accusation',
+      args: [{
+        accuser: [accuser.id, accuser.color.id],
+        accusee: [accused.id, accused.color.id],
+        evidence: accusalEv
+      }],
+      isInGame: true,
+    };
+
+  };
+
+  function resolveAccusal(game, accusalEv, accuser, io) {
+
+    return isAccusalRight() ? resolveRightAccusal() : resolveWrongAccusal();
+
+    function isAccusalRight() {
+      return intersection(accusalEv, game.keyEvidence).length === 2;
+    };
+
+    function resolveRightAccusal() {
+      return game.witness
+        ? advToSecondMurder(accuser.id)
+        : resolveGame(game, 'bluewin', {accuser, killer: game.killer}, io);
+    };
+
+    function advToSecondMurder() {
+      game.advanceStage('second-murder', io);
+
+      const msgData = {
+        type: 'advanceTo',
+        args: [game.currentStage, accuser.id],
+        isInGame: true,
+      };
+
+      return ['advanceStage', msg(msgData)];
+    };
+
+    function resolveWrongAccusal() {
+      return game.blueCanAccuse()
+        ? continueRound()
+        : resolveGame(game, 'redwin', {accuser}, io);
+    };
+
+    function continueRound() {
+      const args = [
+        [accuser.id, accuser.color.id]
+      ];
+
+      const msgData = {
+        type: 'accusationWrong',
+        args,
+        isInGame: true,
+      };
+
+      return ['wrongAccusation', msg(msgData)];
+    };
+
+  };
+
+  function resolveSecondMurder(game, targetId, io) {
+    return game.witness.id === targetId
+      ? resolveGame(game, 'redwinwitnessdead', {killer: game.killer}, io)
+      : resolveGame(game, 'bluewinwitnessalive', {target: game.witness}, io);
+  };
+
+  function resolveGame(game, result, args, io) {
+    game.advanceStage('game-over', io);
+
+    const msgData = {
+      type: 'resolveGame',
+      args: [result, args],
+      isInGame: true,
+    };
+
+    return ['resolveGame', msg(msgData)];
+  };
+
   return {
     STAGES,
     advanceToNextStage,
     advanceOnKeyEvChosen,
     confirmClueChoice,
+    announceAccusal,
+    resolveAccusal,
+    resolveSecondMurder,
+    resolveGame,
   };
 
 };
