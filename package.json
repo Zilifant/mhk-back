@@ -1,19 +1,17 @@
 {
-  "name": "sgp-back",
-  "version": "0.0.1",
-  "description": "Server-side code for sgp app.",
+  "name": "mhk-back",
+  "version": "0.1.0",
+  "description": "Server-side code for mhk app.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js",
-    "devstart": "nodemon app.js"
+    "t": "echo \"Error: no test specified\" && exit 1",
+    "s": "node app.js",
+    "d": "nodemon app.js"
   },
   "author": "Scott Silsbe",
   "license": "MIT",
   "dependencies": {
     "@socket.io/admin-ui": "^0.2.0",
-    "axios": "^0.21.1",
-    "connect-mongodb-session": "^2.4.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
