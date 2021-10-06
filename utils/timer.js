@@ -19,17 +19,15 @@ function run({lobbyId, duration, io}) {
     if (!io) return console.log('Timer Error: no io');
 
     if (--timer <= 0) {
-      console.log(timer);
       io.in(lobbyId).emit('timeUp', timer);
       clearInterval(timers[lobbyId]);
       lobby.game.timerIsRunning = false;
       return;
     }
 
-    console.log(timer);
     io.in(lobbyId).emit('tenSec', timer);
 
-  }, 3000);
+  }, 10000);
 };
 
 function clear(lobbyId, io) {
