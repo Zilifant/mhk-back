@@ -1,6 +1,6 @@
 // constants
 
-const DEVMODE = process.env.NODE_ENV !== "production"
+const DEVMODE = process.env.NODE_ENV !== 'production';
 
 const LOBBIES = {},
       GHOST = 'ghost',
@@ -11,8 +11,8 @@ const LOBBIES = {},
       CAUSE = 'cause',
       LOCATION = 'location',
       CLUE = 'clue',
-      MIN_PLAYER_COUNT = 3,
-      MIN_PLAYER_COUNT_FOR_ADV_ROLES = 4;
+      MIN_PLAYER = DEVMODE ? 3 : 4,
+      MIN_PLAYER_ADV_ROLES = DEVMODE ? 4 : 5;
 
 const OPT_ROLES = ['witness', 'accomplice'];
 
@@ -220,5 +220,5 @@ exports.GHOST_CARD_INFO = GHOST_CARD_INFO;
 exports.COLORS = COLORS;
 exports.HIDE_FROM = HIDE_FROM;
 exports.DEFAULT_GAME_SETTINGS = DEFAULT_GAME_SETTINGS;
-exports.MIN_PLAYER_COUNT = MIN_PLAYER_COUNT;
-exports.MIN_PLAYER_COUNT_FOR_ADV_ROLES = MIN_PLAYER_COUNT_FOR_ADV_ROLES;
+exports.MIN_PLAYER = MIN_PLAYER;
+exports.MIN_PLAYER_ADV_ROLES = MIN_PLAYER_ADV_ROLES;

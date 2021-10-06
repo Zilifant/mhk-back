@@ -9,7 +9,7 @@ const {
   OPT_ROLES, HIDE_FROM,
   HUNTER, KILLER, GHOST, ACCOMPLICE, WITNESS,
   EVIDENCE_DECK, MEANS_DECK, GHOST_CARD_INFO, COLORS,
-  MIN_PLAYER_COUNT, MIN_PLAYER_COUNT_FOR_ADV_ROLES
+  MIN_PLAYER, MIN_PLAYER_ADV_ROLES
 } = require('./utils/constants');
 
 const {
@@ -70,13 +70,13 @@ const makeLobby = (creator) => {
       return this.users.filter(u => u.isReady === false);
     },
     canUseAdvRoles() {
-      return this.numOnline() >= MIN_PLAYER_COUNT_FOR_ADV_ROLES;
+      return this.numOnline() >= this.minPlayerAdvRoles;
     },
     minPlayersOnline() {
-      return this.numOnline() >= MIN_PLAYER_COUNT;
+      return this.numOnline() >= this.minPlayer;
     },
     minPlayersReady() {
-      return this.numReady() >= MIN_PLAYER_COUNT;
+      return this.numReady() >= this.minPlayer;
     },
     canStart() {
       return (this.numReady() >= 3) && (this.numReady() === this.numOnline());
@@ -91,6 +91,8 @@ const makeLobby = (creator) => {
     game: null,
     chat: [],
     createdAt: new Date().toLocaleTimeString(),
+    minPlayer: MIN_PLAYER,
+    minPlayerAdvRoles: MIN_PLAYER_ADV_ROLES,
     defaultSettings: {
       assignedToGhost: null,
       hasWitness: false,
