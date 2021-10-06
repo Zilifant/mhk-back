@@ -260,7 +260,13 @@ module.exports = io => {
       }, 3000);
     });
 
-    socket.on('secondMurder', targetId => g.resolveSecondMurder(lobby.game, targetId, io));
+    socket.on('secondMurder', targetId => {
+      if (!have(lobby)) return;
+
+      const [result, message] = g.resolveSecondMurder(lobby.game, targetId, io);
+
+      emitByRole(result, message);
+    });
 
     // newMessage
 
