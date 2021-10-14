@@ -5,7 +5,19 @@ const l = require('../utils/lobby-module')();
 const g = require('../utils/game-module')();
 
 const emitSimply = [
-  'userConnected', 'userDisconnected', 'giveLeadership', 'ghostAssigned', 'gameSettingsChange', 'startGame', 'readyUnready', 'clearGame', 'advanceStage', 'clueChosen', 'newAccusal', 'wrongAccusation', 'resolveGame'
+  'userConnected', // anno/feed, memberlist, setup, players
+  'userDisconnected', // anno/feed, memberlist, setup, players
+  'readyUnready', // anno/feed, memberlist, setup, players
+  'giveLeadership', // anno/feed, memberlist, setup*, info*, footer*
+  'ghostAssigned', // anno/feed, memberlist
+  'gameSettingsChange', // setup
+  'startGame', // all???
+  'clearGame', // all???
+  'advanceStage', // anno/feed, info, ???
+  'clueChosen', // anno/feed, ghostcard
+  'newAccusal', // anno/feed, loading
+  'wrongAccusation', // anno/feed, players*, playerUI*
+  'resolveGame', // anno/feed, info*, all buttons
 ];
 
 const saveToChat = [
