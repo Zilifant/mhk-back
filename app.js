@@ -11,7 +11,11 @@ const { DEVMODE } = require('./utils/constants');
 const servName = 'MHK';
 const port = 5000;
 
-const whiteList = [process.env.CLIENT_URL_HTTP, process.env.CLIENT_URL_HTTPS];
+const whiteList = [
+  process.env.CLIENT_URL_HTTP,
+  process.env.CLIENT_URL_HTTPS,
+  process.env.CLIENT_URL_HTTPS_ALT,
+];
 const corsOpts = {
   origin: function (origin, callback) {
     if (whiteList.indexOf(origin) !== -1) {
