@@ -1,8 +1,7 @@
 
 const { getLobbyById, omit, msg, have } = require('../utils/utils');
-// const { DEVMODE } = require('../utils/constants');
-const l = require('../utils/lobby-module')();
-const g = require('../utils/game-module')();
+const l = require('../utils/modules/lobby-module')();
+const g = require('../utils/modules/game-module')();
 
 const emitSimply = [
   'userConnected', // anno/feed, memberlist, setup, players

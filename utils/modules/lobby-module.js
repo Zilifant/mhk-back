@@ -1,7 +1,8 @@
 // lobby utilities module
+// provides functions used in lobby
 
 const sample = require('lodash.sample');
-const { DEVMODE } = require('../utils/constants');
+const { DEVMODE } = require('../utils');
 
 module.exports = () => {
 

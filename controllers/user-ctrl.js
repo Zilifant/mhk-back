@@ -1,8 +1,10 @@
 
 const HttpError = require('../models/HttpError');
 const { uniqUserID } = require('../utils/uniqUserID');
-const { makeUser } = require('../data');
-const { getLobbyById, getUserById, cookieSettings } = require('../utils/utils');
+const { makeUser } = require('../utils/modules/user-init-module');
+const {
+  getLobbyById, getUserById, cookieSettings
+} = require('../utils/utils');
 
 // const checkForSess = async (req, res, next) => {
 

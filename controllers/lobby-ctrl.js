@@ -2,9 +2,11 @@
 const HttpError = require('../models/HttpError');
 const { uniqUserID } = require('../utils/uniqUserID');
 const { uniqLobbyID } = require('../utils/uniqLobbyID');
-const { makeLobby, makeUser } = require('../data');
-const { getLobbyById, getRoleById, omit, cookieSettings } = require('../utils/utils');
-const { LOBBIES, DEVMODE } = require('../utils/constants');
+const { makeLobby } = require('../utils/modules/lobby-init-module');
+const { makeUser } = require('../utils/modules/user-init-module');
+const {
+  getLobbyById, getRoleById, omit, cookieSettings, LOBBIES, DEVMODE
+} = require('../utils/utils');
 
 function resData(user, lobby) {
   if (!lobby.game) return lobby;

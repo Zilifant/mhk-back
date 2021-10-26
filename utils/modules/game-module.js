@@ -1,7 +1,8 @@
 // game utilities module
+// provides functions used during game
 
 const intersection = require('lodash.intersection');
-const { msg } = require('../utils/utils');
+const { msg } = require('../utils');
 
 module.exports = () => {
 
@@ -183,6 +184,45 @@ module.exports = () => {
     return ['resolveGame', msg(msgData)];
   };
 
+  function runTimer(game, io) {
+    console.log(`${game.settings.timer.duration} min timer started in ${game.lobbyId}`);
+
+    let timer = game.settings.timer.duration * 6;
+
+    io.in(game.lobbyId).emit('timerStarted');
+
+    game.currentTimer = setInterval(() => {
+      if (!io) return console.log('Timer Error: no io');
+
+      if (--timer <= 0) {
+        io.in(game.lobbyId).emit('timeUp', timer);
+        clearInterval(game.currentTimer);
+        game.timerIsRunning = false;
+        return;
+      }
+
+      io.in(game.lobbyId).emit('tenSec', timer);
+
+    }, 10000);
+  };
+
+  function clearTimer(game, io) {
+    clearInterval(game.currentTimer);
+    io.in(game.lobbyId).emit('clear');
+    console.log(`timer cleared in ${game.lobbyId}`);
+  };
+
+  function handleTimer(game, io) {
+    if (game.currentStage.timed) {
+      runTimer(game, io);
+      game.timerIsRunning = true;
+    };
+    if (!game.currentStage.timed && game.timerIsRunning === true) {
+      clearTimer(game, io);
+      game.timerIsRunning = false;
+    };
+  };
+
   return {
     STAGES,
     advanceToNextStage,
@@ -192,6 +232,7 @@ module.exports = () => {
     resolveAccusal,
     resolveSecondMurder,
     resolveGame,
+    handleTimer,
   };
 
 };

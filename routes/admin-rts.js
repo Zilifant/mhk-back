@@ -1,5 +1,6 @@
+
 const router = require('express').Router();
-const { LOBBIES } = require('../utils/constants');
+const { LOBBIES } = require('../utils/utils');
 
 const getData = async (req, res, next) => {
   res.json({

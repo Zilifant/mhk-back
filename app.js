@@ -6,7 +6,7 @@ const socketio = require('socket.io')
 const { instrument } = require('@socket.io/admin-ui');
 // const mongoose = require('mongoose');
 // const MongoDBStore = require('connect-mongodb-session')(session);
-const { DEVMODE } = require('./utils/constants');
+const { DEVMODE } = require('./utils/utils');
 
 const servName = 'MHK';
 const port = 5000;

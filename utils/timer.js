@@ -4,7 +4,7 @@ const { getLobbyById } = require('../utils/utils');
 
 const timers = {};
 
-function run({lobbyId, duration, io}) {
+function run(lobbyId, duration, io) {
 
   const lobby = getLobbyById(lobbyId);
   if (!lobby) return;
