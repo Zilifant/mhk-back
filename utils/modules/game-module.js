@@ -2,7 +2,7 @@
 // provides functions used during game
 
 const intersection = require('lodash.intersection');
-const { msg } = require('../utils');
+const { TIMERS, msg } = require('../utils');
 
 module.exports = () => {
 
@@ -184,43 +184,46 @@ module.exports = () => {
     return ['resolveGame', msg(msgData)];
   };
 
-  function runTimer(game, io) {
-    console.log(`${game.settings.timer.duration} min timer started in ${game.lobbyId}`);
+  // Timer
 
-    let timer = game.settings.timer.duration * 6;
-
-    io.in(game.lobbyId).emit('timerStarted');
-
-    game.currentTimer = setInterval(() => {
-      if (!io) return console.log('Timer Error: no io');
-
-      if (--timer <= 0) {
-        io.in(game.lobbyId).emit('timeUp', timer);
-        clearInterval(game.currentTimer);
-        game.timerIsRunning = false;
-        return;
-      }
-
-      io.in(game.lobbyId).emit('tenSec', timer);
-
-    }, 10000);
+  function handleTimer(game, io) {
+    const { timerIsRunning, currentStage } = game;
+    if (timerIsRunning) clearTimer(game, io);
+    if (currentStage.timed) runTimer(game, io);
   };
 
   function clearTimer(game, io) {
-    clearInterval(game.currentTimer);
-    io.in(game.lobbyId).emit('clear');
-    console.log(`timer cleared in ${game.lobbyId}`);
+    const lobbyId = game.lobbyId;
+
+    io.in(lobbyId).emit('clear');
+    game.timerIsRunning = false;
+
+    clearInterval(TIMERS[lobbyId]);
   };
 
-  function handleTimer(game, io) {
-    if (game.currentStage.timed) {
-      runTimer(game, io);
-      game.timerIsRunning = true;
-    };
-    if (!game.currentStage.timed && game.timerIsRunning === true) {
-      clearTimer(game, io);
-      game.timerIsRunning = false;
-    };
+  function runTimer(game, io) {
+    const lobbyId = game.lobbyId,
+          duration = game.settings.timer.duration;
+
+    console.log(`${duration} minute timer started in ${lobbyId}`);
+    io.in(lobbyId).emit('timerStarted');
+    game.timerIsRunning = true;
+
+    let timer = duration * 6;
+    TIMERS[lobbyId] = setInterval(() => {
+      if (!io) return console.log(`ERR! runTimer: io = ${io}`);
+
+      if (--timer <= 0) {
+        io.in(lobbyId).emit('timeUp', timer);
+        game.timerIsRunning = false;
+
+        clearInterval(TIMERS[lobbyId]);
+        return;
+      };
+
+      io.in(lobbyId).emit('tenSec', timer);
+
+    }, 10000);
   };
 
   return {
@@ -233,6 +236,7 @@ module.exports = () => {
     resolveSecondMurder,
     resolveGame,
     handleTimer,
+    clearTimer
   };
 
 };

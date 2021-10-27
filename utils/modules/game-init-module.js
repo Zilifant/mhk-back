@@ -8,7 +8,7 @@ const g = require('./game-module')();
 const {
   nullify, shuffle, shuffleAndBatch, makeGhostCard, OPT_ROLES, HIDE_FROM, HUNTER, KILLER, GHOST, ACCOMPLICE, WITNESS, EVIDENCE_DECK, MEANS_DECK, GHOST_CARD_INFO,
 } = require('../utils');
-const { timer } = require('../timer');
+// const { timer } = require('../timer');
 
 function makeGame() {
 
@@ -33,13 +33,16 @@ function makeGame() {
     isResolvingAccusal: false,
     currentStage: g.STAGES[0],
     advanceStage(stageId, io) {
+
       if (stageId) {
         this.currentStage = g.STAGES.find(s => s.id === stageId);
       } else {
         const stageNum = g.STAGES.indexOf(this.currentStage);
         this.currentStage = g.STAGES[stageNum+1];
       };
-      if (this.settings.timer.on) handleTimer(this, io);
+
+      if (this.settings.timer.on) g.handleTimer(this, io);
+
     },
     viewAs(role) {
       const g = nullify(this, HIDE_FROM[role]);
@@ -49,8 +52,6 @@ function makeGame() {
     blueCanAccuse() {
       return this.blueTeam.some(player => !!player.canAccuse);
     },
-    timer,
-    currentTimer: null,
     timerIsRunning: false,
   };
 
@@ -62,18 +63,22 @@ function makeGame() {
   this.gameOn = true;
 };
 
-function handleTimer(game, io) {
-  if (game.currentStage.timed) {
-    game.timer.run(game.lobbyId, game.settings.timer.duration, io)
-    // runTimer(game, io);
-    game.timerIsRunning = true;
-  };
-  if (!game.currentStage.timed && game.timerIsRunning === true) {
-    game.timer.clear(game.lobbyId, io);
-    // clearTimer(game, io);
-    game.timerIsRunning = false;
-  };
-};
+// function handleTimer(game, io) {
+//   if (game.currentStage.timed) {
+//     game.timer.run(game.lobbyId, game.settings.timer.duration, io, game.currentTimer);
+//     // runTimer(game, io);
+//     game.timerIsRunning = true;
+//   };
+//   if (!game.currentStage.timed && game.timerIsRunning === true) {
+//     // console.log(game.currentTimer);
+//     game.timer.clear(game.lobbyId, io, game.currentTimer);
+//     // clearTimer(game, io);
+//     game.timerIsRunning = false;
+//   };
+//   console.log('handleTimer...');
+//   // console.log(game.currentTimer);
+//   console.log(game.timerIsRunning);
+// };
 
 function initRoles(game) {
   selectGhost(game);

@@ -1,19 +1,18 @@
 // misc utilites and constants
 
 const DEVMODE = process.env.NODE_ENV !== 'production';
-
-const LOBBIES = {},
-      GHOST = 'ghost',
-      HUNTER = 'hunter',
-      KILLER = 'killer',
-      ACCOMPLICE = 'accomplice',
-      WITNESS = 'witness'
-      CAUSE = 'cause',
-      LOCATION = 'location',
-      CLUE = 'clue',
-      MIN_PLAYER = DEVMODE ? 3 : 4,
-      MIN_PLAYER_ADV_ROLES = DEVMODE ? 4 : 5;
-
+const LOBBIES = {};
+const TIMERS = {};
+const GHOST = 'ghost';
+const HUNTER = 'hunter';
+const KILLER = 'killer';
+const ACCOMPLICE = 'accomplice';
+const WITNESS = 'witness';
+const CAUSE = 'cause';
+const LOCATION = 'location';
+const CLUE = 'clue';
+const MIN_PLAYER = DEVMODE ? 3 : 4;
+const MIN_PLAYER_ADV_ROLES = DEVMODE ? 4 : 5;
 const OPT_ROLES = ['witness', 'accomplice'];
 
 const DEFAULT_GAME_SETTINGS = {
@@ -123,7 +122,7 @@ const makePlayerCard = (info, type) => {
   };
 };
 
-const MEANS_DECK = MEANS_CARD_INFO.map(info => makePlayerCard(info, 'means'))
+const MEANS_DECK = MEANS_CARD_INFO.map(info => makePlayerCard(info, 'means'));
 const EVIDENCE_DECK = EVIDENCE_CARD_INFO.map(info => makePlayerCard(info, 'evidence'));
 
 const GHOST_CARD_INFO = [
@@ -327,6 +326,7 @@ const cookieSettings = {
 
 exports.DEVMODE = DEVMODE;
 exports.LOBBIES = LOBBIES;
+exports.TIMERS = TIMERS;
 exports.OPT_ROLES = OPT_ROLES;
 exports.GHOST = GHOST;
 exports.HUNTER = HUNTER;

@@ -2,6 +2,9 @@
 // provides functions used in lobby
 
 const sample = require('lodash.sample');
+
+const g = require('./game-module')();
+
 const { DEVMODE } = require('../utils');
 
 module.exports = () => {
@@ -178,7 +181,7 @@ module.exports = () => {
       });
     };
 
-    if (lobby.game.timerIsRunning) lobby.game.timer.clear(lobby.id, io);
+    if (lobby.game.timerIsRunning) g.clearTimer(lobby.game, io);
 
     lobby.game = null;
     lobby.gameOn = false;
