@@ -9,7 +9,7 @@ const { instrument } = require('@socket.io/admin-ui');
 const { DEVMODE } = require('./utils/utils');
 
 const servName = 'MHK';
-const port = 5000;
+const port = 5555;
 
 const whiteList = [
   process.env.CLIENT_URL_HTTP,
