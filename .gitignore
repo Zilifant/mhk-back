@@ -2,3 +2,4 @@ node_modules
 zed
 notes
 nodemon.json
+.DS_Store
