@@ -27,25 +27,36 @@ const DEFAULT_GAME_SETTINGS = {
 };
 
 const COLORS = [
-  'red','blue','green','yellow','orange','purple','pink','cyan','emerald','violet','rose','amber'
+  'red',
+  'blue',
+  'green',
+  'yellow',
+  'orange',
+  'purple',
+  'pink',
+  'cyan',
+  'emerald',
+  'violet',
+  'rose',
+  'amber',
 ];
 
 const EVIDENCE_CARD_INFO = [
-  'Love Letter',
-  'Raincoat',
-  'Broken Glass',
-  'Wine Glass',
-  'Motor Oil',
-  'Thread',
-  'Mirror',
-  'Fish Tank',
-  'Tire',
-  'Bicycle',
-  'Computer',
-  'Umbrella',
-  'Flowers',
-  'Apple',
-  'Plane Ticket',
+  'love letter',
+  'raincoat',
+  'broken glass',
+  'wine glass',
+  'motor oil',
+  'thread',
+  'mirror',
+  'fish tank',
+  'tire',
+  'bicycle',
+  'computer',
+  'umbrella',
+  'flowers',
+  'apple',
+  'plane ticket',
   'telephone',
   'envelope',
   'chalk',
@@ -73,21 +84,21 @@ const EVIDENCE_CARD_INFO = [
 ];
 
 const MEANS_CARD_INFO = [
-  'Knife',
-  'Revolver',
-  'Pills',
-  'Falling Debris',
-  'Animal Bite',
-  'Power Tool',
-  'Machine',
-  'Motor Vehicle',
-  'Plastic Bag',
-  'Brick',
-  'Axe',
-  'Crowbar',
-  'Drowned',
-  'Hunting Rifle',
-  'Heart Attack',
+  'knife',
+  'revolver',
+  'pills',
+  'falling debris',
+  'animal bite',
+  'power tool',
+  'machine',
+  'motor vehicle',
+  'plastic bag',
+  'brick',
+  'axe',
+  'crowbar',
+  'drowned',
+  'hunting rifle',
+  'heart attack',
   'crutch',
   'razor blade',
   'electric baton',
@@ -128,61 +139,61 @@ const EVIDENCE_DECK = EVIDENCE_CARD_INFO.map(info => makePlayerCard(info, 'evide
 const GHOST_CARD_INFO = [
   {
     type: CAUSE,
-  
     id: 'Cause of Death',
-    opts: ['Suffocation', 'Severe Injury', 'Blood Loss', 'Illness/Disease', 'Poison', 'Accident']
+    opts: ['Suffocation', 'Severe Injury', 'Blood Loss', 'Illness', 'Poison', 'Accident']
   },
   {
     type: LOCATION,
-  
     id: 'Location',
     opts: ['Playground', 'Classroom', 'Dormitory', 'Cafeteria', 'Elevator', 'Toilet']
   },
   {
     type: LOCATION,
-  
     id: 'Location',
     opts: ['Pub', 'Restaurant', 'Bookstore', 'Hotel', 'Hospital', 'Building Site']
   },
   {
+    type: LOCATION,
+    id: 'Location',
+    opts: ['vacation home', 'park', 'supermarket', 'school', 'forest', 'bank']
+  },
+  {
+    type: LOCATION,
+    id: 'Location',
+    opts: ['living room', 'bedroom', 'pantry', 'bathroom', 'kitchen', 'driveway']
+  },
+  {
     type: CLUE,
-  
     id: 'Motive',
     opts: ['Hatred', 'Power', 'Money', 'Love', 'Envy', 'Justice']
   },
   {
     type: CLUE,
-  
     id: 'In Progress',
     opts: ['Entertainment', 'Relaxation', 'Assembly', 'Trading', 'Visit', 'Dining']
   },
   {
     type: CLUE,
-  
     id: 'Duration',
     opts: ['Instant', 'Brief', 'Gradual', 'Prolonged', 'A Few Days', 'Unclear']
   },
   {
     type: CLUE,
-  
     id: 'General Impression',
     opts: ['Common', 'Creative', 'Fishy', 'Cruel', 'Horrific', 'Suspensful']
   },
   {
     type: CLUE,
-  
     id: 'Relationship',
     opts: ['Relatives', 'Friends', 'Colleagues', 'Competitors', 'Lovers', 'Strangers']
   },
   {
     type: CLUE,
-  
     id: 'Victim\'s Expression',
     opts: ['Peaceful', 'Struggling', 'Frightened', 'In Pain', 'Blank', 'Angry']
   },
   {
     type: CLUE,
-  
     id: 'Hint on Corpse',
     opts: ['Head', 'Chest', 'Hand', 'Leg', 'Partial', 'All-over']
   }
