@@ -122,7 +122,7 @@ const makeClueCard = (info) => {
 
 const CLUE_CARD_INFO = CLUE_CARD_DATA.map(info => makeClueCard(info));
 
-const GHOST_CARD_INFO = CAUSE_LOC_CARD_INFO.join(CLUE_CARD_INFO);
+const GHOST_CARD_INFO = CAUSE_LOC_CARD_INFO.concat(CLUE_CARD_INFO);
 
 const HIDE_FROM = {
   spectator: [],
