@@ -41,12 +41,12 @@ const COLORS = [
   'amber',
 ];
 
-const EVIDENCE_CARD_INFO = [
-  'love letter','raincoat','broken glass','wine glass','motor oil','thread','mirror','fish tank','tire','bicycle','computer','umbrella','keyboard','flowers','apple','plane ticket','telephone','envelope','chalk','ballet slippers','computer mouse','gift','toothpicks','bullet','fiber optics','sock','gloves','mosquito netting','candy','sewing kit','watch','antique furniture','eggs','spices','tattoo','skull','table lamp','map','gear','flyer','numbers','tea leaves','notebook','hourglass','receipt','towel','tool box','cardboard box','toy blocks','painting','nail','gift wrapping','fruit juice','surgical mask','clothing iron','bone','test tube','perfume','panties','boxer shorts','white powder','black powder','red powder','antique vase','watch','candy','campfire','gloves','sock','computer cable','cigarette ash','paperwork','cigarette butt','lunch box','light switch','postage stamp','button','paper money','dice','mobile phone','blood','earrings','handcuffs','exam paper','lipstick','wallet','costume mask','tweezers','maze','apple','ants','safety pin','paper bag','clothing hanger','prescription','shoe','sandals','cotton balls','bell','bread','sponge','electronic parts','signature','tissues','peanuts','poker chips'
+const EVIDENCE_CARD_DATA = [
+  'love letter','rain coat','broken glass','wine glass','motor oil','thread','mirror','fish tank','tire','bicycle','computer','umbrella','keyboard','flowers','apple','plane ticket','telephone','envelope','chalk','ballet slippers','computer mouse','gift','toothpicks','bullet','fiber optics','sock','gloves','mosquito netting','candy','sewing kit','watch','antique furniture','eggs','spices','tattoo','skull','table lamp','map','gear','flyer','numbers','tea leaves','notebook','hourglass','receipt','towel','tool box','cardboard box','toy blocks','painting','nail','gift wrapping','fruit juice','surgical mask','clothing iron','bone','test tube','perfume','panties','boxer shorts','white powder','black powder','red powder','antique vase','watch','candy','campfire','gloves','sock','computer cable','cigarette ash','paperwork','cigarette butt','lunch box','light switch','postage stamp','button','paper money','dice','mobile phone','blood','earrings','handcuffs','exam paper','lipstick','wallet','costume mask','tweezers','maze','apple','ants','safety pin','paper bag','clothing hanger','prescription','shoe','sandals','cotton balls','bell','bread','sponge','electronic parts','signature','tissues','peanuts','poker chips','diary','flute','coffee','wedding ring','bandage','hat','violin','flash light','badge','dentures','light bulb','suit','cigar','sunglasses','air conditioning','spy camera','book','key','luggage','cockroach','syringe','bracelet','headphones','game console','office supplies','insect','calendar','laptop','teacup','high heel','puppet','stuffed animal','stockings','dog fur','cat fur','leash','vegetables','newspaper','paint','comic books','rose','wedding invite','rat','dust','human hair','oil stain','fingernails','cake','plastic bottle','photograph','dirt','ice','slinky','playing cards','spider','tie','soap','shampoo','puzzle pieces','diamond','curtains','leaf','camp fire','broom','glue','menu','sand','fan','dictonary','library card','wig','riddle','magazine','padlock','hairpin','helmet','lottery ticket',' black cat','graffiti','lens','sticky note','speaker','sawdust','bullseye','herbal medicine','house plant','coins'
 ];
 
-const MEANS_CARD_INFO = [
-  'pocket knife','pistol','pills','falling debris','animal bite','power tool','machine','motor vehicle','plastic bag','brick','axe','crowbar','drowned','hunting rifle','heart attack','crutch','razor blade','cattle prod','scarf','liquid drug','machete','potted plant','wine','dirty water','plague','dumbbell','ice skates','candle stick','matches','belt','venomous insect','lighter','wrench','starvation','electric shock','scissors','machinery','chemicals','metal wire','illegal drugs','fish hook','sculpture','powdered drug','dismembered','injection','baseball bat','towel','box cutter','rope','pills','metal chain','mercury','poisoned needle','stone','amoeba','arson','locked room','dagger','chainsaw','kerosene','wire','arsenic','noxious gas','folding chair','buried','packing tape','steel pipe','smoke','gunpowder','bleeding','explosion','drill','bare hands','rubbing alcohol','meat cleaver','blender','pillow','overdose','throat slit','hammer','rip and tear','medical procedure','radiation','virus','sulfuric acid','sniper rifle','trophy','pesticide','board game','fork','bow and arrow','spear','freezing','liquid nitrogen','infection','head trauma','building collapse','rail car','farm animal','throwing star','sword','crushed','alcohol poisoning','zoo animal'
+const MEANS_CARD_DATA = [
+  'pocket knife','pistol','pills','falling debris','animal bite','power tool','machine','motor vehicle','plastic bag','brick','axe','crowbar','drowned','hunting rifle','heart attack','crutch','razor blade','cattle prod','scarf','liquid drug','machete','potted plant','wine','dirty water','plague','dumbbell','ice skates','candle stick','matches','belt','venomous insect','lighter','wrench','starvation','electric shock','scissors','machinery','chemicals','metal wire','illegal drugs','fish hook','sculpture','powdered drug','dismembered','injection','baseball bat','towel','box cutter','rope','pills','metal chain','mercury','poisoned needle','stone','amoeba','arson','locked room','dagger','chainsaw','kerosene','wire','arsenic','noxious gas','folding chair','buried','packing tape','steel pipe','smoke','gunpowder','bleeding','explosion','drill','bare hands','rubbing alcohol','meat cleaver','blender','pillow','overdose','throat slit','hammer','rip and tear','medical procedure','radiation','virus','sulfuric acid','sniper rifle','trophy','pesticide','board game','fork','bow and arrow','spear','freezing','liquid nitrogen','infection','head trauma','building collapse','rail car','farm animal','throwing star','sword','crushed','alcohol poisoning','zoo animal','ice pick','scythe','cesspool','rockslide','tablesaw','forklift','boat propeller'
 ];
 
 const makePlayerCard = (info, type) => {
@@ -57,10 +57,10 @@ const makePlayerCard = (info, type) => {
   };
 };
 
-const MEANS_DECK = MEANS_CARD_INFO.map(info => makePlayerCard(info, 'means'));
-const EVIDENCE_DECK = EVIDENCE_CARD_INFO.map(info => makePlayerCard(info, 'evidence'));
+const MEANS_DECK = MEANS_CARD_DATA.map(info => makePlayerCard(info, 'means'));
+const EVIDENCE_DECK = EVIDENCE_CARD_DATA.map(info => makePlayerCard(info, 'evidence'));
 
-const GHOST_CARD_INFO = [
+const CAUSE_LOC_CARD_INFO = [
   {
     type: CAUSE,
     id: 'Cause of Death',
@@ -85,43 +85,44 @@ const GHOST_CARD_INFO = [
     type: LOCATION,
     id: 'Location',
     opts: ['living room', 'bedroom', 'pantry', 'bathroom', 'kitchen', 'driveway']
-  },
-  {
-    type: CLUE,
-    id: 'Motive',
-    opts: ['Hatred', 'Power', 'Money', 'Love', 'Envy', 'Justice']
-  },
-  {
-    type: CLUE,
-    id: 'In Progress',
-    opts: ['Entertainment', 'Relaxation', 'Assembly', 'Trading', 'Visit', 'Dining']
-  },
-  {
-    type: CLUE,
-    id: 'Duration',
-    opts: ['Instant', 'Brief', 'Gradual', 'Prolonged', 'A Few Days', 'Unclear']
-  },
-  {
-    type: CLUE,
-    id: 'General Impression',
-    opts: ['Common', 'Creative', 'Fishy', 'Cruel', 'Horrific', 'Suspensful']
-  },
-  {
-    type: CLUE,
-    id: 'Relationship',
-    opts: ['Relatives', 'Friends', 'Colleagues', 'Competitors', 'Lovers', 'Strangers']
-  },
-  {
-    type: CLUE,
-    id: 'Victim\'s Expression',
-    opts: ['Peaceful', 'Struggling', 'Frightened', 'In Pain', 'Blank', 'Angry']
-  },
-  {
-    type: CLUE,
-    id: 'Hint on Corpse',
-    opts: ['Head', 'Chest', 'Hand', 'Leg', 'Partial', 'All-over']
   }
 ];
+
+const CLUE_CARD_DATA = [
+  'victim\'s build:large,thin,tall,short,disfigured,athletic',
+  'trace at scene:fingerprint,footprint,bruise,blood stain,bodily fluid,scar',
+  'killer\'s personality:arrogant,despicable,angry,greedy,stubborn,perverted',
+  'day of crime:weekday,weekend,spring,summer,fall,winter',
+  'evidence left behind:natural,artistic,written,synthetic,personal,unrelated',
+  'victim\'s clothes:neat,dirty,elegant,shabby,bizarre,naked',
+  'noticed by bystander:sudden sound,prolonged sound,smell,visual,action,nothing',
+  'time of death:dawn,morning,noon,afternoon,evening,midnight',
+  'state of the scene:bits and pieces,ashes,liquid damage,cracked,disorderly,clean',
+  'weather:sunny,stormy,dry,humid,cold,hot',
+  'victim\'s occupation:boss,professional,amateur,student,unemployed,retired',
+  'condition of corpse:still warm,stiff,decayed,incomplete,intact,twisted',
+  'victim\'s identity:child,young adult,middle-aged,senior,man,woman',
+  'sudden incident:power failure,fire,conflict,scattering,scream,nothing',
+  'Motive:Hatred,Power,Money,Love,Envy,Justice',
+  'In Progress:Entertainment,Relaxation,Assembly,Trading,Visit,Dining',
+  'Duration:Instant,Brief,Gradual,Prolonged,A Few Days,Unclear',
+  'General Impression:Common,Creative,Fishy,Cruel,Horrific,Suspensful',
+  'Relationship:Relatives,Friends,Colleagues,Competitors,Lovers,Strangers',
+  'Victim\'s Expression:Peaceful,Struggling,Frightened,In Pain,Blank,Angry',
+  'Hint on Corpse:Head,Chest,Hand,Leg,Partial,All-over'
+];
+
+const makeClueCard = (info) => {
+  return {
+    type: CLUE,
+    id: info.split(':')[0],
+    opts: info.split(':')[1].split(',')
+  };
+};
+
+const CLUE_CARD_INFO = CLUE_CARD_DATA.map(info => makeClueCard(info));
+
+const GHOST_CARD_INFO = CAUSE_LOC_CARD_INFO.join(CLUE_CARD_INFO);
 
 const HIDE_FROM = {
   spectator: [],
