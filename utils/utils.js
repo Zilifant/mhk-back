@@ -1,4 +1,6 @@
-// misc utilites and constants
+// Misc Utilites and Constants
+
+// TO DO: break these out into separate files
 
 const DEVMODE = process.env.NODE_ENV !== 'production';
 const LOBBIES = {};
@@ -289,15 +291,3 @@ exports.getUserById = getUserById;
 exports.getRoleById = getRoleById;
 exports.msg = msg;
 exports.have = have;
-
-// const makeGhostDecks = (ghostCardInfo) => {
-//   const gCards = ghostCardInfo.map(item => makeGhostCard(item));
-//   const gDecks = {
-//     causes: gCards.filter(card => card.type === 'cause'),
-//     locs: gCards.filter(card => card.type === 'location'),
-//     clues: gCards.filter(card => card.type === 'clue')
-//   };
-//   return gDecks;
-// };
-
-// exports.makeGhostDecks = makeGhostDecks;

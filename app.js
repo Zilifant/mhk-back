@@ -1,8 +1,9 @@
+// App
+
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
 const socketio = require('socket.io')
-const { instrument } = require('@socket.io/admin-ui');
 const { DEVMODE } = require('./utils/utils');
 
 const servName = 'MHK';
@@ -55,7 +56,8 @@ app.use((error, req, res, next) => {
   if (res.headerSent) {
     return next(error);
   };
-  // send error code attached to the error object that was recieved, if any, or else send error code 500
+  // send error code attached to the error object that was recieved, if any,
+  // or else send error code 500
   res.status(error.code || 500);
   // send a message to the client to show to the user
   res.json({message: error.message || 'An unknown error occurred!'});
@@ -65,5 +67,3 @@ server.listen(
   process.env.PORT || port,
   console.log(`${servName} listening on port ${process.env.PORT || port}`)
 );
-
-instrument(io, { auth: false });
