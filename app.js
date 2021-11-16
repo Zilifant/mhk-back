@@ -1,11 +1,8 @@
 const express = require('express');
 const cors = require('cors');
-// const session = require('express-session');
 const http = require('http');
 const socketio = require('socket.io')
 const { instrument } = require('@socket.io/admin-ui');
-// const mongoose = require('mongoose');
-// const MongoDBStore = require('connect-mongodb-session')(session);
 const { DEVMODE } = require('./utils/utils');
 
 const servName = 'MHK';
@@ -43,37 +40,10 @@ const adminRoutes = require('./routes/admin-rts');
 
 app.use(cors(corsOpts));
 app.use(express.json());
-// resave false so session will only be saved if something in the session changes, not on every req; saveuninit false so session not saved before a req where it doesn't need to be saved
-// note: add cookie: {} to config session cookie
-// const store = new MongoDBStore({
-//   uri: process.env.DB_URL,
-//   collection: 'sessions'
-// });
 
 if (!DEVMODE) {
   app.set('trust proxy', 1);
 }
-
-// app.use(session({
-//   secret: 'xyz',
-//   resave: false,
-//   saveUninitialized: false,
-//   store: store,
-//   cookie: {
-//     httpOnly: true,
-//     secure: !DEVMODE,
-//     maxAge: 60 * 60 * 6000 // 6hr
-//   }
-// }));
-
-// app.use((req, res, next) => {
-//   // res.setHeader('Access-Control-Allow-Origin', '*');
-//   res.setHeader('Access-Control-Allow-Origin', process.env.CLIENT_URL);
-//   res.setHeader('Access-Control-Allow-Credentials', 'true');
-//   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control, Pragma');
-//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE');
-//   next();
-// })
 
 app.use('/api/user', userRoutes);
 app.use('/api/lobby', lobbyRoutes);
@@ -91,24 +61,9 @@ app.use((error, req, res, next) => {
   res.json({message: error.message || 'An unknown error occurred!'});
 });
 
-// mongoose
-//   .connect(process.env.DB_URL, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true
-//   })
-//   .then(() => {
-//     server.listen(
-//       process.env.PORT || port,
-//       console.log(`${servName} listening on port ${process.env.PORT || port}`)
-//     );
-//   })
-//   .catch(error => console.log(error));
-
 server.listen(
   process.env.PORT || port,
   console.log(`${servName} listening on port ${process.env.PORT || port}`)
 );
-
-// server.listen(process.env.PORT || port, () => console.log(`sgp server listening on port ${port}`));
 
 instrument(io, { auth: false });
