@@ -1,5 +1,5 @@
-// lobby initiation module
-// creates new lobby
+// Lobby Initiation Module
+// Creates new lobby.
 
 const { makeGame } = require('./game-init-module');
 

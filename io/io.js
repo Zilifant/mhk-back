@@ -1,8 +1,10 @@
+// IO
 
 const { getLobbyById, omit, msg, have } = require('../utils/utils');
 const l = require('../utils/modules/lobby-module')();
 const g = require('../utils/modules/game-module')();
 
+// TO DO: break these out into more granular emits.
 const emitSimply = [
   'userConnected', // anno/feed, memberlist, setup, players
   'userDisconnected', // anno/feed, memberlist, setup, players

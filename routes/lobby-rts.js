@@ -1,3 +1,4 @@
+
 const express = require('express');
 const { check } = require('express-validator');
 
@@ -14,7 +15,7 @@ module.exports = () => {
     createLobby
   );
 
-  // get lobby (needs to know userId to recieve user/role-specific lobby/game data)
+  // get lobby (must know userId to recieve user/role-specific lobby/game data)
   router.post(
     '/:lobbyUrlRoute',
     getLobby

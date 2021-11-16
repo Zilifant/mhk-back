@@ -1,5 +1,5 @@
-// user initiation module
-// creates new user
+// User Initiation Module
+// Creates new user.
 
 const makeUser = ({
   id, myLobby, isStreamer, lobbyCreator = false

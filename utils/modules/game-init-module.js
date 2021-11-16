@@ -1,4 +1,4 @@
-// game initiation module
+// Game Initiation Module
 // creates new game
 
 const sample = require('lodash.sample');
@@ -8,7 +8,6 @@ const g = require('./game-module')();
 const {
   nullify, shuffle, shuffleAndBatch, makeGhostCard, OPT_ROLES, HIDE_FROM, HUNTER, KILLER, GHOST, ACCOMPLICE, WITNESS, EVIDENCE_DECK, MEANS_DECK, GHOST_CARD_INFO,
 } = require('../utils');
-// const { timer } = require('../timer');
 
 function makeGame() {
 
@@ -62,23 +61,6 @@ function makeGame() {
   this.game = game;
   this.gameOn = true;
 };
-
-// function handleTimer(game, io) {
-//   if (game.currentStage.timed) {
-//     game.timer.run(game.lobbyId, game.settings.timer.duration, io, game.currentTimer);
-//     // runTimer(game, io);
-//     game.timerIsRunning = true;
-//   };
-//   if (!game.currentStage.timed && game.timerIsRunning === true) {
-//     // console.log(game.currentTimer);
-//     game.timer.clear(game.lobbyId, io, game.currentTimer);
-//     // clearTimer(game, io);
-//     game.timerIsRunning = false;
-//   };
-//   console.log('handleTimer...');
-//   // console.log(game.currentTimer);
-//   console.log(game.timerIsRunning);
-// };
 
 function initRoles(game) {
   selectGhost(game);

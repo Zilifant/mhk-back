@@ -10,6 +10,4 @@ const getData = async (req, res, next) => {
 
 router.get('/data', getData);
 
-// router.post('/admin', );
-
 module.exports = router;

@@ -1,6 +1,6 @@
 // Misc Utilites and Constants
 
-// TO DO: break these out into separate files
+// TO DO: break these out into separate files.
 
 const DEVMODE = process.env.NODE_ENV !== 'production';
 const LOBBIES = {};

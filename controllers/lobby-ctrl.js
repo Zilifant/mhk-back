@@ -90,11 +90,3 @@ module.exports = () => {
   }
 
 };
-
-// module.exports = {
-//   getLobby,
-//   createLobby
-// }
-
-// exports.getLobby = getLobby;
-// exports.createLobby = createLobby;

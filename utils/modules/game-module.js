@@ -1,5 +1,5 @@
-// game utilities module
-// provides functions used during game
+// Game Utilities Module
+// Provides functions used during game.
 
 const intersection = require('lodash.intersection');
 const { TIMERS, msg } = require('../utils');

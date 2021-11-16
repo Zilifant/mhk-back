@@ -1,5 +1,5 @@
-// lobby utilities module
-// provides functions used in lobby
+// Lobby Utilities Module
+// Provides functions used in lobby.
 
 const sample = require('lodash.sample');
 
@@ -32,7 +32,7 @@ module.exports = () => {
       user.isLeader = true;
     };
 
-    console.log(`IO: ${user.id} connected`);
+    if (DEVMODE) console.log(`IO: ${user.id} connected`);
   };
 
   function assignColor(lobby, user) {
@@ -73,7 +73,7 @@ module.exports = () => {
     let user;
     try {
       user = lobby.getUserBy(socket.id, 'socketId');
-      console.log(`IO: ${user.id} disconnected`);
+      if (DEVMODE) console.log(`IO: ${user.id} disconnected`);
     } catch (err) {
       return console.log(`ERR! idDisconnectedUser: no user for socket '${socket.id}'`);
     };

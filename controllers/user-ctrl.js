@@ -2,32 +2,7 @@
 const HttpError = require('../models/HttpError');
 const { uniqUserID } = require('../utils/uniqUserID');
 const { makeUser } = require('../utils/modules/user-init-module');
-const {
-  getLobbyById, getUserById, cookieSettings
-} = require('../utils/utils');
-
-// const checkForSess = async (req, res, next) => {
-
-//   if (!req.session.userIdCookie) {
-//     const error = new HttpError('No active session found.', 404);
-//     return next(error);
-//   };
-
-//   let user;
-//   if (req.session.userIdCookie) {
-//     try {
-//       user = await getUserById({
-//         lobbyId: req.session.userLobbyCookie,
-//         userId: req.session.userIdCookie
-//       });
-//     } catch (err) {
-//       console.log(err);
-//       const error = new HttpError('Could not find lobby.', 500);
-//       return next(error);
-//     };
-//   };
-//   res.status(200).json({ user: user });
-// };
+const { getLobbyById, getUserById, cookieSettings } = require('../utils/utils');
 
 function parseCookies(c) {
   const cArr = c.split(';');
@@ -45,8 +20,6 @@ const checkForCookie = async (req, res, next) => {
 
   if (!cookies) {
     return res.status(200).json({ user: null });
-    // const error = new HttpError('No cookie found.', 404);
-    // return next(error);
   };
 
   let user;
@@ -67,7 +40,6 @@ const checkForCookie = async (req, res, next) => {
 };
 
 const addUserToLobby = async (req, res, next) => {
-  // console.log('addUserToLobby');
 
   let lobby;
   try {
@@ -103,8 +75,5 @@ const addUserToLobby = async (req, res, next) => {
   });
 };
 
-// exports.checkForSess = checkForSess;
 exports.checkForCookie = checkForCookie;
 exports.addUserToLobby = addUserToLobby;
-
-// .setHeader('Set-Cookie',`userData=${userId}--${lobby.id}`)
