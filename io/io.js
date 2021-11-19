@@ -1,6 +1,6 @@
 // IO
 
-const { getLobbyById, omit, msg, have } = require('../utils/utils');
+const { getLobbyById, omit, msg, have, DEVMODE } = require('../utils/utils');
 const l = require('../utils/modules/lobby-module')();
 const g = require('../utils/modules/game-module')();
 
@@ -39,6 +39,14 @@ module.exports = io => {
 
       const user = lobby?.users.find(u => u.id === userId);
       if (!user) return console.log(`ERR! connect: '${userId}' not in '${lobbyId}' user list`);
+
+      if (!!user.socketId) {
+        const oldSocket = io.sockets.sockets.get(user.socketId);
+        const msgType = { type: 'duplicateConnection' };
+        const disconnectMsg = msg(msgType);
+        io.to(oldSocket.id).emit('privateAnnounce', disconnectMsg);
+        oldSocket.disconnect(true);
+      };
 
       l.connectToLobby(lobby, user, socket);
 

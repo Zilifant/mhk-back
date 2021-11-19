@@ -70,8 +70,6 @@ module.exports = () => {
     unAssignToGhost(lobby, user);
     reconcileAdvRolesSettings(lobby);
 
-    console.table(lobby.users);
-
     if (DEVMODE) console.log(`IO: ${user.id} disconnected`);
   }
 
