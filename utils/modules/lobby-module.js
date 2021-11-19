@@ -32,6 +32,8 @@ module.exports = () => {
       user.isLeader = true;
     };
 
+    console.table(lobby.users);
+
     if (DEVMODE) console.log(`IO: ${user.id} connected`);
   };
 
@@ -64,25 +66,29 @@ module.exports = () => {
   // User disconnects
 
   function disconnectFromLobby(lobby, user) {
-    removeUserFromLists(user);
+    setUserDataToOffline(user);
     unAssignToGhost(lobby, user);
     reconcileAdvRolesSettings(lobby);
+
+    console.table(lobby.users);
+
+    if (DEVMODE) console.log(`IO: ${user.id} disconnected`);
   }
 
   function identifyDisconnectedUser(lobby, socket) {
     let user;
     try {
       user = lobby.getUserBy(socket.id, 'socketId');
-      if (DEVMODE) console.log(`IO: ${user.id} disconnected`);
     } catch (err) {
       return console.log(`ERR! idDisconnectedUser: no user for socket '${socket.id}'`);
     };
     return user;
   };
 
-  function removeUserFromLists(user) {
+  function setUserDataToOffline(user) {
     user.isOnline = false;
     user.isReady = false;
+    user.socketId = null;
   };
 
   function changeLeader(lobby, user) {
