@@ -1,6 +1,6 @@
 // IO
 
-const { getLobbyById, omit, msg, have, DEVMODE } = require('../utils/utils');
+const { getLobbyById, omit, msg, have } = require('../utils/utils');
 const l = require('../utils/modules/lobby-module')();
 const g = require('../utils/modules/game-module')();
 
