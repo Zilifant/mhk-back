@@ -4,7 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const http = require('http');
 const socketio = require('socket.io')
-const { DEVMODE } = require('./utils/utils');
+const { isDevEnv } = require('./utils/utils');
 
 const servName = 'MHK';
 const port = 5555;
@@ -42,7 +42,7 @@ const adminRoutes = require('./routes/admin-rts');
 app.use(cors(corsOpts));
 app.use(express.json());
 
-if (!DEVMODE) {
+if (!isDevEnv) {
   app.set('trust proxy', 1);
 }
 

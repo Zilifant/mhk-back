@@ -5,7 +5,7 @@ const sample = require('lodash.sample');
 
 const g = require('./game-module')();
 
-const { DEVMODE } = require('../utils');
+const { isDevEnv } = require('../utils');
 
 module.exports = () => {
 
@@ -21,7 +21,7 @@ module.exports = () => {
     socket.join(lobby.id);
 
     user.isOnline = true;
-    user.isReady = DEVMODE; // users start ready in dev mode
+    user.isReady = isDevEnv; // users start ready in dev mode
     user.socketId = socket.id;
     user.connectionTime = Date.now();
 
@@ -34,7 +34,7 @@ module.exports = () => {
 
     console.table(lobby.users);
 
-    if (DEVMODE) console.log(`IO: ${user.id} connected`);
+    if (isDevEnv) console.log(`IO: ${user.id} connected`);
   };
 
   function assignColor(lobby, user) {
@@ -70,7 +70,7 @@ module.exports = () => {
     unAssignToGhost(lobby, user);
     reconcileAdvRolesSettings(lobby);
 
-    if (DEVMODE) console.log(`IO: ${user.id} disconnected`);
+    if (isDevEnv) console.log(`IO: ${user.id} disconnected`);
   }
 
   function identifyDisconnectedUser(lobby, socket) {
@@ -178,7 +178,7 @@ module.exports = () => {
 
   function clearGame(lobby, io) {
 
-    if (!DEVMODE) {
+    if (!isDevEnv) {
       lobby.game.players.map(player => {
         player.isReady = false;
         return player;

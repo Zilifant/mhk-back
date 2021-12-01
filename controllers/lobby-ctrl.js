@@ -5,7 +5,7 @@ const { uniqLobbyID } = require('../utils/uniqLobbyID');
 const { makeLobby } = require('../utils/modules/lobby-init-module');
 const { makeUser } = require('../utils/modules/user-init-module');
 const {
-  getLobbyById, getRoleById, omit, cookieSettings, LOBBIES, DEVMODE
+  getLobbyById, getRoleById, omit, cookieSettings, LOBBIES, isDevEnv
 } = require('../utils/utils');
 
 function resData(user, lobby) {
@@ -62,7 +62,7 @@ module.exports = () => {
   
     const userId = uniqUserID(req.body.userName);
     const isStreamer = req.body.isStreamer;
-    const lobbyId = DEVMODE ? 'z' : uniqLobbyID();
+    const lobbyId = isDevEnv ? 'z' : uniqLobbyID();
   
     const newUser = makeUser({
       id: userId,

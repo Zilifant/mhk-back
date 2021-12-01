@@ -2,7 +2,8 @@
 
 // TO DO: break these out into separate files.
 
-const DEVMODE = process.env.NODE_ENV !== 'production';
+const isDevEnv = process.env.NODE_ENV !== 'production';
+
 const LOBBIES = {};
 const TIMERS = {};
 const GHOST = 'ghost';
@@ -13,8 +14,8 @@ const WITNESS = 'witness';
 const CAUSE = 'cause';
 const LOCATION = 'location';
 const CLUE = 'clue';
-const MIN_PLAYER = DEVMODE ? 3 : 4;
-const MIN_PLAYER_ADV_ROLES = DEVMODE ? 4 : 5;
+const MIN_PLAYER = isDevEnv ? 3 : 4;
+const MIN_PLAYER_ADV_ROLES = isDevEnv ? 4 : 5;
 const OPT_ROLES = ['witness', 'accomplice'];
 
 const DEFAULT_GAME_SETTINGS = {
@@ -262,7 +263,7 @@ const cookieSettings = {
   secure: process.env.NODE_ENV === "production"
 }
 
-exports.DEVMODE = DEVMODE;
+exports.isDevEnv = isDevEnv;
 exports.LOBBIES = LOBBIES;
 exports.TIMERS = TIMERS;
 exports.OPT_ROLES = OPT_ROLES;
