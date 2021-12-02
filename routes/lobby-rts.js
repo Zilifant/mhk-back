@@ -1,26 +1,23 @@
+// Lobby Routes
 
 const express = require('express');
 const { check } = require('express-validator');
 
 module.exports = () => {
 
+  const router = express.Router();
   const { createLobby, getLobby } = require('../controllers/lobby-ctrl')();
 
-  const router = express.Router();
-
-  // create new lobby
   router.post(
     '/new',
     [ check('userName').not().isEmpty() ],
     createLobby
   );
 
-  // get lobby (must know userId to recieve user/role-specific lobby/game data)
   router.post(
     '/:lobbyUrlRoute',
     getLobby
   );
 
-  return router
-
-}
+  return router;
+};
