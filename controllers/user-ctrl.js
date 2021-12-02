@@ -39,7 +39,7 @@ function parseUserDataCookie(c) {
     return c.trim().substr(0,8) === 'userData';
   });
   // Extract data or throw error.
-  // TODO: add proper error handling.
+  // TO DO: add proper error handling.
   if (!userDataCookie) return console.log(`parseCookies Error; c = ${c}`);
   const userData = userDataCookie.split('=')[1];
   // Convert userData ('userId--lobbyId') to object.

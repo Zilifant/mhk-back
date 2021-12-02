@@ -12,7 +12,7 @@ const {
 // If user is returning to an in-progress game, data may need to be redacted.
 function lobbyData(user, lobby) {
   if (!lobby.game) return lobby;
-  // TODO: seperate this semi-related side effect.
+  // TO DO: seperate this semi-related side effect.
   if (!isPlayer(user, lobby)) {
     assignSpectator(user, lobby);
     return lobby;
@@ -42,7 +42,7 @@ function redactGame(userId, lobby) {
 module.exports = () => {
 
   // Called when visitor reaches a (potential) lobby url.
-  // TODO: replace param with json data.
+  // TO DO: replace param with json data.
   const getLobby = async (req, res, next) => {
 
     let lobby;
