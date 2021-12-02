@@ -1,11 +1,10 @@
+// Admin Routes
 
 const router = require('express').Router();
-const { LOBBIES } = require('../utils/utils');
 
+// Placeholder
 const getData = async (req, res, next) => {
-  res.json({
-    lobbies: LOBBIES
-  });
+  res.json({ data: 'data' });
 };
 
 router.get('/data', getData);
