@@ -3,6 +3,8 @@
 // TO DO: break these out into separate files.
 
 const isDevEnv = process.env.NODE_ENV !== 'production';
+const servName = 'MHK';
+const devPort = 5555;
 
 const LOBBIES = {};
 const TIMERS = {};
@@ -264,6 +266,8 @@ const cookieSettings = {
 }
 
 exports.isDevEnv = isDevEnv;
+exports.servName = servName;
+exports.devPort = devPort;
 exports.LOBBIES = LOBBIES;
 exports.TIMERS = TIMERS;
 exports.OPT_ROLES = OPT_ROLES;

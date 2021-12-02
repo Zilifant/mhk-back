@@ -4,10 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const http = require('http');
 const socketio = require('socket.io')
-const { isDevEnv } = require('./utils/utils');
-
-const servName = 'MHK';
-const port = 5555;
+const { isDevEnv, servName, devPort } = require('./utils/utils');
 
 const whiteList = [
   process.env.CLIENT_URL_HTTP,
@@ -64,6 +61,6 @@ app.use((error, req, res, next) => {
 });
 
 server.listen(
-  process.env.PORT || port,
-  console.log(`${servName} listening on port ${process.env.PORT || port}`)
+  process.env.PORT || devPort,
+  console.log(`${servName} listening on port ${process.env.PORT || devPort}`)
 );
