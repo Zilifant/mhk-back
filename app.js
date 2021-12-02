@@ -6,6 +6,7 @@ const http = require('http');
 const socketio = require('socket.io')
 const { isDevEnv, servName, devPort } = require('./utils/utils');
 
+// Setup CORS.
 const whiteList = [
   process.env.CLIENT_URL_HTTP,
   process.env.CLIENT_URL_HTTPS
@@ -22,6 +23,7 @@ const corsOpts = {
   credentials: true
 };
 
+// Setup server and io.
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server, {
@@ -32,15 +34,21 @@ const io = socketio(server, {
   ]
 });
 
+// Send io to file where all of the io logic is.
 require('./io/io')(io);
+
+// Routes //
 
 const lobbyRoutes = require('./routes/lobby-rts')(io);
 const userRoutes = require('./routes/user-rts');
 const adminRoutes = require('./routes/admin-rts');
 
+// Middleware //
+
 app.use(cors(corsOpts));
 app.use(express.json());
 
+// Required setting for cookies to work with CORS.
 if (!isDevEnv) {
   app.set('trust proxy', 1);
 }
@@ -49,16 +57,16 @@ app.use('/api/user', userRoutes);
 app.use('/api/lobby', lobbyRoutes);
 app.use('/api/admin', adminRoutes);
 
-// this will execute if any middleware before it throws an error
+// This will execute if any middleware before it throws an error.
 app.use((error, req, res, next) => {
-  // check if a response has already been sent
+  // Check if a response has already been sent.
   if (res.headerSent) {
     return next(error);
   };
-  // send error code attached to the error object that was recieved, if any,
-  // or else send error code 500
+  // Send error code attached to the error object that was recieved, if any,
+  // or else send error code 500.
   res.status(error.code || 500);
-  // send a message to the client to show to the user
+  // Send a message to the client to show to the user.
   res.json({message: error.message || 'An unknown error occurred!'});
 });
 
