@@ -1,8 +1,9 @@
+// Unique User ID
+// Appends '-' + four random numbers to the given username.
 
 const { customAlphabet } = require('nanoid');
 
-const alpha = '1234567890';
-const nanoid = customAlphabet(alpha, 4);
+const nanoid = customAlphabet('1234567890', 4);
 
 const uniqUserID = (userName) => userName + '-' + nanoid();
 
