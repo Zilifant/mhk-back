@@ -8,8 +8,7 @@ const { isDevEnv, servName, devPort } = require('./utils/utils');
 
 const whiteList = [
   process.env.CLIENT_URL_HTTP,
-  process.env.CLIENT_URL_HTTPS,
-  process.env.CLIENT_URL_HTTPS_ALT,
+  process.env.CLIENT_URL_HTTPS
 ];
 const corsOpts = {
   origin: function (origin, callback) {
@@ -27,7 +26,10 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server, {
   cors: true,
-  origins: [process.env.CLIENT_URL_HTTP, process.env.CLIENT_URL_HTTPS]
+  origins: [
+    process.env.CLIENT_URL_HTTP,
+    process.env.CLIENT_URL_HTTPS
+  ]
 });
 
 require('./io/io')(io);
