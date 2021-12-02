@@ -1,3 +1,4 @@
+// Lobby Control
 
 const HttpError = require('../models/HttpError');
 const { uniqUserID } = require('../utils/uniqUserID');
@@ -8,12 +9,14 @@ const {
   getLobbyById, getRoleById, omit, cookieSettings, LOBBIES, isDevEnv
 } = require('../utils/utils');
 
-function resData(user, lobby) {
+// If user is returning to an in-progress game, data may need to be redacted.
+function lobbyData(user, lobby) {
   if (!lobby.game) return lobby;
+  // TODO: seperate this semi-related side effect.
   if (!isPlayer(user, lobby)) {
     assignSpectator(user, lobby);
     return lobby;
-  }
+  };
   return redactGame(user.id, lobby);
 };
 
@@ -26,6 +29,8 @@ function assignSpectator(user, lobby) {
   lobby.game.rolesRef.push({role: 'spectator', user: user});
 };
 
+// Get user's role, then replace the lobby's game property with a redacted
+// version specific to that role.
 function redactGame(userId, lobby) {
   const role = getRoleById(userId, lobby);
 
@@ -36,6 +41,8 @@ function redactGame(userId, lobby) {
 
 module.exports = () => {
 
+  // Called when visitor reaches a (potential) lobby url.
+  // TODO: replace param with json data.
   const getLobby = async (req, res, next) => {
 
     let lobby;
@@ -54,16 +61,19 @@ module.exports = () => {
 
     const user = lobby.users.find(u => u.id === req.body.userId);
 
-    res.status(200).json({ lobby: resData(user, lobby) });
+    res.status(200).json({ lobby: lobbyData(user, lobby) });
   };
 
   const createLobby = async (req, res) => {
-    // console.log('createLobby');
-  
+
+    // Append random numbers to visitor's chosen user name
     const userId = uniqUserID(req.body.userName);
+    // Set 'streaming mode' option
     const isStreamer = req.body.isStreamer;
+
+    // Generate lobby id; in development give lobby short, predictable id.
     const lobbyId = isDevEnv ? 'z' : uniqLobbyID();
-  
+
     const newUser = makeUser({
       id: userId,
       myLobby: lobbyId,
@@ -72,9 +82,9 @@ module.exports = () => {
     });
 
     const newLobby = makeLobby(newUser);
-  
+
     LOBBIES[newLobby.id] = newLobby;
-  
+
     res
     .status(201)
     .cookie('userData', `${userId}--${lobbyId}`, cookieSettings)
