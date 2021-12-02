@@ -284,34 +284,36 @@ const cookieSettings = {
   secure: process.env.NODE_ENV === "production"
 }
 
-exports.isDevEnv = isDevEnv;
-exports.servName = servName;
-exports.devPort = devPort;
-exports.LOBBIES = LOBBIES;
-exports.TIMERS = TIMERS;
-exports.OPT_ROLES = OPT_ROLES;
-exports.GHOST = GHOST;
-exports.HUNTER = HUNTER;
-exports.KILLER = KILLER;
-exports.ACCOMPLICE = ACCOMPLICE;
-exports.WITNESS = WITNESS;
-exports.EVIDENCE_DECK = EVIDENCE_DECK;
-exports.MEANS_DECK = MEANS_DECK;
-exports.GHOST_CARD_INFO = GHOST_CARD_INFO;
-exports.COLORS = COLORS;
-exports.HIDE_FROM = HIDE_FROM;
-exports.DEFAULT_GAME_SETTINGS = DEFAULT_GAME_SETTINGS;
-exports.MIN_PLAYER = MIN_PLAYER;
-exports.MIN_PLAYER_ADV_ROLES = MIN_PLAYER_ADV_ROLES;
-exports.cookieSettings = cookieSettings;
-exports.omit = omit;
-exports.nullify = nullify;
-exports.capitalize = capitalize;
-exports.shuffle = shuffle;
-exports.shuffleAndBatch = shuffleAndBatch;
-exports.makeGhostCard = makeGhostCard;
-exports.getLobbyById = getLobbyById;
-exports.getUserById = getUserById;
-exports.getRoleById = getRoleById;
-exports.msg = msg;
-exports.have = have;
+module.exports = {
+  isDevEnv,
+  servName,
+  devPort,
+  LOBBIES,
+  TIMERS,
+  OPT_ROLES,
+  GHOST,
+  HUNTER,
+  KILLER,
+  ACCOMPLICE,
+  WITNESS,
+  EVIDENCE_DECK,
+  MEANS_DECK,
+  GHOST_CARD_INFO,
+  COLORS,
+  HIDE_FROM,
+  DEFAULT_GAME_SETTINGS,
+  MIN_PLAYER,
+  MIN_PLAYER_ADV_ROLES,
+  cookieSettings,
+  omit,
+  nullify,
+  capitalize,
+  shuffle,
+  shuffleAndBatch,
+  makeGhostCard,
+  getLobbyById,
+  getUserById,
+  getRoleById,
+  msg,
+  have
+};
