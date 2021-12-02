@@ -55,7 +55,7 @@ if (!isDevEnv) {
 
 app.use('/api/user', userRoutes);
 app.use('/api/lobby', lobbyRoutes);
-app.use('/api/admin', adminRoutes);
+app.use('/api/admin', adminRoutes); // Not yet implemented.
 
 // This will execute if any middleware before it throws an error.
 app.use((error, req, res, next) => {
