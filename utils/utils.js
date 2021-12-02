@@ -56,7 +56,7 @@ const MEANS_CARD_DATA = [
 
 const makePlayerCard = (info, type) => {
   return {
-    imgURL: `url.${info}`,
+    imgURL: `placeholderUrl.${info}`, // Not yet implemented.
     id: info,
     type: type
   };
@@ -129,6 +129,7 @@ const CLUE_CARD_INFO = CLUE_CARD_DATA.map(info => makeClueCard(info));
 
 const GHOST_CARD_INFO = CAUSE_LOC_CARD_INFO.concat(CLUE_CARD_INFO);
 
+// List of game properties to be hidden from certain roles.
 const HIDE_FROM = {
   spectator: [],
   ghost: [],
@@ -142,12 +143,15 @@ const HIDE_FROM = {
     'blueTeam', 'rolesRef', 'keyEvidence', 'killer', 'accomplice'
   ],
   hunter: [
-    'blueTeam', 'redTeam', 'rolesRef', 'keyEvidence', 'hunters', 'killer', 'accomplice', 'witness'
+    'blueTeam', 'redTeam', 'rolesRef', 'keyEvidence', 'hunters',
+    'killer', 'accomplice', 'witness'
   ]
 };
 
+// Check if value is truthy.
 const have = (x) => !!x ? true : console.log(`ERR! have = ${x}`);
 
+// Return new object with specified properties to `null`.
 const nullify = (obj, keys) => {
   const newObj = Object.assign({}, obj);
   keys.forEach(key => {
@@ -156,6 +160,7 @@ const nullify = (obj, keys) => {
   return newObj;
 };
 
+// Return new object with specified properties removed.
 const omit = (obj, keys) => {
   const newObj = Object.assign({}, obj);
   keys.forEach(key => {
@@ -164,10 +169,12 @@ const omit = (obj, keys) => {
   return newObj;
 };
 
+// Capitalize first letter of each word (separated by non-letter characters).
 const capitalize = (str) => {
   return str.replace(/\b([a-zÁ-ú])/g, (w) => w.charAt(0).toUpperCase() + w.slice(1));
 };
 
+// Shuffle an array. (Mutates the array.)
 const shuffle = (array) => {
   let m = array.length, t, i;
   while (m) {
@@ -179,6 +186,9 @@ const shuffle = (array) => {
   return array;
 };
 
+// Divide elements of an array into 'batches' of given size (e.g. arrays of
+// given length). Last 'batch' contains to remainder, if any. Returns an array
+// of arrays. Does not mutate the original array.
 const batch = (array, batchSize) => {
   const batches = [];
 
@@ -210,21 +220,23 @@ const shuffleAndBatch = (array, batchSize) => {
 };
 
 const makeGhostCard = (item) => {
-  const optionObjects = item.opts.map(opt => {
+  return {
+    type: item.type,
+    id: item.id,
+    opts: item.opts.map(opt => createOption(opt)),
+    isDisplayed: false,
+    isLocked: false
+  };
+
+  function createOption(opt) {
     return {
       id: opt,
       isSelected: false
     };
-  });
-  return {
-    type: item.type,
-    id: item.id,
-    opts: optionObjects,
-    isDisplayed: false,
-    isLocked: false
   };
 };
 
+// TO DO: add proper error handling.
 const getLobbyById = lobbyId => {
   const id = lobbyId.toLowerCase();
   if (!LOBBIES[id]) {
@@ -234,6 +246,7 @@ const getLobbyById = lobbyId => {
   return LOBBIES[id];
 };
 
+// TO DO: add proper error handling.
 const getUserById = ({lobbyId, userId}) => {
   if (!LOBBIES[lobbyId]) {
     console.log(`ERR! getUserById: lobby '${lobbyId}' not found`);
@@ -242,20 +255,26 @@ const getUserById = ({lobbyId, userId}) => {
   return LOBBIES[lobbyId].users.find(user => user.id === userId);
 };
 
+// TO DO: add proper error handling.
 const getRoleById = (userId, lobby) => {
   const role = lobby.game.rolesRef.find(ref => ref.user.id === userId).role;
   if (!!role) return role;
   return console.log(`ERR! getRoleById: role '${userId}' matches no roles in this game`);
 };
 
-const msg = ({type, args=[], isInGame, senderId='app'}) => {
+const msg = ({
+  type,
+  args=[],
+  isInGame,
+  senderId='app'
+}) => {
   return {
     time: new Date().toLocaleTimeString().slice(0,-6),
     type,
     isInGame,
     args,
     senderId,
-  }
+  };
 };
 
 const cookieSettings = {
