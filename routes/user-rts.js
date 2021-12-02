@@ -1,9 +1,7 @@
 
 const express = require('express');
-
-const userControl = require('../controllers/user-ctrl');
-
 const router = express.Router();
+const userControl = require('../controllers/user-ctrl');
 
 router.post(
   '/new',
@@ -11,7 +9,7 @@ router.post(
 );
 
 router.get(
-  '/session',
+  '/cookie',
   userControl.checkForCookie
 );
 
