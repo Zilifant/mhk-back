@@ -1,11 +1,8 @@
 // Lobby Initiation Module
-// Creates new lobby.
+// Provides functions used to create a new lobby.
 
 const { makeGame } = require('./game-init-module');
-
-const {
-  COLORS, MIN_PLAYER, MIN_PLAYER_ADV_ROLES,
-} = require('../utils');
+const { COLORS, MIN_PLAYER, MIN_PLAYER_ADV_ROLES } = require('../utils');
 
 const makeLobby = (creator) => {
   const lobby = {
