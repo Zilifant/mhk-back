@@ -244,7 +244,6 @@ module.exports = () => {
     const lobbyId = game.lobbyId,
           duration = game.settings.timer.duration;
 
-    console.log(`${duration} minute timer started in ${lobbyId}`);
     io.in(lobbyId).emit('timerStarted');
     game.timerIsRunning = true;
 
