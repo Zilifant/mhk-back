@@ -6,11 +6,15 @@ const http = require('http');
 const socketio = require('socket.io')
 const { isDevEnv, servName, devPort } = require('./utils/utils');
 
-// Setup CORS.
+// CORS //
+
 const whiteList = [
   process.env.CLIENT_URL_HTTP,
   process.env.CLIENT_URL_HTTPS
 ];
+// Temporary fix to allow Firefox browser use in development.
+if (isDevEnv) whiteList.push(undefined);
+
 const corsOpts = {
   origin: function (origin, callback) {
     if (whiteList.indexOf(origin) !== -1) {
@@ -23,7 +27,7 @@ const corsOpts = {
   credentials: true
 };
 
-// Setup server and io.
+// Server and IO //
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server, {
