@@ -13,6 +13,7 @@ const whiteList = [
   process.env.CLIENT_URL_HTTPS
 ];
 // Temporary fix to allow Firefox browser use in development.
+// TO DO: Find and implement proper fix.
 if (isDevEnv) whiteList.push(undefined);
 
 const corsOpts = {
