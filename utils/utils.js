@@ -121,7 +121,7 @@ const HIDE_FROM = {
 };
 
 // Check if value is truthy.
-const have = (x) => !!x ? true : console.log(`ERR! have = ${x}`);
+const isTruthy = (x) => !!x ? true : console.log(`ERR! have = ${x}`);
 
 // Return new object with specified properties to `null`.
 const nullify = (obj, keys) => {
@@ -283,5 +283,5 @@ module.exports = {
   getUserById,
   getRoleById,
   msg,
-  have
+  isTruthy
 };
