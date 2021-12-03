@@ -42,6 +42,9 @@ module.exports = io => {
       const user = lobby?.users.find(u => u.id === userId);
       if (!user) return console.log(`ERR! connect: '${userId}' not in '${lobbyId}' user list`);
 
+      // Handle case of user loading the app on a second browser window that
+      // shares the same cookie data. Send a notification and then disconnect
+      // the original instance.
       if (!!user.socketId) {
         const oldSocket = io.sockets.sockets.get(user.socketId);
         const msgType = { type: 'duplicateConnection' };
@@ -70,7 +73,7 @@ module.exports = io => {
       emitByRole('userConnected', msg(msgData), data);
     });
 
-    // User disconnects
+    // User Disconnects //
 
     socket.on('disconnect', () => {
       if (!isTruthy(lobby)) return;
@@ -80,6 +83,8 @@ module.exports = io => {
 
       l.disconnectFromLobby(lobby, user);
 
+      // If user was the leader, assign a new leader.
+      // TO DO: This is confusing; refactor.
       const newLeader = user.isLeader ? l.changeLeader(lobby, user) : null;
 
       const args = [
@@ -96,7 +101,7 @@ module.exports = io => {
       emitByRole('userDisconnected', msg(msgData));
     });
 
-    // Leader gives leadership to another user
+    // Leader Abdicates (Transfers Leadership) //
 
     socket.on('giveLeadership', newLeaderId => {
       if (!isTruthy(lobby)) return;
@@ -118,7 +123,7 @@ module.exports = io => {
       emitByRole('giveLeadership', msg(msgData));
     });
 
-    // User becomes ready/unready
+    // User Becomes Ready/Unready //
 
     socket.on('readyUnready', userId => {
       if (!isTruthy(lobby)) return;
@@ -140,11 +145,14 @@ module.exports = io => {
       emitByRole('readyUnready', msg(msgData));
     });
 
-    // Leader assigns/unassigns ghost role
+    // Leader Assigns/Unassigns Ghost //
 
     socket.on('ghostAssigned', userId => {
       if (!isTruthy(lobby)) return;
 
+      // If userId is falsy or if userId is already assigned to Ghost (meaning
+      // the leader 'selected' that user again to toggle the assignment), send
+      // `null` to assignGhost, else send the userId.
       const unAssign = !userId || (userId === lobby.gameSettings.assignedToGhost);
       const newGhost = !unAssign ? lobby.getUserBy(userId) : null;
 
@@ -163,8 +171,10 @@ module.exports = io => {
       emitByRole('ghostAssigned', msg(msgData));
     });
 
-    // Update a game setting
+    // Toggle Advanced Roles //
 
+    // TO DO: rename this and related functions to be less generic, as this
+    // only handles the advanced role settings.
     socket.on('toggle', setting => {
       if (!isTruthy(lobby)) return;
 
@@ -173,7 +183,7 @@ module.exports = io => {
       emitByRole('gameSettingsChange');
     });
 
-    // Update game timer setting
+    // Update Game Timer Setting //
 
     socket.on('chooseTimer', duration => {
       if (!isTruthy(lobby)) return;
@@ -183,7 +193,7 @@ module.exports = io => {
       emitByRole('gameSettingsChange');
     });
 
-    // Start game
+    // Start Game //
 
     socket.on('startGame', data => {
       if (!isTruthy(lobby)) return;
@@ -199,7 +209,7 @@ module.exports = io => {
       emitByRole('startGame', msg(msgData));
     });
 
-    // Clear game
+    // Clear Game //
 
     socket.on('clearGame', () => {
       if (!isTruthy(lobby)) return;
@@ -214,7 +224,7 @@ module.exports = io => {
       emitByRole('clearGame', msg(msgData));
     });
 
-    // Advance game stage
+    // Advance Stage //
 
     socket.on('advanceStage', data => {
       if (!isTruthy(lobby)) return;
@@ -230,7 +240,7 @@ module.exports = io => {
       emitByRole('advanceStage', msg(msgData));
     });
 
-    // Key evidence chosen by killer
+    // Key Evidence Chosen //
 
     socket.on('keyEvidenceChosen', (keyEv) => {
       if (!isTruthy(lobby)) return;
@@ -246,7 +256,7 @@ module.exports = io => {
       emitByRole('advanceStage', msg(msgData));
     });
 
-    // Clue chosen by ghost
+    // Clue Chosen //
 
     socket.on('clueChosen', data => {
       if (!isTruthy(lobby)) return;
@@ -262,7 +272,7 @@ module.exports = io => {
       emitByRole('clueChosen', msg(msgData));
     });
 
-    // accusation
+    // Accusation //
 
     socket.on('accusation', ({accuserId, accusedId, accusalEv}) => {
       if (!isTruthy(lobby)) return;
@@ -270,19 +280,23 @@ module.exports = io => {
       const accuser = lobby.getUserBy(accuserId);
       const accused = lobby.getUserBy(accusedId);
 
+      // Send message announcing the accusal.
       const msgData = g.announceAccusal({lobby, accuser, accused, accusalEv});
-
       emitByRole('newAccusal', msg(msgData));
 
+      // Resolve the accusal.
       const [result, message] = g.resolveAccusal(lobby.game, accusalEv, accuser, io);
 
-      // suspenseful delay
+      // After a suspenseful delay, send message with the resolution.
       setTimeout(() => {
         lobby.game.isResolvingAccusal = false;
         emitByRole(result, message);
       }, 3000);
     });
 
+    // Second Murder //
+
+    // TO DO: Implement a suspensful delay.
     socket.on('secondMurder', targetId => {
       if (!isTruthy(lobby)) return;
 
@@ -291,8 +305,9 @@ module.exports = io => {
       emitByRole(result, message);
     });
 
-    // newMessage
+    // New Message //
 
+    // Handles user messages in chat.
     socket.on('newMessage', ({senderId, text}) => {
       if (!isTruthy(lobby)) return;
 
@@ -316,15 +331,15 @@ module.exports = io => {
       io.in(lobby.id).emit('newMessage', message);
     });
 
-    function saveAnnouncement(msg) {
-      lobby.chat.push(msg);
-    }
-
+    // Each client recieves different data depending on the player's role.
     function emitByRole(e, msg, data) {
 
-      if (saveToChat.includes(e)) saveAnnouncement(msg);
+      // Some system messages are saved to chat feed, so that they will appear
+      // to users who connect later.
+      // TO DO: move this elsewhere.
+      if (saveToChat.includes(e)) lobby.chat.push(msg);
 
-      // currently redundant
+      // TO DO: Currently redundant; remove this.
       const event = emitSimply.includes(e) ? 'updateLobby' : e;
 
       const emitRedacted = () => {
