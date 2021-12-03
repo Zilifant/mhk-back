@@ -5,6 +5,7 @@ const l = require('../utils/modules/lobby-module')();
 const g = require('../utils/modules/game-module')();
 
 // TO DO: break these out into more granular emits.
+// Which front end components need each emit:
 const emitSimply = [
   'userConnected', // anno/feed, memberlist, setup, players
   'userDisconnected', // anno/feed, memberlist, setup, players
@@ -22,7 +23,8 @@ const emitSimply = [
 ];
 
 const saveToChat = [
-  'startGame', 'clearGame', 'advanceStage', 'newAccusal', 'wrongAccusation', 'resolveGame'
+  'startGame', 'clearGame', 'advanceStage', 'newAccusal', 'wrongAccusation',
+  'resolveGame'
 ];
 
 module.exports = io => {
@@ -31,7 +33,7 @@ module.exports = io => {
 
     let lobby;
 
-    // User connects
+    // User Connects //
 
     socket.on('connectToLobby', ({ userId, lobbyId }) => {
       lobby = getLobbyById(lobbyId);
