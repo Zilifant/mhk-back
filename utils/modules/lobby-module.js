@@ -1,5 +1,5 @@
 // Lobby Utilities Module
-// Provides functions used in lobby.
+// Provides functions used in lobby but not necessarily during a game.
 
 const sample = require('lodash.sample');
 
@@ -9,7 +9,9 @@ const { isDevEnv } = require('../utils');
 
 module.exports = () => {
 
-  // User connects to IO.
+  // User Connects //
+
+  // Join the IO room and update lobby data.
   function connectToLobby(lobby, user, socket) {
     socket.join(lobby.id);
 
@@ -58,7 +60,7 @@ module.exports = () => {
     };
   };
 
-  // User disconnects from IO.
+  // User Disconnects //
 
   function disconnectFromLobby(lobby, user) {
     setUserDataToOffline(user);
@@ -68,6 +70,7 @@ module.exports = () => {
     if (isDevEnv) console.log(`IO: ${user.id} disconnected`);
   }
 
+  // On disconnect front end sends no additional data; so id user by socket.
   function identifyDisconnectedUser(lobby, socket) {
     let user;
     try {
@@ -78,12 +81,16 @@ module.exports = () => {
     return user;
   };
 
+  // Update lobby data.
   function setUserDataToOffline(user) {
     user.isOnline = false;
     user.isReady = false;
     user.socketId = null;
   };
 
+  // If user was leader, and if any other users are online, assign a new leader.
+  // Leadership is checked in io.js.
+  // TO DO: clean this up.
   function changeLeader(lobby, user) {
     unAssignLeader(lobby, user);
     if (lobby.numOnline() > 0) return assignNewLeader(lobby);
@@ -102,6 +109,8 @@ module.exports = () => {
     lobby.leader = null;
   }
 
+  // If user was assigned to Ghost, unassign them. This does not unassign the
+  // user from the Ghost role if a game is already in progress.
   function unAssignToGhost(lobby, user) {
     if (user.isAssignedToGhost) {
       user.isAssignedToGhost = false;
@@ -109,6 +118,8 @@ module.exports = () => {
     };
   };
 
+  // If number of online users is now below the min needed to use adv roles,
+  // disable these roles.
   function reconcileAdvRolesSettings(lobby) {
     if (!lobby.canUseAdvRoles()) {
       lobby.gameSettings.hasWitness = false;
@@ -116,7 +127,7 @@ module.exports = () => {
     };
   };
 
-  // Leader gives leadership to another user
+  // Leader Abdicates (Transfers Leadership) //
 
   function giveLeadership(lobby, newLeader) {
     lobby.users.find(u => u.id === lobby.leader).isLeader = false;
@@ -124,7 +135,7 @@ module.exports = () => {
     lobby.leader = newLeader.id;
   };
 
-  // Leader assigns/unassigns ghost role
+  // Leader Assigns/Unassigns Ghost //
 
   function assignGhost(lobby, newGhost) {
     unAssignGhost();
@@ -145,8 +156,9 @@ module.exports = () => {
     };
   };
 
-  // Update a game setting
+  // Update A Game Setting //
 
+  // TO DO: refactor into separate toggles.
   function updateSetting(lobby, setting) {
     switch (setting) {
       case `witness`:
@@ -159,8 +171,9 @@ module.exports = () => {
     };
   };
 
-  // Update game timer setting
+  // Update Game Timer Setting //
 
+  // Timer duration is in minutes; setting duration to zero turns off timer.
   function updateTimer(lobby, duration) {
     const timer = lobby.gameSettings.timer;
     timer.duration = duration;
@@ -169,10 +182,13 @@ module.exports = () => {
       : timer.on = true;
   };
 
-  // Clear game
+  // Clear Game //
 
+  // Only function in this module that is only used during a game. It does not
+  // deal with game logic.
   function clearGame(lobby, io) {
 
+    // Unready all players. (In dev environment, users start ready.)
     if (!isDevEnv) {
       lobby.game.players.map(player => {
         player.isReady = false;
