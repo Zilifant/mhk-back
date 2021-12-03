@@ -1,24 +1,25 @@
 // User Initiation Module
-// Creates new user.
+// Creates a new user.
 
 const makeUser = ({
   id, myLobby, isStreamer, lobbyCreator = false
 }) => {
-  const userName = id.slice(0,-5);
+
+  // TO DO: remove properties used only in-game.
   return {
     id,
     socketId: null,
-    userName: userName,
+    userName: id.slice(0,-5), // Remove randomized numbers for UI display.
     myLobby,
     isOnline: false,
     isReady: false,
-    isLeader: lobbyCreator,
-    isStreamer,
+    isLeader: lobbyCreator, // If user is lobby creator, they start as leader.
+    isStreamer, // 'Streaming Mode' setting.
     isAssignedToGhost: false,
     connectionTime: null,
     color: null,
     canAccuse: false,
-    hand: { means: null, evidence: null },
+    hand: { means: null, evidence: null }
   };
 };
 
