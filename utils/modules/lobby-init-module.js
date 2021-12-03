@@ -2,7 +2,6 @@
 // Provides functions used to create a new lobby.
 
 const { makeGame } = require('./game-init-module');
-const { COLORS, MIN_PLAYER, MIN_PLAYER_ADV_ROLES } = require('../utils');
 
 const makeLobby = (creator) => {
   const lobby = {
@@ -57,8 +56,8 @@ const makeLobby = (creator) => {
     game: null,
     chat: [],
     createdAt: new Date().toLocaleTimeString(),
-    minPlayer: MIN_PLAYER,
-    minPlayerAdvRoles: MIN_PLAYER_ADV_ROLES,
+    minPlayer: 4,
+    minPlayerAdvRoles: 5,
     defaultSettings: {
       assignedToGhost: null,
       hasWitness: false,
@@ -79,6 +78,10 @@ const makeLobby = (creator) => {
 };
 
 function initColors(lobby) {
+  const COLORS = [
+    'red', 'blue', 'green', 'yellow', 'orange', 'purple', 'pink', 'cyan',
+    'emerald', 'violet', 'rose', 'amber'
+  ];
   lobby.colors = COLORS.map(col => {
     return {
       id: col,
