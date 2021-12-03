@@ -36,16 +36,16 @@ function makeGame() {
     currentStage: g.STAGES[0],
 
     advanceStage(stageId, io) {
-
       if (stageId) {
+        // Advance directly to given stage.
         this.currentStage = g.STAGES.find(s => s.id === stageId);
       } else {
+        // Advance to the next stage in the STAGES array.
         const stageNum = g.STAGES.indexOf(this.currentStage);
         this.currentStage = g.STAGES[stageNum+1];
       };
 
       if (this.settings.timer.on) g.handleTimer(this, io);
-
     },
 
     // Redacts some properties based on given role.
