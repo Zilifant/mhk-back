@@ -47,8 +47,10 @@ const makeLobby = (creator) => {
       return (this.numReady() >= 3) && (this.numReady() === this.numOnline());
     },
     resetSettings() {
+      // If a user was assigned to Ghost, reset that setting on the user object.
       const ghost = this.users.find(u => u.isAssignedToGhost === true);
       if (ghost) ghost.isAssignedToGhost = false;
+      // Reset all settings on the lobby object.
       return initSettings(this);
     },
     makeGame,
@@ -58,17 +60,7 @@ const makeLobby = (creator) => {
     createdAt: new Date().toLocaleTimeString(),
     minPlayer: 4,
     minPlayerAdvRoles: 5,
-    defaultSettings: {
-      assignedToGhost: null,
-      hasWitness: false,
-      hasAccomplice: false,
-      timer: {
-        on: false,
-        duration: 0,
-        durationOpts: [0, 1, 2, 3, 4, 5],
-      }
-    },
-    gameSettings: { ...this.defaultSettings },
+    gameSettings: null,
   };
 
   initColors(lobby);
@@ -77,6 +69,8 @@ const makeLobby = (creator) => {
   return lobby;
 };
 
+// Each user has a unique color.
+// TO DO: Bring all color logic into one file.
 function initColors(lobby) {
   const COLORS = [
     'red', 'blue', 'green', 'yellow', 'orange', 'purple', 'pink', 'cyan',
@@ -91,6 +85,7 @@ function initColors(lobby) {
   });
 };
 
+// TO DO: refactor this; it is needlessly complex.
 function initSettings(lobby) {
   const defaultSettings = {
     assignedToGhost: null,
