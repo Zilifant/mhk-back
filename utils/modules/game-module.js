@@ -225,29 +225,25 @@ module.exports = () => {
 
   // Round Timer //
 
+  // Called when stage advances, immediately after stage data has been updated,
+  // so currentStage will be the stage just advanced to.
   function handleTimer(game, io) {
     const { timerIsRunning, currentStage } = game;
     if (timerIsRunning) clearTimer(game, io);
     if (currentStage.timed) runTimer(game, io);
   };
 
-  function clearTimer(game, io) {
-    const lobbyId = game.lobbyId;
-
-    io.in(lobbyId).emit('clear');
-    game.timerIsRunning = false;
-
-    clearInterval(TIMERS[lobbyId]);
-  };
-
+  // Timer is a 10 second interval.
+  // TO DO: Timers are currently stored in a TIMERS object separate from all
+  // lobbies. Refactor to store each Timer inside of the game it belons to.
   function runTimer(game, io) {
     const lobbyId = game.lobbyId,
-          duration = game.settings.timer.duration;
+          duration = game.settings.timer.duration; // minutes
 
     io.in(lobbyId).emit('timerStarted');
     game.timerIsRunning = true;
 
-    let timer = duration * 6;
+    let timer = duration * 6; // minutes * 6 = total 10 second intervals
     TIMERS[lobbyId] = setInterval(() => {
       if (!io) return console.log(`ERR! runTimer: io = ${io}`);
 
@@ -262,6 +258,15 @@ module.exports = () => {
       io.in(lobbyId).emit('tenSec', timer);
 
     }, 10000);
+  };
+
+  function clearTimer(game, io) {
+    const lobbyId = game.lobbyId;
+
+    io.in(lobbyId).emit('clear');
+    game.timerIsRunning = false;
+
+    clearInterval(TIMERS[lobbyId]);
   };
 
   return {
