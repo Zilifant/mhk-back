@@ -1,21 +1,20 @@
 // Game Utilities Module
-// Provides functions used during game.
+// Provides functions and objects used during game.
 
 const intersection = require('lodash.intersection');
 const { TIMERS, msg } = require('../utils');
 
 module.exports = () => {
 
-  function newClueCard(game, i) {
-    game.cluesDeck[i].isDisplayed = true;
-    game.cluesDeck[i].isNew = true;
-    game.cluesDeck[i-1].isNew = false;
-  };
+  // Game Stages //
 
-  function removeClueCard(game, cardId) {
-    game.cluesDeck.find(card => card.id === cardId).isDisplayed = false;
-  };
-
+  // Stages are not analagous to game rounds.
+  // Stages are listed in the order they (generally) occur in game; Stage
+  // indexes are used by the game logic.
+  // 'Liminal' stages contain (generally brief) procedures carried out between
+  // rounds.
+  // TO DO: update naming to be more specific to this game rather than general
+  // as in a framework.
   const STAGES = [
     {
       type: 'setup',
@@ -76,19 +75,47 @@ module.exports = () => {
     }
   ];
 
+  // Stage Methods //
+
+  // Called at the start of certain rounds.
+  function newClueCard(game, i) {
+    game.cluesDeck[i].isDisplayed = true;
+    game.cluesDeck[i].isNew = true;
+    game.cluesDeck[i-1].isNew = false;
+  };
+
+  // Called when Ghost chooses a Clue card to be replaced.
+  function removeClueCard(game, cardId) {
+    game.cluesDeck.find(card => card.id === cardId).isDisplayed = false;
+  };
+
+  // Advancing Stages //
+
+  // Called when the leader hits the 'advance stage' button.
   function advanceToNextStage(game, io, data) {
+    // Passing `null` tells the method to advance to the next stage in the
+    // STAGES array.
     game.advanceStage(null, io);
+    // If the stage has an onStart method, call that method.
     if (!!game.currentStage.onStart) game.currentStage.onStart(game, data);
   };
 
+  // Called when the killer confirms their selection of key evidence during the
+  // setup stage.
   function advanceOnKeyEvChosen(game, io, keyEv) {
     game.keyEvidence = keyEv;
     game.advanceStage(null, io);
+    // This is only called when advancing from setup to round-1, which does not
+    // have an onStart method.
   };
 
+  // Choosing Clues //
+
+  // Called when the ghost confirms their selection of an option on a clue card.
   function confirmClueChoice(game, clue) {
 
     function lockClueCard() {
+      // TO DO: Can we just pass the whole card instead of finding it?
       const card = game.cluesDeck.find(c => c.opts.some(o => o.id === clue));
       card.isLocked = true;
     };
@@ -97,8 +124,10 @@ module.exports = () => {
     lockClueCard(clue);
   };
 
-  // Accusation
+  // Accusations //
 
+  // Called when a player accuses someone of being the killer.
+  // Updates data on accuser and returns data formatted for the msg function.
   function announceAccusal({ lobby, accuser, accused, accusalEv }) {
 
     lobby.game.isResolvingAccusal = true;
@@ -118,20 +147,25 @@ module.exports = () => {
 
   };
 
+  // Called after announceAccusal and a short timeout.
   function resolveAccusal(game, accusalEv, accuser, io) {
 
     return isAccusalRight() ? resolveRightAccusal() : resolveWrongAccusal();
 
+    // Check if accuser's evidence matches key evidence chosen by killer.
     function isAccusalRight() {
       return intersection(accusalEv, game.keyEvidence).length === 2;
     };
 
+    // Advance to second-murder stage if there is a witness, else resolve a
+    // blue team win.
     function resolveRightAccusal() {
       return game.witness
         ? advToSecondMurder(accuser.id)
         : resolveGame(game, 'bluewin', {accuser, killer: game.killer}, io);
     };
 
+    // Advance to second-murder stage (possibly skipping stages).
     function advToSecondMurder() {
       game.advanceStage('second-murder', io);
 
@@ -144,20 +178,21 @@ module.exports = () => {
       return ['advanceStage', msg(msgData)];
     };
 
+    // Continue the current round (don't advance the stage), unless the blue
+    // team (hunters and witness) are out of accusals, in which case resolve
+    // a red team win.
     function resolveWrongAccusal() {
       return game.blueCanAccuse()
         ? continueRound()
         : resolveGame(game, 'redwin', {accuser}, io);
     };
 
+    // No other game logic. Just send UI message.
     function continueRound() {
-      const args = [
-        [accuser.id, accuser.color.id]
-      ];
 
       const msgData = {
         type: 'accusationWrong',
-        args,
+        args: [accuser.id, accuser.color.id],
         isInGame: true,
       };
 
@@ -166,11 +201,15 @@ module.exports = () => {
 
   };
 
+  // Second Murder //
+
   function resolveSecondMurder(game, targetId, io) {
     return game.witness.id === targetId
       ? resolveGame(game, 'redwinwitnessdead', {killer: game.killer}, io)
       : resolveGame(game, 'bluewinwitnessalive', {target: game.witness}, io);
   };
+
+  // Resolve Game //
 
   function resolveGame(game, result, args, io) {
     game.advanceStage('game-over', io);
@@ -184,7 +223,7 @@ module.exports = () => {
     return ['resolveGame', msg(msgData)];
   };
 
-  // Timer
+  // Round Timer //
 
   function handleTimer(game, io) {
     const { timerIsRunning, currentStage } = game;
