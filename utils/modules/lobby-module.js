@@ -9,35 +9,32 @@ const { isDevEnv } = require('../utils');
 
 module.exports = () => {
 
-  // Utilities
-
-  function getUserById(lobby, userId) {
-    return lobby.users.find(user => user.id === userId);
-  };
-
-  // User connects
-
+  // User connects to IO.
   function connectToLobby(lobby, user, socket) {
     socket.join(lobby.id);
 
     user.isOnline = true;
-    user.isReady = isDevEnv; // users start ready in dev mode
+    user.isReady = isDevEnv; // Users start ready in development.
     user.socketId = socket.id;
-    user.connectionTime = Date.now();
+    user.connectionTime = Date.now(); // Used for order in UI memberlist
 
     if (!user.color) assignColor(lobby, user);
 
+    // If lobby has no leader (most likely because no other users are
+    // connected) make user the leader.
     if (!lobby.leader) {
       lobby.leader = user.id;
       user.isLeader = true;
     };
 
-    console.table(lobby.users);
-
     if (isDevEnv) console.log(`IO: ${user.id} connected`);
   };
 
+  // Assign (and track) a unique color for each user.
   function assignColor(lobby, user) {
+    const availCols = lobby.colors.filter(c => !c.isAssigned);
+    // If length of availCols is truthy (i.e. not 0) assign a new color.
+    return !!availCols.length ? assignNewColor() : assignDupeColor();
 
     function assignNewColor() {
       const color = sample(availCols)
@@ -46,24 +43,22 @@ module.exports = () => {
       user.color = color;
     };
 
+    // In rare case where all 12 unique colors have been assigned, assign
+    // a duplicate color, prioritizing colors assigned to offline users.
     function assignDupeColor() {
       const oUCols = lobby.usersOffline().map(oU => oU.color);
       const pickDupeColor = () => {
         const col = oUCols.find(c => c.assignedTo.length === 1);
-        // handle edge case where all colors are picked twice
+        // Handle edge case where all colors are picked twice.
         return !!col ? col : sample(lobby.colors);
       };
       const color = pickDupeColor();
       color.assignedTo.push(user.id);
       user.color = color;
     };
-
-    const availCols = lobby.colors.filter(c => !c.isAssigned);
-
-    return !!availCols.length ? assignNewColor() : assignDupeColor();
   };
 
-  // User disconnects
+  // User disconnects from IO.
 
   function disconnectFromLobby(lobby, user) {
     setUserDataToOffline(user);
@@ -193,7 +188,6 @@ module.exports = () => {
   };
 
   return {
-    getUserById,
     connectToLobby,
     disconnectFromLobby,
     giveLeadership,
@@ -202,7 +196,7 @@ module.exports = () => {
     identifyDisconnectedUser,
     updateSetting,
     updateTimer,
-    clearGame,
+    clearGame
   };
 
 };
