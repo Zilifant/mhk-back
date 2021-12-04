@@ -1,12 +1,13 @@
 // Admin Routes
 
 const router = require('express').Router();
+const { LOBBIES } = require('../utils/utils');
 
-// Placeholder
-const getData = async (req, res, next) => {
-  res.json({ data: 'data' });
+// Temporary implementation.
+const getLobbies = async (req, res, next) => {
+  res.json({ lobbies: LOBBIES });
 };
 
-router.get('/data', getData);
+router.get('/lobbies', getLobbies);
 
 module.exports = router;
