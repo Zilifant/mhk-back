@@ -190,9 +190,13 @@ module.exports = () => {
     // No other game logic. Just send UI message.
     function continueRound() {
 
+      const args = [
+        [accuser.id, accuser.color.id]
+      ];
+
       const msgData = {
         type: 'accusationWrong',
-        args: [accuser.id, accuser.color.id],
+        args: args,
         isInGame: true,
       };
 
