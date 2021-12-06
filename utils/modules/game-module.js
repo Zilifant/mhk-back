@@ -2,7 +2,7 @@
 // Provides functions and objects used during game.
 
 const intersection = require('lodash.intersection');
-const { TIMERS, msg } = require('../utils');
+const { TIMERS, msg, getUserById } = require('../utils');
 
 module.exports = () => {
 
@@ -208,9 +208,17 @@ module.exports = () => {
   // Second Murder //
 
   function resolveSecondMurder(game, targetId, io) {
+    const target = getUserById({lobbyId: game.lobbyId, userId: targetId});
+
+    const args = {
+      killer: game.killer,
+      witness: game.witness,
+      target: target
+    };
+
     return game.witness.id === targetId
-      ? resolveGame(game, 'redwinwitnessdead', {killer: game.killer}, io)
-      : resolveGame(game, 'bluewinwitnessalive', {target: game.witness}, io);
+      ? resolveGame(game, 'redwinwitnessdead', args, io)
+      : resolveGame(game, 'bluewinwitnessalive', args, io);
   };
 
   // Resolve Game //
