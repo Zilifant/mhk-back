@@ -234,7 +234,7 @@ const getRoleById = (userId, lobby) => {
   return console.log(`ERR! getRoleById: role '${userId}' matches no roles in this game`);
 };
 
-// Structure message data for a specific front end module.
+// Structure message data for the `buildSMDString` front end module.
 const msg = ({
   type,
   args=[],
