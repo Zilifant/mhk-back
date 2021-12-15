@@ -242,7 +242,7 @@ const msg = ({
   senderId='app'
 }) => {
   return {
-    time: new Date().toLocaleTimeString().slice(0,-6),
+    time: new Date().toLocaleTimeString(),
     type,
     isInGame,
     args,
