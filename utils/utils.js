@@ -242,7 +242,8 @@ const msg = ({
   senderId='app'
 }) => {
   return {
-    time: new Date().toLocaleTimeString(),
+    // `en-GB` format is expected by `convertToClientTimezone`.
+    time: new Date().toLocaleTimeString('en-GB'),
     type,
     isInGame,
     args,
