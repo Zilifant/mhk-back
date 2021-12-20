@@ -14,6 +14,7 @@ You can (and should) purchase a physical copy of *Deception* directly from publi
 ### Setup
 
 1. Create a `nodemon.json` file in the root directoy and add the following environmental variables:
+
     ```
     {
       "env": {
