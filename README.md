@@ -13,6 +13,8 @@ You can (and should) purchase a physical copy of *Deception* directly from publi
 
 ### Setup
 
+**Note:** To get anything from this server you will need to have the front-end React app set up and running as well. By default, the development React app will run on port 3000. If you change the port, you will of course need to change the environmental variables below.
+
 1. Create a `nodemon.json` file in the root directoy and add the following environmental variables:
 
     ```
