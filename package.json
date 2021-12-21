@@ -3,7 +3,7 @@
   "version": "0.8.9",
   "author": "Scott Silsbe",
   "license": "GNU GPLv3",
-  "description": "Server-side code for mhk app.",
+  "description": "MHK back-end.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
