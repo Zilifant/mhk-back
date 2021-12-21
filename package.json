@@ -1,6 +1,6 @@
 {
   "name": "mhk-back",
-  "version": "0.1.0",
+  "version": "0.8.9",
   "description": "Server-side code for mhk app.",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "dev": "nodemon app.js"
   },
   "author": "Scott Silsbe",
-  "license": "MIT",
+  "license": "GNU GPLv3",
   "dependencies": {
     "@socket.io/admin-ui": "^0.2.0",
     "cors": "^2.8.5",
