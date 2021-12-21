@@ -40,7 +40,7 @@ const io = socketio(server, {
 });
 
 // Send io to file where all of the io logic is.
-require('./io/io')(io);
+require('./io')(io);
 
 // Routes //
 

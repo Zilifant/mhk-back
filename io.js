@@ -1,8 +1,8 @@
 // IO
 
-const { getLobbyById, omit, msg, isTruthy } = require('../utils/utils');
-const l = require('../utils/modules/lobby-module')();
-const g = require('../utils/modules/game-module')();
+const { getLobbyById, omit, msg, isTruthy } = require('./utils/utils');
+const l = require('./utils/modules/lobby-module')();
+const g = require('./utils/modules/game-module')();
 
 // TO DO: break these out into more granular emits.
 // Which front end components need each emit:
