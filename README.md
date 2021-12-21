@@ -9,6 +9,30 @@ This app is not affiliated with Tobey Ho, Grey Fox Games, or Jolly Thinkers in a
 
 You can (and should) purchase a physical copy of *Deception* directly from publisher [Grey Fox Games](https://greyfoxgames.com/deception-murder-in-hong-kong/). Learn more about the game on [BoardGameGeek](https://boardgamegeek.com/boardgame/156129/deception-murder-hong-kong).
 
+## How to Navigate This Project
+
+* [app.js](./app.js) - Set up the Express HTTP and socket.io server.
+* [io.js](./io.js) - All `on` and `emit` functionality using `io` object.
+* [controllers](./controllers)
+  * [lobby-ctrl.js](./controllers/lobby-ctrl.js)
+  * [user-ctrl.js](./controllers/user-ctrl.js)
+* [models](./models)
+  * [HttpError.js](./models/HttpError.js)
+* [routes](./routes)
+  * [admin-rts.js](./routes/admin-rts.js)
+  * [lobby-rts.js](./routes/lobby-rts.js)
+  * [user-rts.js](./routes/user-rts.js)
+* [utils](./utils)
+  * [modules](./utils/modules)
+    * [game-init-module.js](./utils/modules/game-init-module.js)
+    * [game-module.js](./utils/modules/game-module.js)
+    * [lobby-init-module.js](./utils/modules/lobby-init-module.js)
+    * [lobby-module.js](./utils/modules/lobby-module.js)
+    * [user-init-module.js](./utils/modules/user-init-module.js)
+  * [uniqLobbyID.js](./utils/uniqLobbyID.js)
+  * [uniqUserID.js](./utils/uniqUserID.js)
+  * [utils.js](./utils/utils.js)
+
 ## Setup and Commands
 
 ### Setup
