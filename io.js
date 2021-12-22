@@ -13,8 +13,8 @@ const emitSimply = [
   'giveLeadership', // anno/feed, memberlist, setup*, info*, footer*
   'ghostAssigned', // anno/feed, memberlist
   'gameSettingsChange', // setup
-  'startGame', // all???
-  'clearGame', // all???
+  'startGame', // all
+  'clearGame', // all
   'advanceStage', // anno/feed, info, ???
   'clueChosen', // anno/feed, ghostcard
   'newAccusal', // anno/feed, loading
