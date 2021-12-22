@@ -6,8 +6,10 @@ const sample = require('lodash.sample');
 const g = require('./game-module')();
 
 const {
-  nullify, shuffle, shuffleAndBatch, makeGhostCard, OPT_ROLES, HIDE_FROM, HUNTER, KILLER, GHOST, ACCOMPLICE, WITNESS, EVIDENCE_DECK, MEANS_DECK, GHOST_CARD_INFO,
+  nullify, shuffle, shuffleAndBatch, makeGhostCard, OPT_ROLES, HIDE_FROM, HUNTER, KILLER, GHOST, ACCOMPLICE, WITNESS, EVIDENCE_DECK, MEANS_DECK,
 } = require('../utils');
+
+const { GHOST_CARD_DATA } = require('../data');
 
 // This is added to lobby as a method.
 function makeGame() {
@@ -162,7 +164,7 @@ function createHands(game) {
 // Ghost Cards //
 
 function createGhostCardDisplay(game) {
-  const GHOST_CARDS = GHOST_CARD_INFO.map(item => makeGhostCard(item));
+  const GHOST_CARDS = GHOST_CARD_DATA.map(item => makeGhostCard(item));
 
   const CAUSES_DECK = GHOST_CARDS.filter(card => card.type === 'cause');
   const LOCS_DECK   = GHOST_CARDS.filter(card => card.type === 'location');
