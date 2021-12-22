@@ -37,7 +37,7 @@ const makePlayerCard = (info, type) => {
 const MEANS_DECK = MEANS_CARD_DATA.map(info => makePlayerCard(info, 'means'));
 const EVIDENCE_DECK = EVIDENCE_CARD_DATA.map(info => makePlayerCard(info, 'evidence'));
 
-const CAUSE_LOC_CARD_INFO = [
+const GHOST_CARD_INFO = [
   {
     type: CAUSE,
     id: 'Cause of Death',
@@ -62,44 +62,204 @@ const CAUSE_LOC_CARD_INFO = [
     type: LOCATION,
     id: 'Location',
     opts: ['living room', 'bedroom', 'pantry', 'bathroom', 'kitchen', 'driveway']
+  },
+  {
+    type: 'clue',
+    id: "victim's build",
+    opts: [ 'large', 'thin', 'tall', 'short', 'disfigured', 'athletic' ]
+  },
+  {
+    type: 'clue',
+    id: 'trace at scene',
+    opts: [
+      'fingerprint',
+      'footprint',
+      'bruise',
+      'blood stain',
+      'bodily fluid',
+      'scar'
+    ]
+  },
+  {
+    type: 'clue',
+    id: "killer's personality",
+    opts: [
+      'arrogant',
+      'despicable',
+      'angry',
+      'greedy',
+      'stubborn',
+      'perverted'
+    ]
+  },
+  {
+    type: 'clue',
+    id: 'day of crime',
+    opts: [ 'weekday', 'weekend', 'spring', 'summer', 'fall', 'winter' ]
+  },
+  {
+    type: 'clue',
+    id: 'evidence left behind',
+    opts: [
+      'natural',
+      'artistic',
+      'written',
+      'synthetic',
+      'personal',
+      'unrelated'
+    ]
+  },
+  {
+    type: 'clue',
+    id: "victim's clothes",
+    opts: [ 'neat', 'dirty', 'elegant', 'shabby', 'bizarre', 'naked' ]
+  },
+  {
+    type: 'clue',
+    id: 'noticed by bystander',
+    opts: [
+      'sudden sound',
+      'prolonged sound',
+      'smell',
+      'visual',
+      'action',
+      'nothing'
+    ]
+  },
+  {
+    type: 'clue',
+    id: 'time of death',
+    opts: [ 'dawn', 'morning', 'noon', 'afternoon', 'evening', 'midnight' ]
+  },
+  {
+    type: 'clue',
+    id: 'state of the scene',
+    opts: [
+      'bits and pieces',
+      'ashes',
+      'liquid damage',
+      'cracked',
+      'disorderly',
+      'clean'
+    ]
+  },
+  {
+    type: 'clue',
+    id: 'weather',
+    opts: [ 'sunny', 'stormy', 'dry', 'humid', 'cold', 'hot' ]
+  },
+  {
+    type: 'clue',
+    id: "victim's occupation",
+    opts: [
+      'boss',
+      'professional',
+      'amateur',
+      'student',
+      'unemployed',
+      'retired'
+    ]
+  },
+  {
+    type: 'clue',
+    id: 'condition of corpse',
+    opts: [
+      'still warm',
+      'stiff',
+      'decayed',
+      'incomplete',
+      'intact',
+      'twisted'
+    ]
+  },
+  {
+    type: 'clue',
+    id: "victim's identity",
+    opts: [ 'child', 'young adult', 'middle-aged', 'senior', 'man', 'woman' ]
+  },
+  {
+    type: 'clue',
+    id: 'sudden incident',
+    opts: [
+      'power failure',
+      'fire',
+      'conflict',
+      'scattering',
+      'scream',
+      'nothing'
+    ]
+  },
+  {
+    type: 'clue',
+    id: 'Motive',
+    opts: [ 'Hatred', 'Power', 'Money', 'Love', 'Envy', 'Justice' ]
+  },
+  {
+    type: 'clue',
+    id: 'In Progress',
+    opts: [
+      'Entertainment',
+      'Relaxation',
+      'Assembly',
+      'Trading',
+      'Visit',
+      'Dining'
+    ]
+  },
+  {
+    type: 'clue',
+    id: 'Duration',
+    opts: [
+      'Instant',
+      'Brief',
+      'Gradual',
+      'Prolonged',
+      'A Few Days',
+      'Unclear'
+    ]
+  },
+  {
+    type: 'clue',
+    id: 'General Impression',
+    opts: [
+      'Common',
+      'Creative',
+      'Fishy',
+      'Cruel',
+      'Horrific',
+      'Suspensful'
+    ]
+  },
+  {
+    type: 'clue',
+    id: 'Relationship',
+    opts: [
+      'Relatives',
+      'Friends',
+      'Colleagues',
+      'Competitors',
+      'Lovers',
+      'Strangers'
+    ]
+  },
+  {
+    type: 'clue',
+    id: "Victim's Expression",
+    opts: [
+      'Peaceful',
+      'Struggling',
+      'Frightened',
+      'In Pain',
+      'Blank',
+      'Angry'
+    ]
+  },
+  {
+    type: 'clue',
+    id: 'Hint on Corpse',
+    opts: [ 'Head', 'Chest', 'Hand', 'Leg', 'Partial', 'All-over' ]
   }
 ];
-
-const CLUE_CARD_DATA = [
-  'victim\'s build:large,thin,tall,short,disfigured,athletic',
-  'trace at scene:fingerprint,footprint,bruise,blood stain,bodily fluid,scar',
-  'killer\'s personality:arrogant,despicable,angry,greedy,stubborn,perverted',
-  'day of crime:weekday,weekend,spring,summer,fall,winter',
-  'evidence left behind:natural,artistic,written,synthetic,personal,unrelated',
-  'victim\'s clothes:neat,dirty,elegant,shabby,bizarre,naked',
-  'noticed by bystander:sudden sound,prolonged sound,smell,visual,action,nothing',
-  'time of death:dawn,morning,noon,afternoon,evening,midnight',
-  'state of the scene:bits and pieces,ashes,liquid damage,cracked,disorderly,clean',
-  'weather:sunny,stormy,dry,humid,cold,hot',
-  'victim\'s occupation:boss,professional,amateur,student,unemployed,retired',
-  'condition of corpse:still warm,stiff,decayed,incomplete,intact,twisted',
-  'victim\'s identity:child,young adult,middle-aged,senior,man,woman',
-  'sudden incident:power failure,fire,conflict,scattering,scream,nothing',
-  'Motive:Hatred,Power,Money,Love,Envy,Justice',
-  'In Progress:Entertainment,Relaxation,Assembly,Trading,Visit,Dining',
-  'Duration:Instant,Brief,Gradual,Prolonged,A Few Days,Unclear',
-  'General Impression:Common,Creative,Fishy,Cruel,Horrific,Suspensful',
-  'Relationship:Relatives,Friends,Colleagues,Competitors,Lovers,Strangers',
-  'Victim\'s Expression:Peaceful,Struggling,Frightened,In Pain,Blank,Angry',
-  'Hint on Corpse:Head,Chest,Hand,Leg,Partial,All-over'
-];
-
-const makeClueCard = (info) => {
-  return {
-    type: CLUE,
-    id: info.split(':')[0],
-    opts: info.split(':')[1].split(',')
-  };
-};
-
-const CLUE_CARD_INFO = CLUE_CARD_DATA.map(info => makeClueCard(info));
-
-const GHOST_CARD_INFO = CAUSE_LOC_CARD_INFO.concat(CLUE_CARD_INFO);
 
 // List of game properties to be hidden from certain roles.
 const HIDE_FROM = {
