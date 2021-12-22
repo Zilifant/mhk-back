@@ -47,7 +47,7 @@ module.exports = () => {
 
     let lobby;
     try {
-      lobby = await getLobbyById(req.params.lobbyUrlRoute);
+      lobby = await getLobbyById(req.body.lobbyId);
     } catch (err) {
       console.log(err);
       const error = new HttpError('Could not find lobby.', 500);

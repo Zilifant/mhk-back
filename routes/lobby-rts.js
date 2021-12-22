@@ -15,7 +15,7 @@ module.exports = () => {
   );
 
   router.post(
-    '/:lobbyUrlRoute',
+    '/get',
     getLobby
   );
 
