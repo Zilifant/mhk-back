@@ -1,6 +1,7 @@
 // Admin Routes
 
-const router = require('express').Router();
+const express = require('express');
+const router = express.Router();
 const { LOBBIES } = require('../utils/utils');
 
 // Temporary implementation.
