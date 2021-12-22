@@ -1,6 +1,6 @@
 // IO
 
-const { getLobbyById, omit, msg, isTruthy } = require('./utils/utils');
+const { getLobbyById, omit, msg } = require('./utils/utils');
 const l = require('./utils/modules/lobby-module')();
 const g = require('./utils/modules/game-module')();
 
@@ -37,7 +37,7 @@ module.exports = io => {
 
     socket.on('connectToLobby', ({ userId, lobbyId }) => {
       lobby = getLobbyById(lobbyId);
-      if (!isTruthy(lobby)) return;
+      if (!lobby) return
 
       const user = lobby?.users.find(u => u.id === userId);
       if (!user) return console.log(`ERR! connect: '${userId}' not in '${lobbyId}' user list`);
@@ -76,7 +76,7 @@ module.exports = io => {
     // User Disconnects //
 
     socket.on('disconnect', () => {
-      if (!isTruthy(lobby)) return;
+      if (!lobby) return
 
       const user = l.identifyDisconnectedUser(lobby, socket);
       if (!user) return console.log(`ERR! disconnect: no user for socket '${socket.id}'`);
@@ -104,7 +104,7 @@ module.exports = io => {
     // Leader Abdicates (Transfers Leadership) //
 
     socket.on('giveLeadership', newLeaderId => {
-      if (!isTruthy(lobby)) return;
+      if (!lobby) return
 
       const newLeader = lobby.getUserBy(newLeaderId);
 
@@ -126,7 +126,7 @@ module.exports = io => {
     // User Becomes Ready/Unready //
 
     socket.on('readyUnready', userId => {
-      if (!isTruthy(lobby)) return;
+      if (!lobby) return
 
       const user = lobby.getUserBy(userId);
       user.isReady = !user.isReady;
@@ -148,7 +148,7 @@ module.exports = io => {
     // Leader Assigns/Unassigns Ghost //
 
     socket.on('ghostAssigned', userId => {
-      if (!isTruthy(lobby)) return;
+      if (!lobby) return
 
       // If userId is falsy or if userId is already assigned to Ghost (meaning
       // the leader 'selected' that user again to toggle the assignment), send
@@ -176,7 +176,7 @@ module.exports = io => {
     // TO DO: rename this and related functions to be less generic, as this
     // only handles the advanced role settings.
     socket.on('toggle', setting => {
-      if (!isTruthy(lobby)) return;
+      if (!lobby) return
 
       l.updateSetting(lobby, setting);
 
@@ -186,7 +186,7 @@ module.exports = io => {
     // Update Game Timer Setting //
 
     socket.on('chooseTimer', duration => {
-      if (!isTruthy(lobby)) return;
+      if (!lobby) return
 
       l.updateTimer(lobby, duration);
 
@@ -196,7 +196,7 @@ module.exports = io => {
     // Start Game //
 
     socket.on('startGame', data => {
-      if (!isTruthy(lobby)) return;
+      if (!lobby) return
 
       lobby.makeGame(data.settings);
 
@@ -212,7 +212,7 @@ module.exports = io => {
     // Clear Game //
 
     socket.on('clearGame', () => {
-      if (!isTruthy(lobby)) return;
+      if (!lobby) return
 
       l.clearGame(lobby, io);
 
@@ -227,7 +227,7 @@ module.exports = io => {
     // Advance Stage //
 
     socket.on('advanceStage', data => {
-      if (!isTruthy(lobby)) return;
+      if (!lobby) return
 
       g.advanceToNextStage(lobby.game, io, data);
 
@@ -243,7 +243,7 @@ module.exports = io => {
     // Key Evidence Chosen //
 
     socket.on('keyEvidenceChosen', (keyEv) => {
-      if (!isTruthy(lobby)) return;
+      if (!lobby) return
 
       g.advanceOnKeyEvChosen(lobby.game, io, keyEv);
 
@@ -259,7 +259,7 @@ module.exports = io => {
     // Clue Chosen //
 
     socket.on('clueChosen', data => {
-      if (!isTruthy(lobby)) return;
+      if (!lobby) return
 
       g.confirmClueChoice(lobby.game, data[0]);
 
@@ -275,7 +275,7 @@ module.exports = io => {
     // Accusation //
 
     socket.on('accusation', ({accuserId, accusedId, accusalEv}) => {
-      if (!isTruthy(lobby)) return;
+      if (!lobby) return
 
       const accuser = lobby.getUserBy(accuserId);
       const accused = lobby.getUserBy(accusedId);
@@ -298,7 +298,7 @@ module.exports = io => {
 
     // TO DO: Implement a suspensful delay.
     socket.on('secondMurder', targetId => {
-      if (!isTruthy(lobby)) return;
+      if (!lobby) return
 
       const [result, message] = g.resolveSecondMurder(lobby.game, targetId, io);
 
@@ -309,7 +309,7 @@ module.exports = io => {
 
     // Handles user messages in chat.
     socket.on('newMessage', ({senderId, text}) => {
-      if (!isTruthy(lobby)) return;
+      if (!lobby) return
 
       const user = lobby.getUserBy(senderId);
 
