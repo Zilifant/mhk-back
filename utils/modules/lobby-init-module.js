@@ -22,17 +22,11 @@ const makeLobby = (creator) => {
     numReady() {
       return this.users.filter(u => u.isReady === true).length;
     },
-    usersOnline() {
-      return this.users.filter(u => u.isOnline === true);
-    },
     usersOffline() {
       return this.users.filter(u => u.isOnline === false);
     },
     usersReady() {
       return this.users.filter(u => u.isReady === true);
-    },
-    usersUnReady() {
-      return this.users.filter(u => u.isReady === false);
     },
     canUseAdvRoles() {
       return this.numOnline() >= this.minPlayerAdvRoles;
