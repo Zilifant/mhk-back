@@ -39,64 +39,58 @@ function redactGame(userId, lobby) {
   return lobbyWithGame;
 };
 
-module.exports = () => {
+// Called when visitor reaches a (potential) lobby url.
+// TO DO: replace param with json data.
+const getLobby = async (req, res, next) => {
 
-  // Called when visitor reaches a (potential) lobby url.
-  // TO DO: replace param with json data.
-  const getLobby = async (req, res, next) => {
-
-    let lobby;
-    try {
-      lobby = await getLobbyById(req.body.lobbyId);
-    } catch (err) {
-      console.log(err);
-      const error = new HttpError('Could not find lobby.', 500);
-      return next(error);
-    };
-
-    if (!lobby) {
-      const error = new HttpError('No lobby with that name.', 404);
-      return next(error);
-    };
-
-    const user = lobby.users.find(u => u.id === req.body.userId);
-
-    res.status(200).json({ lobby: lobbyData(user, lobby) });
+  let lobby;
+  try {
+    lobby = await getLobbyById(req.body.lobbyId);
+  } catch (err) {
+    console.log(err);
+    const error = new HttpError('Could not find lobby.', 500);
+    return next(error);
   };
 
-  const createLobby = async (req, res) => {
-
-    // Append random numbers to visitor's chosen user name
-    const userId = uniqUserID(req.body.userName);
-    // Set 'streaming mode' option
-    const isStreamer = req.body.isStreamer;
-
-    // Generate lobby id; in development give lobby short, predictable id.
-    const lobbyId = isDevEnv ? 'z' : uniqLobbyID();
-
-    const newUser = makeUser({
-      id: userId,
-      myLobby: lobbyId,
-      isStreamer,
-      lobbyCreator: true
-    });
-
-    const newLobby = makeLobby(newUser);
-
-    LOBBIES[newLobby.id] = newLobby;
-
-    res
-    .status(201)
-    .cookie('userData', `${userId}--${lobbyId}`, cookieSettings)
-    .json({
-      user: newUser,
-      lobby: newLobby
-    });
+  if (!lobby) {
+    const error = new HttpError('No lobby with that name.', 404);
+    return next(error);
   };
 
-  return {
-    getLobby,
-    createLobby
-  }
+  const user = lobby.users.find(u => u.id === req.body.userId);
 
+  res.status(200).json({ lobby: lobbyData(user, lobby) });
 };
+
+const createLobby = async (req, res) => {
+
+  // Append random numbers to visitor's chosen user name
+  const userId = uniqUserID(req.body.userName);
+  // Set 'streaming mode' option
+  const isStreamer = req.body.isStreamer;
+
+  // Generate lobby id; in development give lobby short, predictable id.
+  const lobbyId = isDevEnv ? 'z' : uniqLobbyID();
+
+  const newUser = makeUser({
+    id: userId,
+    myLobby: lobbyId,
+    isStreamer,
+    lobbyCreator: true
+  });
+
+  const newLobby = makeLobby(newUser);
+
+  LOBBIES[newLobby.id] = newLobby;
+
+  res
+  .status(201)
+  .cookie('userData', `${userId}--${lobbyId}`, cookieSettings)
+  .json({
+    user: newUser,
+    lobby: newLobby
+  });
+};
+
+exports.getLobby = getLobby;
+exports.createLobby = createLobby;

@@ -44,7 +44,7 @@ require('./io')(io);
 
 // Routes //
 
-const lobbyRoutes = require('./routes/lobby-rts')(io);
+const lobbyRoutes = require('./routes/lobby-rts');
 const userRoutes = require('./routes/user-rts');
 const adminRoutes = require('./routes/admin-rts');
 

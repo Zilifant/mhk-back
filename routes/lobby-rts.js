@@ -1,23 +1,19 @@
 // Lobby Routes
 
 const express = require('express');
+const router = express.Router();
 const { check } = require('express-validator');
+const lobbyControl = require('../controllers/lobby-ctrl');
 
-module.exports = () => {
+router.post(
+  '/new',
+  [ check('userName').not().isEmpty() ],
+  lobbyControl.createLobby
+);
 
-  const router = express.Router();
-  const { createLobby, getLobby } = require('../controllers/lobby-ctrl')();
+router.post(
+  '/get',
+  lobbyControl.getLobby
+);
 
-  router.post(
-    '/new',
-    [ check('userName').not().isEmpty() ],
-    createLobby
-  );
-
-  router.post(
-    '/get',
-    getLobby
-  );
-
-  return router;
-};
+module.exports = router;
