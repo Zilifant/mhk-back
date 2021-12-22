@@ -9,7 +9,7 @@ This app is not affiliated with Tobey Ho, Grey Fox Games, or Jolly Thinkers in a
 
 You can (and should) purchase a physical copy of *Deception* directly from publisher [Grey Fox Games](https://greyfoxgames.com/deception-murder-in-hong-kong/). Learn more about the game on [BoardGameGeek](https://boardgamegeek.com/boardgame/156129/deception-murder-hong-kong).
 
-## How to Navigate This Project
+## Project Overview
 
 * [app.js](./app.js) - Set up the Express HTTP and socket.io server.
 * [io.js](./io.js) - All `on` and `emit` functionality using `io` object.
@@ -41,7 +41,7 @@ You can (and should) purchase a physical copy of *Deception* directly from publi
 
 1. Create a `nodemon.json` file in the root directoy and add the following environmental variables:
 
-    ```
+    ```json
     {
       "env": {
         "CLIENT_URL_HTTP": "http://localhost:3000",
