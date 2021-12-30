@@ -25,16 +25,17 @@ MHK is my first full-stack application. I built it as a learning exercise and po
 React • Node.js • Socket.IO • Express.js • CORS • SCSS • nodemon • React Router • Create React App • VSCode • Postman • Vercel • Heroku 
 
 ### Notable Features
-- **Text Chat:** Handles both user messages and system announcements. Includes unique, non-duplicating user colors.
-- **Private Lobbies:** Unique, procedurally generated lobby IDs. Joinable by entering the lobby ID or visiting it directly as a URL.
-- **Live-Stream Friendly:** Lobby IDs hidden in URL bar, even if user connected via the URL. *Streamer Mode* option available to automatically hide lobby ID in the UI.
-- **Lobby Leadership:** 'Leadership' allows one user to handle game set up. Leadership automatically passes to another user if the Leader disconnects; it can also be transferred manually.
-- **Sensitive Data Handling:** Players cannot use basic client-side tools/scripts to cheat; hidden role data is never sent to clients that should not have it.
-- **Visual Timer:** Server-side timer uses dynamic styling to sync a graphical UI timer for all players.
-- **Cookies:** User data is saved in a browser cookie, allowing them to seamlessly rejoin a lobby/game if they disconnect. Also checks for and prevents same user from connecting twice.
-- **Styled-Markdown Module:** A more generally useful module that turns a basic markdown language into HTML/JSX with classes for complex styling.
-- **SVG React Components:** General components for rendering icons and buttons from a library of SVG data.
-- **Tooltip Component:** General component for rendering tooltips when hovering elements; includes settings for tooltip content, size, and relative position.
+**Note:** Some links point to front-end repository.
+- [**Text Chat:**](https://github.com/Zilifant/mhk-front/tree/main/src/components/lobby/chat) Handles both [user messages and system announcements](https://github.com/Zilifant/mhk-front/blob/main/src/hooks/chat-hook.js). Includes unique, non-duplicating user [colors](https://github.com/Zilifant/mhk-back/blob/main/utils/modules/lobby-module.js).
+- [**Private Lobbies:**](https://github.com/Zilifant/mhk-back/blob/main/controllers/lobby-ctrl.js) Unique, procedurally generated lobby IDs. Joinable by entering the lobby ID or visiting it directly as a URL.
+- [**Live-Stream Friendly:**](https://github.com/Zilifant/mhk-front/blob/main/src/components/lobby/Foyer.jsx) Lobby IDs hidden in URL bar, even if user connected via the URL. *Streaming Mode* option available to automatically hide lobby ID in the UI.
+- [**Lobby Leadership:**](https://github.com/Zilifant/mhk-back/blob/main/utils/modules/lobby-module.js) 'Leadership' allows one user to handle game set up. Leadership automatically passes to another user if the Leader disconnects; it can also be transferred manually.
+- [**Sensitive Data Handling:**](https://github.com/Zilifant/mhk-back/blob/main/io.js#L335) Players cannot use basic client-side tools/scripts to cheat; hidden role data is never sent to clients that should not have it.
+- [**Visual Timer:**](https://github.com/Zilifant/mhk-front/blob/main/src/components/lobby/main/game/Timer.jsx) Dynamic UI timer synced [server-side](https://github.com/Zilifant/mhk-back/blob/main/utils/modules/game-module.js#L238) for all players.
+- [**Cookies:**](https://github.com/Zilifant/mhk-back/blob/main/controllers/user-ctrl.js) User data is saved in a browser cookie, allowing them to seamlessly rejoin a lobby/game if they disconnect. Also checks for and prevents same user from connecting twice.
+- [**Styled-Markdown Module:**](https://github.com/Zilifant/mhk-front/blob/main/src/util/styled-markdown.js) A more generally useful module that turns a basic markdown language into HTML/JSX with classes for complex styling.
+- [**SVG React Components:**](https://github.com/Zilifant/mhk-front/tree/main/src/components/shared) General components for rendering icons and buttons from a [library](https://github.com/Zilifant/mhk-front/blob/main/src/util/static-content/svgs-html.js) of SVG data.
+- [**Tooltip React Component:**](https://github.com/Zilifant/mhk-front/tree/main/src/components/shared) General component for rendering tooltips when hovering elements; includes settings for tooltip content, size, and relative position.
 
 ## Navigating the Project - Node API
 * [app.js](./app.js) - Set up the Express HTTP and socket.io server.
