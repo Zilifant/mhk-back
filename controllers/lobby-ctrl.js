@@ -40,7 +40,6 @@ function redactGame(userId, lobby) {
 };
 
 // Called when visitor reaches a (potential) lobby url.
-// TO DO: replace param with json data.
 const getLobby = async (req, res, next) => {
 
   let lobby;
