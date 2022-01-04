@@ -5,9 +5,7 @@ const { uniqUserID } = require('../utils/uniqUserID');
 const { uniqLobbyID } = require('../utils/uniqLobbyID');
 const { makeLobby } = require('../utils/modules/lobby-init-module');
 const { makeUser } = require('../utils/modules/user-init-module');
-const {
-  getLobbyById, getRoleById, omit, cookieSettings, LOBBIES, isDevEnv
-} = require('../utils/utils');
+const { getRoleById, omit, cookieSettings, LOBBIES, isDevEnv } = require('../utils/utils');
 
 // If user is returning to an in-progress game, data may need to be redacted.
 function lobbyData(user, lobby) {
@@ -29,8 +27,8 @@ function assignSpectator(user, lobby) {
   lobby.game.rolesRef.push({role: 'spectator', user: user});
 };
 
-// Get user's role, then replace the lobby's game property with a redacted
-// version specific to that role.
+// Get user's role, then replace the lobby's game property with a redacted version specific
+// to that role.
 function redactGame(userId, lobby) {
   const role = getRoleById(userId, lobby);
 
@@ -40,16 +38,8 @@ function redactGame(userId, lobby) {
 };
 
 // Called when visitor reaches a (potential) lobby url.
-const getLobby = async (req, res, next) => {
-
-  let lobby;
-  try {
-    lobby = await getLobbyById(req.body.lobbyId);
-  } catch (err) {
-    console.log(err);
-    const error = new HttpError('Could not find lobby.', 500);
-    return next(error);
-  };
+const getLobby = (req, res, next) => {
+  const lobby = LOBBIES[req.body.lobbyId.toLowerCase()];
 
   if (!lobby) {
     const error = new HttpError('No lobby with that name.', 404);
