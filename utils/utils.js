@@ -135,15 +135,7 @@ const makeGhostCard = (item) => {
   };
 };
 
-// TO DO: add proper error handling.
-const getLobbyById = lobbyId => {
-  const id = lobbyId.toLowerCase();
-  if (!LOBBIES[id]) {
-    console.log(`ERR! getLobbyById: lobby '${id}' not found`);
-    return;
-  };
-  return LOBBIES[id];
-};
+const getLobbyById = lobbyId => LOBBIES[lobbyId.toLowerCase()];
 
 // TO DO: add proper error handling.
 const getUserById = ({lobbyId, userId}) => {
