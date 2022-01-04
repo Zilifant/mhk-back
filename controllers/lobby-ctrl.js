@@ -51,20 +51,13 @@ const getLobby = (req, res, next) => {
   res.status(200).json({ lobby: lobbyData(user, lobby) });
 };
 
-const createLobby = async (req, res) => {
-
-  // Append random numbers to visitor's chosen user name
-  const userId = uniqUserID(req.body.userName);
-  // Set 'streaming mode' option
-  const isStreamer = req.body.isStreamer;
-
-  // Generate lobby id; in development give lobby short, predictable id.
-  const lobbyId = isDevEnv ? 'z' : uniqLobbyID();
+const createLobby = (req, res) => {
 
   const newUser = makeUser({
-    id: userId,
-    myLobby: lobbyId,
-    isStreamer,
+    id: uniqUserID(req.body.userName),
+    // Generate lobby id; in development give lobby short, predictable id.
+    myLobby: isDevEnv ? 'z' : uniqLobbyID(),
+    isStreamer: req.body.isStreamer,
     lobbyCreator: true
   });
 
@@ -74,7 +67,7 @@ const createLobby = async (req, res) => {
 
   res
   .status(201)
-  .cookie('userData', `${userId}--${lobbyId}`, cookieSettings)
+  .cookie('userData', `${newUser.id}--${newLobby.id}`, cookieSettings)
   .json({
     user: newUser,
     lobby: newLobby
