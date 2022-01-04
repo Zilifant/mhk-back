@@ -3,7 +3,7 @@
 const HttpError = require('../models/HttpError');
 const { uniqUserID } = require('../utils/uniqUserID');
 const { makeUser } = require('../utils/modules/user-init-module');
-const { getLobbyById, getUserById, cookieSettings } = require('../utils/utils');
+const { getUserById, cookieSettings } = require('../utils/utils');
 
 // TO DO correct status codes and improve error handling.
 const checkForCookie = async (req, res, next) => {
