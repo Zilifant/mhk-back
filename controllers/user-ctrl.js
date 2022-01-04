@@ -52,38 +52,25 @@ function parseUserDataCookie(c) {
 // Called when a visitor attempts to join an existing lobby. Each user is
 // associated with exactly one lobby; this function handles both creating the
 // user and adding them to the lobby.
-const addUserToLobby = async (req, res, next) => {
-
-  let lobby;
-  try {
-    lobby = await getLobbyById(req.body.lobbyURL);
-  } catch (err) {
-    console.log(err);
-    const error = new HttpError('Could not find lobby.', 500);
-    return next(error);
-  };
+const addUserToLobby = (req, res, next) => {
+  const lobby = LOBBIES[req.body.lobbyId.toLowerCase()];
 
   if (!lobby) {
     const error = new HttpError('No lobby with that name.', 404);
     return next(error);
   };
 
-  // Append random numbers to visitor's chosen user name
-  const userId = uniqUserID(req.body.userName);
-  // Set 'streaming mode' option
-  const isStreamer = req.body.isStreamer;
-
   const newUser = makeUser({
-    id: userId,
+    id: uniqUserID(req.body.userName),
     myLobby: lobby.id,
-    isStreamer
+    isStreamer: req.body.isStreamer
   });
 
   lobby.users.push(newUser);
 
   res
   .status(201)
-  .cookie('userData', `${userId}--${lobby.id}`, cookieSettings)
+  .cookie('userData', `${newUser.id}--${lobby.id}`, cookieSettings)
   .json({
     user: newUser,
     lobby: lobby
