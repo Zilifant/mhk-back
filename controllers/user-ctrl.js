@@ -34,14 +34,15 @@ const checkForCookie = async (req, res, next) => {
 function parseUserDataCookie(c) {
   // Convert string to array of individual cookies.
   const cookieArr = c.split(';');
+
   // Find 'userData' cookie.
   const userDataCookie = cookieArr.find(c => {
     return c.trim().substr(0,8) === 'userData';
   });
-  // Extract data or throw error.
-  // TO DO: add proper error handling.
-  if (!userDataCookie) return console.log(`parseCookies Error; c = ${c}`);
+
+  // Extract data.
   const userData = userDataCookie.split('=')[1];
+
   // Convert userData ('userId--lobbyId') to object.
   return {
     userId: userData.split('--')[0],
