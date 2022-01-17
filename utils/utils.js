@@ -6,7 +6,7 @@ const { MEANS_CARD_DATA, EVIDENCE_CARD_DATA } = require('./data');
 
 const isDevEnv = process.env.NODE_ENV !== 'production';
 const servName = 'MHK';
-const devPort = 5555;
+const devPort = 8888;
 
 const LOBBIES = {}; // Top-level object.
 const TIMERS = {}; // Top-level object. TO DO: move timers into lobbies.
