@@ -10,7 +10,9 @@ const { isDevEnv, servName, devPort } = require('./utils/utils');
 
 const whiteList = [
   process.env.CLIENT_URL_HTTP,
-  process.env.CLIENT_URL_HTTPS
+  process.env.CLIENT_URL_HTTPS,
+  process.env.PORTFOLIO_URL_HTTP,
+  process.env.PORTFOLIO_URL_HTTPS,
 ];
 // Temporary fix to allow Firefox browser use in development.
 // TO DO: Find and implement proper fix.
