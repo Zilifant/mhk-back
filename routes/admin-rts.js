@@ -3,7 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const { LOBBIES } = require('../utils/utils');
-const { httpsGet } = require('../utils/httpsRequest');
+const { httpsRequest } = require('../utils/httpsRequest');
 
 // Temporary implementation.
 const getLobbies = async (req, res, next) => {
@@ -13,12 +13,11 @@ const getLobbies = async (req, res, next) => {
 // ***** Not used by MHK app. *****
 // Used by personal portfolio website to fetch content from JSON database.
 const getPortfolio = async (req, res, next) => {
-  console.log('getPortfolio');
-  httpsGet({
+  httpsRequest({
     hostname: 'api.jsonbin.io',
     path: `/v3/b/${process.env.PORTFOLIO_BIN_ID}/latest`,
     headers: { 'X-Master-Key': process.env.JSIO_KEY }
-  }, res);
+  }, (data) => res.json({ data }));
 };
 
 router.get('/lobbies', getLobbies);

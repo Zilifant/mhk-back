@@ -2,23 +2,27 @@
 
 const https = require('https');
 
-function httpsGet(options, res) {
-  https.get(options, (response) => {
-    let dat = [];
+function httpsRequest(opts, callback) {
 
-    response.on('data', chunk => {
-      dat.push(chunk);
+  const request = https.request(opts, response => {
+    const data = [];
+
+    response.on('data', (chunk) => {
+      data.push(chunk);
     });
 
     response.on('end', () => {
-      const data = JSON.parse(Buffer.concat(dat).toString())
-      data ? console.log(data.metadata) : console.log(data);
-      res.json({ data });
+      const parsedData = JSON.parse(Buffer.concat(data).toString());
+      callback(parsedData);
     });
 
-  }).on('error', (err) => {
-    console.log('ERR!', err.message);
   });
+
+  request.on('error', error => {
+    console.error(error);
+  });
+
+  request.end();
 };
 
-exports.httpsGet = httpsGet;
+exports.httpsRequest = httpsRequest;
