@@ -11,7 +11,9 @@ function httpsGet(options, res) {
     });
 
     response.on('end', () => {
-      res.json({ data: JSON.parse(Buffer.concat(dat).toString()) });
+      const data = JSON.parse(Buffer.concat(dat).toString())
+      data ? console.log(data.metadata) : console.log(data);
+      res.json({ data });
     });
 
   }).on('error', (err) => {
