@@ -2,7 +2,7 @@
 
 const https = require('https');
 
-function httpsRequest(opts, callback) {
+function sendNodeHttpsRequest(opts, callback) {
 
   const request = https.request(opts, response => {
     const data = [];
@@ -25,4 +25,4 @@ function httpsRequest(opts, callback) {
   request.end();
 };
 
-exports.httpsRequest = httpsRequest;
+exports.sendNodeHttpsRequest = sendNodeHttpsRequest;
