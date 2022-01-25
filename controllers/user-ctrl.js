@@ -64,7 +64,8 @@ const addUserToLobby = (req, res, next) => {
   const newUser = makeUser({
     id: uniqUserID(req.body.userName),
     myLobby: lobby.id,
-    isStreamer: req.body.isStreamer
+    isStreamer: req.body.isStreamer,
+    isDemo: lobby.isDemo,
   });
 
   lobby.users.push(newUser);
