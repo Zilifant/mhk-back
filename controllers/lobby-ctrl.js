@@ -53,7 +53,7 @@ const getLobby = (req, res, next) => {
 
 const createLobby = (req, res) => {
 
-  const isDemo = !!req.body.isDemo
+  const isDemo = req.body.isDemo
 
   // Generate lobby id; in development and not demo mode, give lobby short, predictable id.
   const myLobby = () => {
@@ -66,6 +66,7 @@ const createLobby = (req, res) => {
     id: uniqUserID(req.body.userName),
     myLobby: myLobby(),
     isStreamer: req.body.isStreamer,
+    isDemo: isDemo,
     lobbyCreator: true
   });
 
