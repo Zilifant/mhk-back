@@ -2,12 +2,13 @@
 // Creates a new user.
 
 const makeUser = ({
-  id, myLobby, isStreamer, lobbyCreator = false
+  id, myLobby, isStreamer, isDemo, lobbyCreator = false
 }) => {
 
   // TO DO: remove properties used only in-game.
   return {
     id,
+    isDemo,
     socketId: null,
     userName: id.slice(0,-5), // Remove randomized numbers for UI display.
     myLobby,
