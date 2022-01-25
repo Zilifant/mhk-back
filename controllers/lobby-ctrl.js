@@ -53,15 +53,23 @@ const getLobby = (req, res, next) => {
 
 const createLobby = (req, res) => {
 
+  const isDemo = !!req.body.isDemo
+
+  // Generate lobby id; in development and not demo mode, give lobby short, predictable id.
+  const myLobby = () => {
+    if (isDemo) return uniqLobbyID(isDemo);
+    if (isDevEnv) return 'z';
+    return uniqLobbyID(isDemo);
+  }
+
   const newUser = makeUser({
     id: uniqUserID(req.body.userName),
-    // Generate lobby id; in development give lobby short, predictable id.
-    myLobby: isDevEnv ? 'z' : uniqLobbyID(),
+    myLobby: myLobby(),
     isStreamer: req.body.isStreamer,
     lobbyCreator: true
   });
 
-  const newLobby = makeLobby(newUser);
+  const newLobby = makeLobby(newUser, isDemo);
 
   LOBBIES[newLobby.id] = newLobby;
 
