@@ -3,9 +3,10 @@
 
 const { makeGame } = require('./game-init-module');
 
-const makeLobby = (creator) => {
+const makeLobby = (creator, isDemo) => {
   const lobby = {
     id: creator.myLobby,
+    isDemo: isDemo,
     creatorId: creator.id,
     leader: creator.id,
     users: [creator],
