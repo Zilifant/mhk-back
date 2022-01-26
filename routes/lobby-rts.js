@@ -11,6 +11,12 @@ router.post(
   lobbyControl.createLobby
 );
 
+// Unimplemented.
+router.post(
+  '/new-demo',
+  lobbyControl.createDemoLobby
+)
+
 router.post(
   '/get',
   lobbyControl.getLobby

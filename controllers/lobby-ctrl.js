@@ -55,19 +55,13 @@ const createLobby = (req, res) => {
 
   const isDemo = req.body.isDemo
 
-  // Generate lobby id; in development and not demo mode, give lobby short, predictable id.
-  const myLobby = () => {
-    if (isDemo) return uniqLobbyID();
-    if (isDevEnv) return 'z';
-    return uniqLobbyID();
-  }
-
   const newUser = makeUser({
     id: uniqUserID(req.body.userName),
-    myLobby: myLobby(),
+    // Generate lobby id; in development and not demo mode, give lobby short, predictable id.
+    myLobby: isDevEnv ? 'z' : uniqLobbyID(),
     isStreamer: req.body.isStreamer,
     isDemo: isDemo,
-    lobbyCreator: true
+    lobbyCreator: true,
   });
 
   const newLobby = makeLobby(newUser, isDemo);
@@ -79,9 +73,25 @@ const createLobby = (req, res) => {
   .cookie('userData', `${newUser.id}--${newLobby.id}`, cookieSettings)
   .json({
     user: newUser,
-    lobby: newLobby
+    lobby: newLobby,
   });
+};
+
+// Unimplemented.
+const createDemoLobby = (req, res) => {
+  const firstUserPlaceholderData = {
+    id: 'demo-creator',
+    myLobby: 'demo-' + uniqLobbyID(),
+    isDemo: req.body.isDemo,
+  };
+
+  const newDemoLobby = makeLobby(firstUserPlaceholderData, req.body.isDemo);
+
+  LOBBIES[newDemoLobby.id] = newDemoLobby;
+
+  res.status(201).json({ lobby: newDemoLobby });
 };
 
 exports.getLobby = getLobby;
 exports.createLobby = createLobby;
+exports.createDemoLobby = createDemoLobby;
