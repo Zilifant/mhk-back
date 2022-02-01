@@ -1,8 +1,8 @@
-# MHK 🕹 Node API
+# Deception 🕹 Node API
 
 ### ⚡️ This is the back-end. Find the front-end React app [here](https://github.com/Zilifant/mhk-front).
 
-MHK is an online implementation of the social deduction game *Deception: Murder in Hong Kong* by designer Tobey Ho.
+Deception is an online implementation of the social deduction game *Deception: Murder in Hong Kong* by designer Tobey Ho.
 
 ***Deception: Murder in Hong Kong* is © Jolly Thinkers' Learning Centre Limited.**
 This app is not affiliated with Tobey Ho, Grey Fox Games, or Jolly Thinkers in any way.
@@ -17,9 +17,9 @@ You can (and should) purchase a physical copy of *Deception* directly from publi
 - [Setup and Commands](#setup-and-commands---node-api)
 
 ## Overview
-MHK is a React front-end connected to a Node.js REST API via [Socket.IO](https://socket.io/) and the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API). It uses Fetch to initially load user and lobby data. Once users are verified and have loaded their lobby, Socket.IO connects and handles all further communicaton.
+Deception is a React front-end connected to a Node.js REST API via [Socket.IO](https://socket.io/) and the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API). It uses Fetch to initially load user and lobby data. Once users are verified and have loaded their lobby, Socket.IO connects and handles all further communicaton.
 
-MHK is my first full-stack application. I built it as a learning exercise and portfolio piece. As of January 2022 MHK remains a work in progress. There is no doubt much that can be improved; I welcome suggestions and constructive criticism.
+Deception is my first full-stack application. I built it as a learning exercise and portfolio piece. As of January 2022 Deception remains a work in progress. There is no doubt much that can be improved; I welcome suggestions and constructive criticism.
 
 ### Notable Tools and Tech
 React • Node.js • Socket.IO • Express.js • CORS • SCSS • nodemon • React Router • Create React App • VSCode • Postman • Vercel • Heroku 
