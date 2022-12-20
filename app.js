@@ -4,7 +4,8 @@ const express = require('express');
 const cors = require('cors');
 const http = require('http');
 const socketio = require('socket.io')
-const { isDevEnv, servName, devPort } = require('./utils/utils');
+const mongo = require('./mongo');
+const { isDevEnv, servName } = require('./utils/utils');
 
 // CORS //
 
@@ -77,7 +78,16 @@ app.use((error, req, res, next) => {
   res.json({message: error.message || 'An unknown error occurred!'});
 });
 
-server.listen(
-  process.env.PORT || devPort,
-  console.log(`${servName} listening on port ${process.env.PORT || devPort}`)
-);
+async function connect() {
+  if (mongo) {
+    await mongo.connect(process.env.DB_NAME, 'lobbies')
+      .then(() => {
+        console.log(`${servName} listening on port ${process.env.PORT}`)
+      });
+  } else {
+    console.log(`${servName} listening on port ${process.env.PORT}`)
+  }
+
+};
+
+server.listen(process.env.PORT, connect);

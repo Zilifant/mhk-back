@@ -7,48 +7,48 @@ const { getUserById, cookieSettings, LOBBIES } = require('../utils/utils');
 
 // TO DO correct status codes and improve error handling.
 const checkForCookie = async (req, res, next) => {
-
   const cookies = req.get('Cookie');
+  const userDataCookie = getUserDataCookie(cookies);
 
-  if (!cookies) {
+  if (!userDataCookie) {
     return res.status(200).json({ user: null });
-  };
+  }
 
   let user;
   if (cookies) {
-    const data = parseUserDataCookie(cookies);
+    const data = parseUserDataCookie(userDataCookie);
     try {
       user = await getUserById({
-        userId: data.userId,
-        lobbyId: data.lobbyId
+        userId: data?.userId,
+        lobbyId: data?.lobbyId,
       });
     } catch (err) {
       console.log(err);
       const error = new HttpError('Could not find lobby!', 500);
       return next(error);
-    };
-  };
+    }
+  }
   res.status(200).json({ user: user });
 };
 
-function parseUserDataCookie(c) {
+function getUserDataCookie(cookies) {
   // Convert string to array of individual cookies.
-  const cookieArr = c.split(';');
+  const cookieArr = cookies?.split(';');
 
   // Find 'userData' cookie.
-  const userDataCookie = cookieArr.find(c => {
-    return c.trim().substr(0,8) === 'userData';
-  });
+  return cookieArr?.find((ck) => ck.trim().substr(0, 8) === 'userData');
+}
 
+function parseUserDataCookie(cookie) {
   // Extract data.
-  const userData = userDataCookie.split('=')[1];
+  const userData = cookie.split('=')[1];
 
   // Convert userData ('userId--lobbyId') to object.
   return {
     userId: userData.split('--')[0],
-    lobbyId: userData.split('--')[1]
+    lobbyId: userData.split('--')[1],
   };
-};
+}
 
 // Called when a visitor attempts to join an existing lobby. Each user is
 // associated with exactly one lobby; this function handles both creating the
@@ -59,7 +59,7 @@ const addUserToLobby = (req, res, next) => {
   if (!lobby) {
     const error = new HttpError('No lobby with that name.', 404);
     return next(error);
-  };
+  }
 
   const newUser = makeUser({
     id: uniqUserID(req.body.userName),
@@ -71,12 +71,12 @@ const addUserToLobby = (req, res, next) => {
   lobby.users.push(newUser);
 
   res
-  .status(201)
-  .cookie('userData', `${newUser.id}--${lobby.id}`, cookieSettings)
-  .json({
-    user: newUser,
-    lobby: lobby
-  });
+    .status(201)
+    .cookie('userData', `${newUser.id}--${lobby.id}`, cookieSettings)
+    .json({
+      user: newUser,
+      lobby: lobby,
+    });
 };
 
 exports.checkForCookie = checkForCookie;
