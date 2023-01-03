@@ -21,39 +21,41 @@ const makePlayerCard = (info, type) => {
   return {
     imgURL: `placeholderUrl.${info}`, // Images not yet implemented.
     id: info,
-    type: type
+    type: type,
   };
 };
 
-const MEANS_DECK = MEANS_CARD_DATA.map(info => makePlayerCard(info, 'means'));
-const EVIDENCE_DECK = EVIDENCE_CARD_DATA.map(info => makePlayerCard(info, 'evidence'));
+const MEANS_DECK = MEANS_CARD_DATA.map((info) => makePlayerCard(info, 'means'));
+const EVIDENCE_DECK = EVIDENCE_CARD_DATA.map((info) =>
+  makePlayerCard(info, 'evidence'),
+);
 
 // List of game properties to be hidden from certain roles.
 const HIDE_FROM = {
   spectator: [],
   ghost: [],
-  killer: [
-    'blueTeam', 'rolesRef', 'witness', 'hunters'
-  ],
-  accomplice: [
-    'blueTeam', 'rolesRef', 'witness', 'hunters'
-  ],
-  witness: [
-    'blueTeam', 'rolesRef', 'keyEvidence', 'killer', 'accomplice'
-  ],
+  killer: ['blueTeam', 'rolesRef', 'witness', 'hunters'],
+  accomplice: ['blueTeam', 'rolesRef', 'witness', 'hunters'],
+  witness: ['blueTeam', 'rolesRef', 'keyEvidence', 'killer', 'accomplice'],
   hunter: [
-    'blueTeam', 'redTeam', 'rolesRef', 'keyEvidence', 'hunters', 'killer',
-    'accomplice', 'witness'
-  ]
+    'blueTeam',
+    'redTeam',
+    'rolesRef',
+    'keyEvidence',
+    'hunters',
+    'killer',
+    'accomplice',
+    'witness',
+  ],
 };
 
 // Check if value is truthy.
-const isTruthy = (x) => !!x ? true : console.log(`ERR! have = ${x}`);
+const isTruthy = (x) => (!!x ? true : console.log(`ERR! have = ${x}`));
 
 // Return new object with specified properties to `null`.
 const nullify = (obj, keys) => {
   const newObj = Object.assign({}, obj);
-  keys.forEach(key => {
+  keys.forEach((key) => {
     newObj[key] = null;
   });
   return newObj;
@@ -62,7 +64,7 @@ const nullify = (obj, keys) => {
 // Return new object with specified properties removed.
 const omit = (obj, keys) => {
   const newObj = Object.assign({}, obj);
-  keys.forEach(key => {
+  keys.forEach((key) => {
     delete newObj[key];
   });
   return newObj;
@@ -70,18 +72,23 @@ const omit = (obj, keys) => {
 
 // Capitalize first letter of each word (separated by non-letter characters).
 const capitalize = (str) => {
-  return str.replace(/\b([a-zÁ-ú])/g, (w) => w.charAt(0).toUpperCase() + w.slice(1));
+  return str.replace(
+    /\b([a-zÁ-ú])/g,
+    (w) => w.charAt(0).toUpperCase() + w.slice(1),
+  );
 };
 
 // Shuffle an array. (Mutates the array.)
 const shuffle = (array) => {
-  let m = array.length, t, i;
+  let m = array.length,
+    t,
+    i;
   while (m) {
     i = Math.floor(Math.random() * m--);
     t = array[m];
     array[m] = array[i];
     array[i] = t;
-  };
+  }
   return array;
 };
 
@@ -91,23 +98,23 @@ const shuffle = (array) => {
 const batch = (array, batchSize) => {
   const batches = [];
 
-  let i = 1
-  array.forEach(card => {
+  let i = 1;
+  array.forEach((card) => {
     switch (true) {
-      case (i === 1):
+      case i === 1:
         batches.push([]);
-        batches[batches.length-1].push(card);
+        batches[batches.length - 1].push(card);
         i++;
         break;
-      case (i > 1 && i < batchSize):
-        batches[batches.length-1].push(card);
-        i++
+      case i > 1 && i < batchSize:
+        batches[batches.length - 1].push(card);
+        i++;
         break;
-      case (i === batchSize):
-        batches[batches.length-1].push(card);
+      case i === batchSize:
+        batches[batches.length - 1].push(card);
         i = 1;
         break;
-    };
+    }
   });
 
   return batches;
@@ -122,44 +129,41 @@ const makeGhostCard = (item) => {
   return {
     type: item.type,
     id: item.id,
-    opts: item.opts.map(opt => createOption(opt)),
+    opts: item.opts.map((opt) => createOption(opt)),
     isDisplayed: false,
-    isLocked: false
+    isLocked: false,
   };
 
   function createOption(opt) {
     return {
       id: opt,
-      isSelected: false
+      isSelected: false,
     };
-  };
+  }
 };
 
-const getLobbyById = lobbyId => LOBBIES[lobbyId.toLowerCase()];
+const getLobbyById = (lobbyId) => LOBBIES[lobbyId.toLowerCase()];
 
 // TO DO: add proper error handling.
-const getUserById = ({lobbyId, userId}) => {
+const getUserById = ({ lobbyId, userId }) => {
   if (!LOBBIES[lobbyId]) {
     console.log(`ERR! getUserById: lobby '${lobbyId}' not found`);
     return;
-  };
-  return LOBBIES[lobbyId].users.find(user => user.id === userId);
+  }
+  return LOBBIES[lobbyId].users.find((user) => user.id === userId);
 };
 
 // TO DO: add proper error handling.
 const getRoleById = (userId, lobby) => {
-  const role = lobby.game.rolesRef.find(ref => ref.user.id === userId).role;
+  const role = lobby.game.rolesRef.find((ref) => ref.user.id === userId).role;
   if (!!role) return role;
-  return console.log(`ERR! getRoleById: role '${userId}' matches no roles in this game`);
+  return console.log(
+    `ERR! getRoleById: role '${userId}' matches no roles in this game`,
+  );
 };
 
 // Structure message data for the `buildSMDString` front end module.
-const msg = ({
-  type,
-  args=[],
-  isInGame,
-  senderId='app'
-}) => {
+const msg = ({ type, args = [], isInGame, senderId = 'app' }) => {
   return {
     // `en-GB` format is expected by `convertToClientTimezone`.
     time: new Date().toLocaleTimeString('en-GB'),
@@ -173,9 +177,9 @@ const msg = ({
 const cookieSettings = {
   maxAge: 60 * 60 * 7000, // 7 hours
   httpOnly: true,
-  sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
-  secure: process.env.NODE_ENV === "production"
-}
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  secure: process.env.NODE_ENV === 'production',
+};
 
 module.exports = {
   isDevEnv,
@@ -203,5 +207,5 @@ module.exports = {
   getUserById,
   getRoleById,
   msg,
-  isTruthy
+  isTruthy,
 };
