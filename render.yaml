@@ -19,8 +19,6 @@ services:
         value: http://www.scottsilsbe.com
       - key: PORTFOLIO_URL_HTTPS # Imported from Heroku app
         value: https://www.scottsilsbe.com
-      - key: SENTRY_DSN # Imported from Heroku app
-        value: https://3199ae33aaa14d4abbe0086ee813bc63:2d5c6bb98b0c474d940b6bd56d98c794@o1269531.ingest.sentry.io/6459648
       # - key: REDIS_URL # Render Redis service
       #   fromService:
       #     name: redis-asymmetrical-73539
@@ -29,6 +27,5 @@ services:
   # - type: redis # Render Redis service
   #   name: redis-asymmetrical-73539
   #   plan: starter # optional (defaults to starter)
-  #   maxmemoryPolicy: allkeys-lru # optional (defaults to allkeys-lru)  
+  #   maxmemoryPolicy: allkeys-lru # optional (defaults to allkeys-lru)
   #   ipAllowList: [] # only allow internal connections
-
