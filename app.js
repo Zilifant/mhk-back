@@ -3,7 +3,7 @@
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
-const socketio = require('socket.io')
+const socketio = require('socket.io');
 const mongo = require('./mongo');
 const { isDevEnv, servName } = require('./utils/utils');
 
@@ -14,6 +14,8 @@ const whiteList = [
   process.env.CLIENT_URL_HTTPS,
   process.env.PORTFOLIO_URL_HTTP,
   process.env.PORTFOLIO_URL_HTTPS,
+  process.env.TEST_URL_ONE,
+  process.env.TEST_URL_TWO,
 ];
 // Temporary fix to allow Firefox browser use in development.
 // TO DO: Find and implement proper fix.
@@ -26,9 +28,9 @@ const corsOpts = {
     } else {
       console.log(`Origin: ${origin} not allowed by CORS.`);
       callback(new Error(`Origin: ${origin} not allowed by CORS.`));
-    };
+    }
   },
-  credentials: true
+  credentials: true,
 };
 
 // Server and IO //
@@ -36,10 +38,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server, {
   cors: true,
-  origins: [
-    process.env.CLIENT_URL_HTTP,
-    process.env.CLIENT_URL_HTTPS
-  ]
+  origins: [process.env.CLIENT_URL_HTTP, process.env.CLIENT_URL_HTTPS],
 });
 
 // Send io to file where all of the io logic is.
@@ -70,24 +69,22 @@ app.use((error, req, res, next) => {
   // Check if a response has already been sent.
   if (res.headerSent) {
     return next(error);
-  };
+  }
   // Send error code attached to the error object that was recieved, if any,
   // or else send error code 500.
   res.status(error.code || 500);
   // Send a message to the client to show to the user.
-  res.json({message: error.message || 'An unknown error occurred!'});
+  res.json({ message: error.message || 'An unknown error occurred!' });
 });
 
 async function connect() {
-  if (mongo) {
-    await mongo.connect(process.env.DB_NAME, 'lobbies')
-      .then(() => {
-        console.log(`${servName} listening on port ${process.env.PORT}`)
-      });
+  if (false) {
+    await mongo.connect(process.env.DB_NAME, 'lobbies').then(() => {
+      console.log(`${servName} listening on port ${process.env.PORT}`);
+    });
   } else {
-    console.log(`${servName} listening on port ${process.env.PORT}`)
+    console.log(`${servName} listening on port ${process.env.PORT}`);
   }
-
-};
+}
 
 server.listen(process.env.PORT, connect);
